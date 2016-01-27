@@ -69,7 +69,7 @@ public abstract class AbstractDocumentSource {
 
     protected String swaggerSchemaConverter;
 
-    public AbstractDocumentSource(ApiSource apiSource) throws GradleException {
+    public AbstractDocumentSource(ApiSource apiSource) throws Exception {
         this.outputPath = apiSource.getOutputPath();
         this.templatePath = apiSource.getTemplatePath();
         this.swaggerPath = apiSource.getSwaggerDirectory();
@@ -98,7 +98,7 @@ public abstract class AbstractDocumentSource {
                 } finally {
                     try {
                         is.close();
-                    } catch (IOException e) {
+                    } catch (IOException ignored) {
                     }
                 }
             } catch (FileNotFoundException e) {
@@ -114,7 +114,7 @@ public abstract class AbstractDocumentSource {
     }
 
 
-    public abstract void loadDocuments() throws Exception, GenerateException;
+    public abstract void loadDocuments() throws Exception;
 
     public void toSwaggerDocuments(String uiDocBasePath, String outputFormats) throws GenerateException {
 

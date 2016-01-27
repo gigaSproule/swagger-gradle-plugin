@@ -94,20 +94,22 @@ public class ApiSource {
 
     private File descriptionFile;
 
+    private ClassLoader classLoader;
+
     public Set<Class<?>> getValidClasses() throws GenerateException {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         if (getLocations() == null) {
-            Set<Class<?>> c = new Reflections("").getTypesAnnotatedWith(Api.class);
+            Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(Api.class);
             classes.addAll(c);
         } else {
             if (locations.contains(";")) {
                 String[] sources = locations.split(";");
                 for (String source : sources) {
-                    Set<Class<?>> c = new Reflections(source).getTypesAnnotatedWith(Api.class);
+                    Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(Api.class);
                     classes.addAll(c);
                 }
             } else {
-                classes.addAll(new Reflections(locations).getTypesAnnotatedWith(Api.class));
+                classes.addAll(new Reflections(classLoader, locations).getTypesAnnotatedWith(Api.class));
             }
         }
 
@@ -297,6 +299,14 @@ public class ApiSource {
 
     public void setDescriptionFile(File descriptionFile) {
         this.descriptionFile = descriptionFile;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 }
 

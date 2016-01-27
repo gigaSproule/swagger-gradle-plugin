@@ -8,10 +8,8 @@ import io.swagger.config.FilterFactory;
 import io.swagger.core.filter.SpecFilter;
 import io.swagger.core.filter.SwaggerSpecFilter;
 import io.swagger.models.auth.SecuritySchemeDefinition;
-import org.gradle.api.GradleException;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,9 +22,7 @@ import java.util.TreeMap;
  */
 public class MavenDocumentSource extends AbstractDocumentSource {
 
-    private final SpecFilter specFilter = new SpecFilter();
-
-    public MavenDocumentSource(ApiSource apiSource) throws GradleException {
+    public MavenDocumentSource(ApiSource apiSource) throws Exception {
         super(apiSource);
     }
 
@@ -47,9 +43,7 @@ public class MavenDocumentSource extends AbstractDocumentSource {
                 if (sd.getDefinitions().isEmpty()) {
                     continue;
                 }
-                Iterator<Map.Entry<String, SecuritySchemeDefinition>> it = sd.getDefinitions().entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, SecuritySchemeDefinition> entry = it.next();
+                for (Map.Entry<String, SecuritySchemeDefinition> entry : sd.getDefinitions().entrySet()) {
                     swagger.addSecurityDefinition(entry.getKey(), entry.getValue());
                 }
             }
@@ -68,7 +62,6 @@ public class MavenDocumentSource extends AbstractDocumentSource {
                 new HashMap<String, List<String>>(), new HashMap<String, String>(),
                 new HashMap<String, List<String>>());
         }
-
     }
 
     private ClassSwaggerReader resolveApiReader() throws GenerateException {

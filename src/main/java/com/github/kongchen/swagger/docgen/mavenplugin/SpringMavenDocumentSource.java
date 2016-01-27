@@ -26,7 +26,7 @@ public class SpringMavenDocumentSource extends AbstractDocumentSource {
 
     private final SpecFilter specFilter = new SpecFilter();
 
-    public SpringMavenDocumentSource(ApiSource apiSource) throws GradleException {
+    public SpringMavenDocumentSource(ApiSource apiSource) throws Exception {
         super(apiSource);
     }
 

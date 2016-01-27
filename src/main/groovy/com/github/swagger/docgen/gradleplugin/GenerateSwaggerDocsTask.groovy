@@ -21,9 +21,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     @TaskAction
     def generateSwaggerDocuments() {
-        SwaggerPluginExtension swagger = project.swagger
-        Iterable dependencies = project.configurations.runtime.resolve()
-        File classesDir = project.sourceSets.main.output.classesDir
+        SwaggerPluginExtension swaggerPluginExtension = project.swagger
 
         // TODO: Figure out how to skip
 //        if (skipSwaggerGeneration) {
@@ -31,7 +29,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 //            return;
 //        }
 
-        if (swagger == null) {
+        if (swaggerPluginExtension == null) {
             throw new GradleException("You must configure at least one apiSources element");
         }
         if (useSwaggerSpec11()) {
@@ -46,16 +44,23 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         try {
             // TODO: Set from SwaggerPluginExtension
+            Iterable dependencies = project.configurations.runtime.resolve()
+            File classesDir = project.sourceSets.main.output.classesDir
+            ClassLoader classLoader = prepareClassLoader(dependencies, classesDir)
+
             License license = new License()
-            license.setName("license");
+            license.setName(swaggerPluginExtension.license)
+
             Info info = new Info();
-            info.setTitle("title");
-            info.setVersion("v1");
+            info.setTitle(swaggerPluginExtension.title);
+            info.setVersion(swaggerPluginExtension.version)
             info.setLicense(license)
+
             ApiSource apiSource = new ApiSource();
             apiSource.setInfo(info)
-            apiSource.setLocations("com.sky.search")
-            apiSource.setSwaggerDirectory("build/swaggerui")
+            apiSource.setLocations(swaggerPluginExtension.locations)
+            apiSource.setSwaggerDirectory(swaggerPluginExtension.swaggerDirectory)
+            apiSource.setClassLoader(classLoader)
 //            for (ApiSource apiSource : apiSources) {
 
             validateConfiguration(apiSource);
@@ -92,7 +97,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             if (apiSource.isAttachSwaggerArtifact() && apiSource.getSwaggerDirectory() != null && this.project != null) {
                 String classifier = new File(apiSource.getSwaggerDirectory()).getName();
                 File swaggerFile = new File(apiSource.getSwaggerDirectory(), "swagger.json");
-                this.projectHelper.attachArtifact(project, "json", classifier, swaggerFile);
+//                this.projectHelper.attachArtifact(project, "json", classifier, swaggerFile);
             }
 //            }
 
@@ -150,4 +155,14 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             return false;
         }
     }
+
+    ClassLoader prepareClassLoader(Iterable<File> dependencies, File dir) {
+        List<URL> urls = dependencies.collect { it.toURI().toURL() }
+        urls.add(dir.toURI().toURL())
+
+        logger.debug "Preparing classloader with urls: {}", urls
+
+        return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
+    }
+
 }

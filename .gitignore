@@ -1,0 +1,16 @@
+.ipr
+*.iws
+*.iml
+*/.DS_Store
+.idea
+*.settings
+*.classpath
+*.project
+**/bin
+**/out
+**/target
+atlassian-ide-plugin.xml
+**/build
+**/.gradle
+**/.gradletasknamecache
+pom.xml

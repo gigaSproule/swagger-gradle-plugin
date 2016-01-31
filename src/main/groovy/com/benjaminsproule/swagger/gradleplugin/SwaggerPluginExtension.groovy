@@ -11,10 +11,11 @@ import org.reflections.Reflections
 @ToString(includeNames = true)
 class SwaggerPluginExtension extends ApiSource {
     private Project project
-    ClassLoader classLoader;
+    ClassLoader classLoader
 
     SwaggerPluginExtension(Project project) {
-        this.project = project;
+        this.project = project
+        this.classLoader = prepareClassLoader()
     }
 
     InfoExtension info(Closure closure) {
@@ -27,24 +28,30 @@ class SwaggerPluginExtension extends ApiSource {
         return infoExtension
     }
 
+    private ClassLoader prepareClassLoader() {
+        List<URL> urls = project.configurations.runtime.resolve().collect { it.toURI().toURL() }
+        urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
+        return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
+    }
+
     @Override
-    public Set<Class<?>> getValidClasses() throws GenerateException {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+    Set<Class<?>> getValidClasses() throws GenerateException {
+        Set<Class<?>> classes = new HashSet<Class<?>>()
         if (getLocations() == null) {
-            Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(Api.class);
-            classes.addAll(c);
+            Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(Api.class)
+            classes.addAll(c)
         } else {
-            if (locations.contains(";")) {
-                String[] sources = locations.split(";");
+            if (locations.contains("")) {
+                String[] sources = locations.split("")
                 for (String source : sources) {
-                    Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(Api.class);
-                    classes.addAll(c);
+                    Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(Api.class)
+                    classes.addAll(c)
                 }
             } else {
-                classes.addAll(new Reflections(classLoader, locations).getTypesAnnotatedWith(Api.class));
+                classes.addAll(new Reflections(classLoader, locations).getTypesAnnotatedWith(Api.class))
             }
         }
 
-        return classes;
+        return classes
     }
 }

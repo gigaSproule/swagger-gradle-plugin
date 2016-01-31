@@ -13,8 +13,8 @@ idea {
     }
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenLocal()
@@ -25,27 +25,6 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    def swaggerVersion = "1.5.4"
-
-    compile('org.apache.httpcomponents:httpclient:4.2.2') {
-        exclude group: 'org.apache.commons'
-    }
-    compile 'com.github.jknack:handlebars:1.3.2'
-    compile "io.swagger:swagger-jaxrs:${swaggerVersion}"
-    compile 'org.reflections:reflections:0.9.10'
-    compile 'commons-io:commons-io:2.0.1'
-    compile 'log4j:log4j:1.2.16'
-    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
-    compile "io.swagger:swagger-jersey-jaxrs:${swaggerVersion}"
-    compile 'org.springframework:spring-context:4.0.5.RELEASE'
-    compile 'org.springframework:spring-web:4.0.5.RELEASE'
-    compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
-    compile 'javax.servlet:servlet-api:2.5'
-    compile 'com.github.kongchen:swagger-maven-plugin:3.1.0'
-    testCompile 'org.testng:testng:6.4'
-    testCompile 'org.springframework.hateoas:spring-hateoas:0.12.0.RELEASE'
-    testCompile 'net.javacrumbs.json-unit:json-unit:1.6.1'
-    testCompile 'net.javacrumbs.json-unit:json-unit-core:1.6.1'
-    testCompile 'org.codehaus.jettison:jettison:1.3.3'
+    compile 'com.github.kongchen:swagger-maven-plugin:3.1.2'
+    testCompile 'junit:junit:4.12'
 }

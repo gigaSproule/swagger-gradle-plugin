@@ -4,12 +4,14 @@ import com.github.kongchen.swagger.docgen.AbstractDocumentSource
 import com.github.kongchen.swagger.docgen.GenerateException
 import com.github.kongchen.swagger.docgen.mavenplugin.MavenDocumentSource
 import com.github.kongchen.swagger.docgen.mavenplugin.SpringMavenDocumentSource
+import org.apache.maven.monitor.logging.DefaultLog
+import org.codehaus.plexus.logging.console.ConsoleLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
 /**
- * GradleSwaggerTask copied from ApiDocumentMojo.java
+ * GradleSwaggerTask copied from {@link com.github.kongchen.swagger.docgen.mavenplugin.ApiDocumentMojo}
  */
 class GenerateSwaggerDocsTask extends DefaultTask {
     public static final String TASK_NAME = 'swagger'
@@ -35,55 +37,52 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
 
         try {
-            // TODO: Set from SwaggerPluginExtension
-            Iterable dependencies = project.configurations.runtime.resolve()
-            File classesDir = project.sourceSets.main.output.classesDir
-            ClassLoader classLoader = prepareClassLoader(dependencies, classesDir)
-            swaggerPluginExtension.classLoader = classLoader
 //            for (swaggerPluginExtension swaggerPluginExtension : swaggerPluginExtensions) {
-
-            validateConfiguration(swaggerPluginExtension);
-
-            AbstractDocumentSource documentSource;
-
-            if (swaggerPluginExtension.isSpringmvc()) {
-                documentSource = new SpringMavenDocumentSource(swaggerPluginExtension);
-            } else {
-                documentSource = new MavenDocumentSource(swaggerPluginExtension);
-            }
-
-            documentSource.loadTypesToSkip();
-            documentSource.loadModelModifier();
-            documentSource.loadDocuments();
-            if (swaggerPluginExtension.getOutputPath() != null) {
-                File outputDirectory = new File(swaggerPluginExtension.getOutputPath()).getParentFile();
-                if (outputDirectory != null && !outputDirectory.exists()) {
-                    if (!outputDirectory.mkdirs()) {
-                        throw new GradleException("Create directory[" + swaggerPluginExtension.getOutputPath() + "] for output failed.");
-                    }
-                }
-            }
-            if (swaggerPluginExtension.getTemplatePath() != null) {
-                documentSource.toDocuments();
-            }
-            documentSource.toSwaggerDocuments(
-                swaggerPluginExtension.getSwaggerUIDocBasePath() == null
-                    ? swaggerPluginExtension.getBasePath()
-                    : swaggerPluginExtension.getSwaggerUIDocBasePath(),
-                swaggerPluginExtension.getOutputFormats());
-
-
-            if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
-                String classifier = new File(swaggerPluginExtension.getSwaggerDirectory()).getName();
-                File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), "swagger.json");
-//                this.projectHelper.attachArtifact(project, "json", classifier, swaggerFile);
-            }
+            processSwaggerPluginExtension(swaggerPluginExtension)
 //            }
 
         } catch (GenerateException e) {
             throw new GradleException(e.getMessage(), e);
         } catch (Exception e) {
             throw new GradleException(e.getMessage(), e);
+        }
+    }
+
+    private void processSwaggerPluginExtension(SwaggerPluginExtension swaggerPluginExtension) {
+        validateConfiguration(swaggerPluginExtension);
+
+        AbstractDocumentSource documentSource;
+
+        if (swaggerPluginExtension.isSpringmvc()) {
+            documentSource = new SpringMavenDocumentSource(swaggerPluginExtension, new DefaultLog(new ConsoleLogger(0, "name")));
+        } else {
+            documentSource = new MavenDocumentSource(swaggerPluginExtension, new DefaultLog(new ConsoleLogger(0, "name")));
+        }
+
+        documentSource.loadTypesToSkip();
+        documentSource.loadModelModifier();
+        documentSource.loadDocuments();
+        if (swaggerPluginExtension.getOutputPath() != null) {
+            File outputDirectory = new File(swaggerPluginExtension.getOutputPath()).getParentFile();
+            if (outputDirectory != null && !outputDirectory.exists()) {
+                if (!outputDirectory.mkdirs()) {
+                    throw new GradleException("Create directory[" + swaggerPluginExtension.getOutputPath() + "] for output failed.");
+                }
+            }
+        }
+        if (swaggerPluginExtension.getTemplatePath() != null) {
+            documentSource.toDocuments();
+        }
+        documentSource.toSwaggerDocuments(
+            swaggerPluginExtension.getSwaggerUIDocBasePath() == null
+                ? swaggerPluginExtension.getBasePath()
+                : swaggerPluginExtension.getSwaggerUIDocBasePath(),
+            swaggerPluginExtension.getOutputFormats());
+
+        if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
+            String classifier = new File(swaggerPluginExtension.getSwaggerDirectory()).getName();
+            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), "swagger.json");
+//                this.projectHelper.attachArtifact(project, "json", classifier, swaggerFile);
         }
     }
 
@@ -134,14 +133,4 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             return false;
         }
     }
-
-    ClassLoader prepareClassLoader(Iterable<File> dependencies, File dir) {
-        List<URL> urls = dependencies.collect { it.toURI().toURL() }
-        urls.add(dir.toURI().toURL())
-
-        logger.debug "Preparing classloader with urls: {}", urls
-
-        return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
-    }
-
 }

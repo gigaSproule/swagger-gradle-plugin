@@ -1,4 +1,4 @@
-package com.github.swagger.docgen.gradleplugin
+package com.benjaminsproule.swagger.gradleplugin
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder

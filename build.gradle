@@ -45,21 +45,23 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-bintray {
-    user = bintray_user
-    key = bintray_apiKey
+if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
+    bintray {
+        user = bintray_user
+        key = bintray_apiKey
 
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        name = "swagger-gradle-plugin"
-//        websiteUrl = siteUrl
-        vcsUrl = "https://github.com/gigaSproule/swagger-gradle-plugin"
-        licenses = ["Apache-2.0"]
-        publish = true
-        version {
-            name = project.version
-            released = new Date()
+        configurations = ['archives']
+        pkg {
+            repo = "maven"
+            name = "swagger-gradle-plugin"
+//            websiteUrl = siteUrl
+            vcsUrl = "https://github.com/gigaSproule/swagger-gradle-plugin"
+            licenses = ["Apache-2.0"]
+            publish = true
+            version {
+                name = project.version
+                released = new Date()
+            }
         }
     }
 }

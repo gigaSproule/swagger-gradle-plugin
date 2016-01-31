@@ -1,6 +1,6 @@
 # Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin)
 
-This plugin is basically a wrapper around [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin) (at the moment)
+This plugin is a wrapper around [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)
 
 This enables your Swagger-annotated project to generate **Swagger specs** and **customizable, templated static documents** during the gradle build phase. Unlike swagger-core, swagger-gradle-plugin does not actively serve the spec with the rest of the application; it generates the spec as a build artifact to be used in downstream Swagger tooling.
 
@@ -14,11 +14,11 @@ This enables your Swagger-annotated project to generate **Swagger specs** and **
 Import the plugin in your project by adding following configuration: 
 
 ```groovy
-apiSources [
+swagger {
     apiSource {
         ...
     }
-]
+}
 ```
 One `apiSource` can be considered as a version of APIs of your service.
 

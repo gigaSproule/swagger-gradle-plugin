@@ -1,12 +1,9 @@
-package com.github.swagger.docgen.gradleplugin
+package com.benjaminsproule.swagger.gradleplugin
 
 import com.github.kongchen.swagger.docgen.AbstractDocumentSource
 import com.github.kongchen.swagger.docgen.GenerateException
-import com.github.kongchen.swagger.docgen.mavenplugin.ApiSource
 import com.github.kongchen.swagger.docgen.mavenplugin.MavenDocumentSource
 import com.github.kongchen.swagger.docgen.mavenplugin.SpringMavenDocumentSource
-import io.swagger.models.Info
-import io.swagger.models.License
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
@@ -23,15 +20,10 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     def generateSwaggerDocuments() {
         SwaggerPluginExtension swaggerPluginExtension = project.swagger
 
-        // TODO: Figure out how to skip
-//        if (skipSwaggerGeneration) {
-//            log.info("Swagger generation is skipped.");
-//            return;
-//        }
-
         if (swaggerPluginExtension == null) {
-            throw new GradleException("You must configure at least one apiSources element");
+            throw new GradleException("You must configure at least one swaggerPluginExtensions element");
         }
+
         if (useSwaggerSpec11()) {
             throw new GradleException("You may use an old version of swagger which is not supported by swagger-maven-plugin 2.0+\n" +
                 "swagger-maven-plugin 2.0+ only supports swagger-core 1.3.x");
@@ -47,56 +39,43 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             Iterable dependencies = project.configurations.runtime.resolve()
             File classesDir = project.sourceSets.main.output.classesDir
             ClassLoader classLoader = prepareClassLoader(dependencies, classesDir)
+            swaggerPluginExtension.classLoader = classLoader
+//            for (swaggerPluginExtension swaggerPluginExtension : swaggerPluginExtensions) {
 
-            License license = new License()
-            license.setName(swaggerPluginExtension.license)
-
-            Info info = new Info();
-            info.setTitle(swaggerPluginExtension.title);
-            info.setVersion(swaggerPluginExtension.version)
-            info.setLicense(license)
-
-            ApiSource apiSource = new ApiSource();
-            apiSource.setInfo(info)
-            apiSource.setLocations(swaggerPluginExtension.locations)
-            apiSource.setSwaggerDirectory(swaggerPluginExtension.swaggerDirectory)
-            apiSource.setClassLoader(classLoader)
-//            for (ApiSource apiSource : apiSources) {
-
-            validateConfiguration(apiSource);
+            validateConfiguration(swaggerPluginExtension);
 
             AbstractDocumentSource documentSource;
 
-            if (apiSource.isSpringmvc()) {
-                documentSource = new SpringMavenDocumentSource(apiSource);
+            if (swaggerPluginExtension.isSpringmvc()) {
+                documentSource = new SpringMavenDocumentSource(swaggerPluginExtension);
             } else {
-                documentSource = new MavenDocumentSource(apiSource);
+                documentSource = new MavenDocumentSource(swaggerPluginExtension);
             }
 
             documentSource.loadTypesToSkip();
             documentSource.loadModelModifier();
             documentSource.loadDocuments();
-            if (apiSource.getOutputPath() != null) {
-                File outputDirectory = new File(apiSource.getOutputPath()).getParentFile();
+            if (swaggerPluginExtension.getOutputPath() != null) {
+                File outputDirectory = new File(swaggerPluginExtension.getOutputPath()).getParentFile();
                 if (outputDirectory != null && !outputDirectory.exists()) {
                     if (!outputDirectory.mkdirs()) {
-                        throw new GradleException("Create directory[" + apiSource.getOutputPath() + "] for output failed.");
+                        throw new GradleException("Create directory[" + swaggerPluginExtension.getOutputPath() + "] for output failed.");
                     }
                 }
             }
-            if (apiSource.getTemplatePath() != null) {
+            if (swaggerPluginExtension.getTemplatePath() != null) {
                 documentSource.toDocuments();
             }
             documentSource.toSwaggerDocuments(
-                apiSource.getSwaggerUIDocBasePath() == null
-                    ? apiSource.getBasePath()
-                    : apiSource.getSwaggerUIDocBasePath(),
-                apiSource.getOutputFormats());
+                swaggerPluginExtension.getSwaggerUIDocBasePath() == null
+                    ? swaggerPluginExtension.getBasePath()
+                    : swaggerPluginExtension.getSwaggerUIDocBasePath(),
+                swaggerPluginExtension.getOutputFormats());
 
 
-            if (apiSource.isAttachSwaggerArtifact() && apiSource.getSwaggerDirectory() != null && this.project != null) {
-                String classifier = new File(apiSource.getSwaggerDirectory()).getName();
-                File swaggerFile = new File(apiSource.getSwaggerDirectory(), "swagger.json");
+            if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
+                String classifier = new File(swaggerPluginExtension.getSwaggerDirectory()).getName();
+                File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), "swagger.json");
 //                this.projectHelper.attachArtifact(project, "json", classifier, swaggerFile);
             }
 //            }
@@ -111,28 +90,28 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     /**
      * validate configuration according to swagger spec and plugin requirement
      *
-     * @param apiSource
+     * @param swaggerPluginExtension
      * @throws GenerateException
      */
-    private static void validateConfiguration(ApiSource apiSource) throws GenerateException {
-        if (apiSource == null) {
-            throw new GenerateException("You do not configure any apiSource!");
-        } else if (apiSource.getInfo() == null) {
+    private static void validateConfiguration(SwaggerPluginExtension swaggerPluginExtension) throws GenerateException {
+        if (swaggerPluginExtension == null) {
+            throw new GenerateException("You do not configure any swaggerPluginExtension!");
+        } else if (swaggerPluginExtension.getInfo() == null) {
             throw new GenerateException("`<info>` is required by Swagger Spec.");
         }
-        if (apiSource.getInfo().getTitle() == null) {
+        if (swaggerPluginExtension.getInfo().getTitle() == null) {
             throw new GenerateException("`<info><title>` is required by Swagger Spec.");
         }
 
-        if (apiSource.getInfo().getVersion() == null) {
+        if (swaggerPluginExtension.getInfo().getVersion() == null) {
             throw new GenerateException("`<info><version>` is required by Swagger Spec.");
         }
 
-        if (apiSource.getInfo().getLicense() != null && apiSource.getInfo().getLicense().getName() == null) {
+        if (swaggerPluginExtension.getInfo().getLicense() != null && swaggerPluginExtension.getInfo().getLicense().getName() == null) {
             throw new GenerateException("`<info><license><name>` is required by Swagger Spec.");
         }
 
-        if (apiSource.getLocations() == null) {
+        if (swaggerPluginExtension.getLocations() == null) {
             throw new GenerateException("<locations> is required by this plugin.");
         }
 

@@ -1,5 +1,6 @@
 package com.github.swagger.docgen.gradleplugin;
 
+import com.benjaminsproule.swagger.gradleplugin.SwaggerPluginExtension;
 import com.github.swagger.docgen.AbstractDocumentSource;
 import com.github.swagger.docgen.TypeUtils;
 import com.wordnik.swagger.annotations.Api;

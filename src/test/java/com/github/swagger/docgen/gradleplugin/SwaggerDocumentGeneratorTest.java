@@ -1,5 +1,6 @@
 package com.github.swagger.docgen.gradleplugin;
 
+import com.benjaminsproule.swagger.gradleplugin.SwaggerPluginExtension;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;

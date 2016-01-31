@@ -49,7 +49,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
     }
 
-    private void processSwaggerPluginExtension(ApiSourceExtension swaggerPluginExtension) {
+    private static void processSwaggerPluginExtension(ApiSourceExtension swaggerPluginExtension) {
         validateConfiguration(swaggerPluginExtension);
 
         AbstractDocumentSource documentSource;

@@ -156,7 +156,7 @@ The model substitution file will be read by `getClass().getResourceAsStream`, so
 # <a id="typesToSkip">Skipping Types During Processing with `typesToSkip`</a>
 
 You can instruct `swagger-gradle-plugin` to skip processing the parameters of certain types by adding the following to your build.gradle:
-
+// TODO: Not fully supported yet
 ```groovy
 typesToSkip [
     'com.foobar.skipper.SkipThisClassPlease',
@@ -165,7 +165,7 @@ typesToSkip [
 ```
 
 # <a id="apiModelPropertyAccessExclusions">Excluding certain `@ApiModelProperty` items</a>
-
+// TODO: Not fully supported yet
 If you'd like to exclude certain `@ApiModelProperty`s based on their `access` values, you may do so by adding the following as a child node of `apiSource` in your pom.xml:
 
 ```groovy
@@ -196,7 +196,7 @@ swaggerDirectory = '${project.build.directory}/swagger-ui'
 attachSwaggerArtifact = true
 
 ```
-
+// TODO: Not supported yet
 The above setting attaches the generated file to Gradle for install/deploy purpose with `swagger-ui`as classifier and `json` as type
 
 

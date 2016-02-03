@@ -17,6 +17,7 @@ class ApiSourceExtension extends ApiSource {
     private ClassLoader classLoader
     List<String> apiModelPropertyAccessExclusionsList
     List<String> typesToSkipList
+    boolean attachSwaggerArtifact
 
     ApiSourceExtension(Project project) {
         this.project = project

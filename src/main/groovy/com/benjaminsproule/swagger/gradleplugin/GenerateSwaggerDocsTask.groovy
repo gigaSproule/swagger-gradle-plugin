@@ -11,6 +11,7 @@ import org.codehaus.plexus.logging.console.ConsoleLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
+import org.gradle.jvm.tasks.Jar
 
 /**
  * GradleSwaggerTask copied from {@link com.github.kongchen.swagger.docgen.mavenplugin.ApiDocumentMojo}
@@ -49,7 +50,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
     }
 
-    private static void processSwaggerPluginExtension(ApiSourceExtension swaggerPluginExtension) {
+    private void processSwaggerPluginExtension(ApiSourceExtension swaggerPluginExtension) {
         validateConfiguration(swaggerPluginExtension);
 
         AbstractDocumentSource documentSource;
@@ -80,11 +81,21 @@ class GenerateSwaggerDocsTask extends DefaultTask {
                 : swaggerPluginExtension.getSwaggerUIDocBasePath(),
             swaggerPluginExtension.getOutputFormats());
 
-//        if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
-//            String classifier = new File(swaggerPluginExtension.getSwaggerDirectory()).getName();
-//            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), "swagger.json");
-//            this.projectHelper.attachArtifact(project, "json", classifier, swaggerFile);
-//        }
+        if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
+            String classifierName = new File(swaggerPluginExtension.getSwaggerDirectory()).getName();
+            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), "swagger.json");
+
+            project.task("createSwaggerArtifact", type: Jar, dependsOn: project.tasks.classes) {
+                classifier = classifierName
+                from swaggerFile
+            }
+
+            project.artifacts {
+                archives project.tasks.createSwaggerArtifact
+            }
+
+            project.tasks.createSwaggerArtifact.execute()
+        }
     }
 
     /**

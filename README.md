@@ -155,7 +155,7 @@ The model substitution file will be read by `getClass().getResourceAsStream`, so
 
 # <a id="typesToSkip">Skipping Types During Processing with `typesToSkip`</a>
 
-You can instruct `swagger-gradle-plugin` to skip processing the parameters of certain types by adding the following to your pom.xml:
+You can instruct `swagger-gradle-plugin` to skip processing the parameters of certain types by adding the following to your build.gradle:
 
 ```groovy
 typesToSkip [
@@ -185,7 +185,7 @@ The above setting would prevent `internalThing` from appearing in the swagger sp
 ...
 ```
 
-Note: In order to use `apiModelPropertyAccessExclusions`, you must specify both the `name` and `access` fields of the property you wish to exclude. Additionally, `apiModelPropertyAccessExclusions` requires at least `swagger-gradle-plugin` version 3.1.1-SNAPSHOT.
+Note: In order to use `apiModelPropertyAccessExclusions`, you must specify both the `name` and `access` fields of the property you wish to exclude.
 
 # Install/Deploy `swagger.json`
 
@@ -209,12 +209,12 @@ buildscript {
         ...
     }
     dependencies {
-        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.0.1-SNAPSHOT'
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.0.1'
     }
 }
-apply plugin: 'swagger-gradle-plugin'
+apply plugin: 'swagger'
 
-apiSources [
+swagger {
     apiSource {
         springmvc = true
         locations = 'com.wordnik.swagger.sample'
@@ -238,25 +238,24 @@ apiSources [
                 name = 'Apache 2.0'
             }
         }
-        securityDefinitions [
-            securityDefinition {
-                name = 'basicAuth'
-                type = 'basic'
-            }
-            securityDefinition {
-                json = '/securityDefinition.json'
-            }
-        ]
-        <!-- Support classpath or file absolute path here.
-        1) classpath e.g: "classpath:/markdown.hbs", "classpath:/templates/hello.html"
-        2) file e.g: "${basedir}/src/main/resources/markdown.hbs",
-        "${basedir}/src/main/resources/template/hello.html" -->
+        securityDefinition {
+            name = 'basicAuth'
+            type = 'basic'
+        }
+        securityDefinition {
+            json = '/securityDefinition.json'
+        }
+        /**
+            Support classpath or file absolute path here.
+            1) classpath e.g: "classpath:/markdown.hbs", "classpath:/templates/hello.html"
+            2) file e.g: "${basedir}/src/main/resources/markdown.hbs", "${basedir}/src/main/resources/template/hello.html"
+        **/
         templatePath = "${basedir}/src/test/resources/strapdown.html.hbs"
         outputPath = "${basedir}/generated/document.html"
         swaggerDirectory = "${basedir}/generated/swagger-ui"
         swaggerApiReader = 'com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader'
-        attachSwaggerArtifact = true
+        // attachSwaggerArtifact = true - WILL BE ADDED IN THE FUTURE
     }
-]
+}
 ...
 ```

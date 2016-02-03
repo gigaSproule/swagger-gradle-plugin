@@ -45,7 +45,7 @@ You can specify several `apiSource`s. Generally, one is enough.
 | `attachSwaggerArtifact` | If enabled, the generated `swagger.json` file will be attached as a gradle artifact. The `swaggerDirectory`'s name will be used as an artifact classifier. Default is `false`. |
 | `modelSubstitute` | The model substitute file's path, see more details [below](#model-substitution)|
 | `typesToSkip` | Nodes of class names to explicitly skip during parameter processing. More details [below](#typesToSkip)|
-| `apiModelPropertyAccessExclusions` | Allows the exclusion of specified `@ApiModelProperty` fields. This can be used to hide certain model properties from the swagger spec. More details [below](#apiModelPropertyAccessExclusions)|
+| `apiModelPropertyAccessExclusionsList` | Allows the exclusion of specified `@ApiModelProperty` fields. This can be used to hide certain model properties from the swagger spec. More details [below](#apiModelPropertyAccessExclusionsList)|
 | `jsonExampleValues` | If `true`, all example values in `@ApiModelProperty` will be handled as json raw values. This is useful for creating valid examples in the generated json for all property types, including non-string ones. |
 | `skipSwaggerGeneration` | If `true`, swagger generation will be skipped. Default is `false`. |
 
@@ -63,8 +63,8 @@ The value for ```templatePath``` supports 2 kinds of path:
 1. Local file's absolute path.
     e.g:
 
-    1. **`${basedir}/src/main/resources/markdown.hbs`**
-    1. **`${basedir}/src/main/resources/template/hello.html`**
+    1. **`${project.rootDir}/src/main/resources/markdown.hbs`**
+    1. **`${project.rootDir}/src/main/resources/template/hello.html`**
 
 
 There's a [standalone project](https://github.com/kongchen/api-doc-template) for the template files, fetch them and customize it for your own project.
@@ -158,18 +158,17 @@ The model substitution file will be read by `getClass().getResourceAsStream`, so
 You can instruct `swagger-gradle-plugin` to skip processing the parameters of certain types by adding the following to your build.gradle:
 // TODO: Not fully supported yet
 ```groovy
-typesToSkip [
+typesToSkip = [
     'com.foobar.skipper.SkipThisClassPlease',
     'com.foobar.skipper.AlsoSkipThisClassPlease'
 }
 ```
 
-# <a id="apiModelPropertyAccessExclusions">Excluding certain `@ApiModelProperty` items</a>
-// TODO: Not fully supported yet
-If you'd like to exclude certain `@ApiModelProperty`s based on their `access` values, you may do so by adding the following as a child node of `apiSource` in your pom.xml:
+# <a id="apiModelPropertyAccessExclusionsList">Excluding certain `@ApiModelProperty` items</a>
+If you'd like to exclude certain `@ApiModelProperty`s based on their `access` values, you may do so by adding the following as a child node of `apiSource` in your build.gradle:
 
 ```groovy
-apiModelPropertyAccessExclusions [
+apiModelPropertyAccessExclusionsList = [
     'secret-property'
 ]
 ```
@@ -185,14 +184,14 @@ The above setting would prevent `internalThing` from appearing in the swagger sp
 ...
 ```
 
-Note: In order to use `apiModelPropertyAccessExclusions`, you must specify both the `name` and `access` fields of the property you wish to exclude.
+Note: In order to use `apiModelPropertyAccessExclusionsList`, you must specify both the `name` and `access` fields of the property you wish to exclude.
 
 # Install/Deploy `swagger.json`
 
-You can instruct `swagger-gradle-plugin` to deploy the generated `swagger.json` by adding the following to your pom.xml:
+You can instruct `swagger-gradle-plugin` to deploy the generated `swagger.json` by adding the following to your build.gradle:
 
 ```groovy
-swaggerDirectory = '${project.build.directory}/swagger-ui'
+swaggerDirectory = '${project.rootDir}/swagger-ui'
 attachSwaggerArtifact = true
 
 ```
@@ -248,11 +247,11 @@ swagger {
         /**
             Support classpath or file absolute path here.
             1) classpath e.g: "classpath:/markdown.hbs", "classpath:/templates/hello.html"
-            2) file e.g: "${basedir}/src/main/resources/markdown.hbs", "${basedir}/src/main/resources/template/hello.html"
+            2) file e.g: "${project.rootDir}/src/main/resources/markdown.hbs", "${project.rootDir}/src/main/resources/template/hello.html"
         **/
-        templatePath = "${basedir}/src/test/resources/strapdown.html.hbs"
-        outputPath = "${basedir}/generated/document.html"
-        swaggerDirectory = "${basedir}/generated/swagger-ui"
+        templatePath = "${project.rootDir}/src/test/resources/strapdown.html.hbs"
+        outputPath = "${project.rootDir}/generated/document.html"
+        swaggerDirectory = "${project.rootDir}/generated/swagger-ui"
         swaggerApiReader = 'com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader'
         // attachSwaggerArtifact = true - WILL BE ADDED IN THE FUTURE
     }

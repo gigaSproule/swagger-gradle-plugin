@@ -14,11 +14,21 @@ import org.reflections.Reflections
 @ToString(includeNames = true)
 class ApiSourceExtension extends ApiSource {
     private Project project
-    ClassLoader classLoader
+    private ClassLoader classLoader
+    List<String> apiModelPropertyAccessExclusionsList
+    List<String> typesToSkipList
 
     ApiSourceExtension(Project project) {
         this.project = project
         this.classLoader = prepareClassLoader()
+
+        if (this.apiModelPropertyAccessExclusionsList != null) {
+            this.apiModelPropertyAccessExclusions.addAll(this.apiModelPropertyAccessExclusionsList)
+        }
+
+        if (this.typesToSkipList != null) {
+            this.typesToSkip.addAll(this.typesToSkipList)
+        }
     }
 
     void info(Closure closure) {
@@ -47,10 +57,12 @@ class ApiSourceExtension extends ApiSource {
     }
 
     void securityDefinition(Closure closure) {
+        SecurityDefinitionExtension securityDefinitionExtension = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
         SecurityDefinition securityDefinition = new SecurityDefinition();
-        securityDefinition.setName(closure.name)
-        securityDefinition.setType(closure.type)
-        securityDefinition.setJson(closure.json)
+        securityDefinition.setName(securityDefinitionExtension.name)
+        securityDefinition.setType(securityDefinitionExtension.type)
+        securityDefinition.setJson(securityDefinitionExtension.json)
+
         if (this.securityDefinitions == null) {
             this.securityDefinitions = new ArrayList<>()
         }

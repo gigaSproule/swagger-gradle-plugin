@@ -195,7 +195,6 @@ swaggerDirectory = '${project.rootDir}/swagger-ui'
 attachSwaggerArtifact = true
 
 ```
-// TODO: Not supported yet
 The above setting attaches the generated file to Gradle for install/deploy purpose with `swagger-ui`as classifier and `json` as type
 
 

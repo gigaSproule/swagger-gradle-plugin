@@ -207,10 +207,10 @@ buildscript {
         ...
     }
     dependencies {
-        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.0.1'
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.0.3'
     }
 }
-apply plugin: 'swagger'
+apply plugin: 'com.benjaminsproule.swagger'
 
 swagger {
     apiSource {

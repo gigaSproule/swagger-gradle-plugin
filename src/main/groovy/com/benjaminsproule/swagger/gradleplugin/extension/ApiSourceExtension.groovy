@@ -71,7 +71,12 @@ class ApiSourceExtension extends ApiSource {
     }
 
     private ClassLoader prepareClassLoader() {
-        List<URL> urls = project.configurations.runtime.resolve().collect { it.toURI().toURL() }
+        List<URL> urls = new ArrayList<>();
+        project.configurations.runtime.resolve().each {
+            if (!it.name.endsWith('.pom')) {
+                urls.add(it.toURI().toURL())
+            }
+        }
         urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
         return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
     }

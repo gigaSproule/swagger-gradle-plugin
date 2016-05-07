@@ -8,7 +8,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.dependencies.add('compile', 'io.swagger:swagger-core:1.5.4', {
+        project.dependencies.add('compile', 'io.swagger:swagger-annotations:1.5.4', {
             exclude group: 'javax.ws.rs', module: 'jsr311-api'
         })
 

@@ -204,10 +204,11 @@ The above setting attaches the generated file to Gradle for install/deploy purpo
 buildscript {
     repositories {
         mavenLocal()
+        jcenter()
         ...
     }
     dependencies {
-        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.0.3'
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.0.6'
     }
 }
 apply plugin: 'com.benjaminsproule.swagger'

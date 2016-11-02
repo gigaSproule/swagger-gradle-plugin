@@ -1,15 +1,15 @@
 package com.benjaminsproule.swagger.gradleplugin.extension
 
-import com.github.kongchen.swagger.docgen.GenerateException
 import com.github.kongchen.swagger.docgen.mavenplugin.ApiSource
 import com.github.kongchen.swagger.docgen.mavenplugin.SecurityDefinition
 import groovy.transform.ToString
-import io.swagger.annotations.Api
 import io.swagger.models.Contact
 import io.swagger.models.Info
 import io.swagger.models.License
 import org.gradle.api.Project
 import org.reflections.Reflections
+
+import java.lang.annotation.Annotation
 
 @ToString(includeNames = true)
 class ApiSourceExtension extends ApiSource {
@@ -82,20 +82,20 @@ class ApiSourceExtension extends ApiSource {
     }
 
     @Override
-    Set<Class<?>> getValidClasses() throws GenerateException {
+    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
         Set<Class<?>> classes = new HashSet<Class<?>>()
         if (getLocations() == null) {
-            Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(Api.class)
+            Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(clazz)
             classes.addAll(c)
         } else {
             if (locations.contains("")) {
                 String[] sources = locations.split("")
                 for (String source : sources) {
-                    Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(Api.class)
+                    Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(clazz)
                     classes.addAll(c)
                 }
             } else {
-                classes.addAll(new Reflections(classLoader, locations).getTypesAnnotatedWith(Api.class))
+                classes.addAll(new Reflections(classLoader, locations).getTypesAnnotatedWith(clazz))
             }
         }
 

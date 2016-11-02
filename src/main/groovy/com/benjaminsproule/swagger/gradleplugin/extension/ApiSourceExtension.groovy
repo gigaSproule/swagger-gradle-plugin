@@ -14,14 +14,12 @@ import org.reflections.Reflections
 @ToString(includeNames = true)
 class ApiSourceExtension extends ApiSource {
     private Project project
-    private ClassLoader classLoader
     List<String> apiModelPropertyAccessExclusionsList
     List<String> typesToSkipList
     boolean attachSwaggerArtifact
 
     ApiSourceExtension(Project project) {
         this.project = project
-        this.classLoader = prepareClassLoader()
 
         if (this.apiModelPropertyAccessExclusionsList != null) {
             this.apiModelPropertyAccessExclusions.addAll(this.apiModelPropertyAccessExclusionsList)
@@ -84,6 +82,7 @@ class ApiSourceExtension extends ApiSource {
     @Override
     Set<Class<?>> getValidClasses() throws GenerateException {
         Set<Class<?>> classes = new HashSet<Class<?>>()
+        ClassLoader classLoader = prepareClassLoader()
         if (getLocations() == null) {
             Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(Api.class)
             classes.addAll(c)

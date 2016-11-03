@@ -1,5 +1,5 @@
 group = 'com.benjaminsproule'
-version = '0.0.7'
+version = '0.0.8'
 
 buildscript {
     repositories {
@@ -34,8 +34,8 @@ idea {
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     compile gradleApi()

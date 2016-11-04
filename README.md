@@ -216,7 +216,7 @@ apply plugin: 'com.benjaminsproule.swagger'
 swagger {
     apiSource {
         springmvc = true
-        locations = 'com.wordnik.swagger.sample'
+        locations = [ 'com.wordnik.swagger.sample' ]
         schemes = 'http,https'
         host = 'www.example.com:8080'
         basePath = '/api'

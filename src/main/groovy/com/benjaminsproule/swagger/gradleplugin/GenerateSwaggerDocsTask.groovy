@@ -63,6 +63,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         documentSource.loadTypesToSkip();
         documentSource.loadModelModifier();
+        documentSource.loadModelConverters();
         documentSource.loadDocuments();
         if (swaggerPluginExtension.getOutputPath() != null) {
             File outputDirectory = new File(swaggerPluginExtension.getOutputPath()).getParentFile();

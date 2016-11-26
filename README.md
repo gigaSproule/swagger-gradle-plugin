@@ -253,6 +253,7 @@ swagger {
         outputPath = "${project.rootDir}/generated/document.html"
         swaggerDirectory = "${project.rootDir}/generated/swagger-ui"
         swaggerApiReader = 'com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader'
+        modelConverters = [ 'io.swagger.validator.BeanValidator' ]
         // attachSwaggerArtifact = true - WILL BE ADDED IN THE FUTURE
     }
 }

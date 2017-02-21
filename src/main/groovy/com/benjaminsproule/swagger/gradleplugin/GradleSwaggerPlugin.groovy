@@ -11,8 +11,6 @@ class GradleSwaggerPlugin implements Plugin<Project> {
         project.extensions.create('swagger', SwaggerExtension, project)
 
         project.task(GenerateSwaggerDocsTask.TASK_NAME,
-            description: 'Generates the Swagger documentation using the provided config',
-            group: 'swagger',
             type: GenerateSwaggerDocsTask,
             dependsOn: 'classes')
     }

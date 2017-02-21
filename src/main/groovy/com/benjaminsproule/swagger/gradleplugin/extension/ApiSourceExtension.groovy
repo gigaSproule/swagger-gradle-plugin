@@ -84,11 +84,11 @@ class ApiSourceExtension extends ApiSource {
         Set<Class<?>> classes = new HashSet<Class<?>>()
         ClassLoader classLoader = prepareClassLoader()
         if (getLocations() == null) {
-            Set<Class<?>> c = new Reflections(classLoader, "").getTypesAnnotatedWith(clazz)
+            Set<Class<?>> c = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz)
             classes.addAll(c)
         } else {
-            if (locations.contains("")) {
-                String[] sources = locations.split("")
+            if (locations.contains('')) {
+                String[] sources = locations.split('')
                 for (String source : sources) {
                     Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(clazz)
                     classes.addAll(c)

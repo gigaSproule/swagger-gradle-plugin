@@ -17,7 +17,7 @@ import org.gradle.jvm.tasks.Jar
  * GradleSwaggerTask copied from {@link com.github.kongchen.swagger.docgen.mavenplugin.ApiDocumentMojo}
  */
 class GenerateSwaggerDocsTask extends DefaultTask {
-    public static final String TASK_NAME = 'swagger'
+    public static final String TASK_NAME = 'generateSwaggerDocumentation'
 
     String description = "Generates swagger documentation"
 

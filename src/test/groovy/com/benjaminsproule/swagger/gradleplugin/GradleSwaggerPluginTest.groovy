@@ -31,7 +31,7 @@ class GradleSwaggerPluginTest {
     @Test
     void producesSwaggerDocumentation() {
         project.configurations.create('runtime')
-        project.plugins.add(new JavaPlugin())
+        project.plugins.apply JavaPlugin
 
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui"
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(

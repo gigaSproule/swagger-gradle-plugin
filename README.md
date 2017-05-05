@@ -186,7 +186,7 @@ The above setting would prevent `internalThing` from appearing in the swagger sp
 
 Note: In order to use `apiModelPropertyAccessExclusionsList`, you must specify both the `name` and `access` fields of the property you wish to exclude.
 
-## Generating the swagger documentation
+# Generating the swagger documentation
 To generate the swagger documentation, you need to run `./gradlw generateSwaggerDocument`.
 
 _N.B_ In previous versions (< 0.1.0) the task was `swagger`, but this caused a conflict with another plugin, `swagger-codegen`, (issue #8).

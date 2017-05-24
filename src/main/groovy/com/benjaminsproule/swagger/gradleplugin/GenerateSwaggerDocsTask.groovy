@@ -2,12 +2,12 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.extension.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.extension.SwaggerExtension
+import com.benjaminsproule.swagger.gradleplugin.logger.Slf4jWrapper
 import com.github.kongchen.swagger.docgen.AbstractDocumentSource
 import com.github.kongchen.swagger.docgen.GenerateException
 import com.github.kongchen.swagger.docgen.mavenplugin.MavenDocumentSource
 import com.github.kongchen.swagger.docgen.mavenplugin.SpringMavenDocumentSource
 import org.apache.maven.monitor.logging.DefaultLog
-import org.codehaus.plexus.logging.console.ConsoleLogger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
@@ -58,9 +58,9 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         AbstractDocumentSource documentSource
 
         if (swaggerPluginExtension.isSpringmvc()) {
-            documentSource = new SpringMavenDocumentSource(swaggerPluginExtension, new DefaultLog(new ConsoleLogger(0, 'name')))
+            documentSource = new SpringMavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()))
         } else {
-            documentSource = new MavenDocumentSource(swaggerPluginExtension, new DefaultLog(new ConsoleLogger(0, 'name')))
+            documentSource = new MavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()))
         }
 
         documentSource.loadTypesToSkip()

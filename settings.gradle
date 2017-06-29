@@ -1,1 +1,3 @@
-rootProject.name = "swagger-gradle-plugin"
+rootProject.name = 'swagger-gradle-plugin'
+
+include 'sample'

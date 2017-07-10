@@ -57,16 +57,22 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         AbstractDocumentSource documentSource
 
+        def encoding = project.compileJava.options.encoding
+        if (encoding == null) {
+            encoding = 'UTF-8'
+        }
+
         if (swaggerPluginExtension.isSpringmvc()) {
-            documentSource = new SpringMavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()))
+            documentSource = new SpringMavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()), encoding)
         } else {
-            documentSource = new MavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()))
+            documentSource = new MavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()), encoding)
         }
 
         documentSource.loadTypesToSkip()
         documentSource.loadModelModifier()
         documentSource.loadModelConverters()
         documentSource.loadDocuments()
+
         if (swaggerPluginExtension.getOutputPath() != null) {
             File outputDirectory = new File(swaggerPluginExtension.getOutputPath()).getParentFile()
             if (outputDirectory != null && !outputDirectory.exists()) {
@@ -75,14 +81,18 @@ class GenerateSwaggerDocsTask extends DefaultTask {
                 }
             }
         }
+
         if (swaggerPluginExtension.getTemplatePath() != null) {
             documentSource.toDocuments()
         }
+
         documentSource.toSwaggerDocuments(
             swaggerPluginExtension.getSwaggerUIDocBasePath() == null
                 ? swaggerPluginExtension.getBasePath()
                 : swaggerPluginExtension.getSwaggerUIDocBasePath(),
-            swaggerPluginExtension.getOutputFormats())
+            swaggerPluginExtension.getOutputFormats(),
+            swaggerPluginExtension.getSwaggerFileName(),
+            encoding)
 
         if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
             String classifierName = new File(swaggerPluginExtension.getSwaggerDirectory()).getName()

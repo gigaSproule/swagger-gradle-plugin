@@ -197,7 +197,7 @@ _N.B_ In previous versions (< 0.1.0) the task was `swagger`, but this caused a c
 You can instruct `swagger-gradle-plugin` to deploy the generated `swagger.json` by adding the following to your build.gradle:
 
 ```groovy
-swaggerDirectory = '${project.rootDir}/swagger-ui'
+swaggerDirectory = "${project.rootDir}/swagger-ui"
 attachSwaggerArtifact = true
 
 ```

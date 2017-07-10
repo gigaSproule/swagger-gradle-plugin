@@ -3,6 +3,7 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
+  - oraclejdk7
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
@@ -11,7 +12,3 @@ cache:
     - $HOME/.gradle/wrapper/
 os:
   - linux
-  - osx
-matrix:
-  allow_failures:
-    - os: osx

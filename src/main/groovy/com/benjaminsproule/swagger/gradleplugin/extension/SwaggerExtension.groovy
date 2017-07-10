@@ -13,6 +13,20 @@ class SwaggerExtension {
         this.project = project
     }
 
+    boolean skipSwaggerGeneration
+
+    boolean getSkipSwaggerGeneration() {
+        if (project.hasProperty('swagger.skip')) {
+            return project.getProperty('swagger.skip')
+        }
+
+        if (System.getProperty('swagger.skip') != null) {
+            return System.getProperty('swagger.skip')
+        }
+
+        return this.skipSwaggerGeneration
+    }
+
     ApiSourceExtension apiSource(Closure closure) {
         ApiSourceExtension apiSourceExtension = project.configure(new ApiSourceExtension(project), closure) as ApiSourceExtension
         apiSourceExtensions.add(apiSourceExtension)

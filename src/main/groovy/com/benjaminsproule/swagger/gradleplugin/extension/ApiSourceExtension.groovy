@@ -18,11 +18,6 @@ class ApiSourceExtension extends ApiSource {
     List<String> typesToSkipList
     boolean attachSwaggerArtifact
 
-    @Override
-    String getSwaggerFileName() {
-        return super.getSwaggerFileName() == null || super.getSwaggerFileName().isEmpty() ? "swagger" : super.getSwaggerFileName()
-    }
-
     ApiSourceExtension(Project project) {
         this.project = project
 
@@ -86,7 +81,7 @@ class ApiSourceExtension extends ApiSource {
 
     @Override
     String getSwaggerFileName() {
-        return super.swaggerFileName != null ? super.swaggerFileName : "swagger.json"
+        return super.getSwaggerFileName() == null || super.getSwaggerFileName().isEmpty() ? "swagger" : super.getSwaggerFileName()
     }
 
     @Override

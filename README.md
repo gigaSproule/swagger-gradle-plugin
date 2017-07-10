@@ -38,7 +38,7 @@ You can specify several `apiSource`s. Generally, one is enough.
 # Configuration for `swagger`
 
 | **name** | **description** |
-| `skipSwaggerGeneration` | If `true`, swagger generation will be skipped. Default is `false`. Gradle and system property is `swagger.skip` (resolved in that order) |
+| `skipSwaggerGeneration` | If `true`, swagger generation will be skipped. Default is `false`. User property is `swagger.skip` |
 | `apiSources` | List of `apiSource` closures. One `apiSource` can be considered as a version of APIs of your service. You can specify several `apiSource` closures, though generally one is enough. |
 
 # Configuration for `apiSource`

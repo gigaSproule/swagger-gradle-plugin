@@ -32,7 +32,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
 
         if (swaggerExtension.skipSwaggerGeneration) {
-            getLogger().info("Swagger generation is skipped.")
+            getLogger().info('Swagger generation is skipped.')
             return
         }
 

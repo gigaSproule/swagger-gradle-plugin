@@ -20,10 +20,6 @@ class SwaggerExtension {
             return project.getProperty('swagger.skip')
         }
 
-        if (System.getProperty('swagger.skip') != null) {
-            return System.getProperty('swagger.skip')
-        }
-
         return this.skipSwaggerGeneration
     }
 

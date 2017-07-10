@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "com.benjaminsproule:swagger-gradle-plugin:+"
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
     }
 }
 

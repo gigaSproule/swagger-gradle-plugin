@@ -31,6 +31,11 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             throw new GradleException('You must configure at least one swaggerPluginExtensions element')
         }
 
+        if (swaggerExtension.skipSwaggerGeneration) {
+            getLogger().info('Swagger generation is skipped.')
+            return
+        }
+
         if (useSwaggerSpec11()) {
             throw new GradleException('You may use an old version of swagger which is not supported by swagger-maven-plugin 2.0+\n' +
                 'swagger-maven-plugin 2.0+ only supports swagger-core 1.3.x')

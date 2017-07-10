@@ -14,6 +14,17 @@ This enables your Swagger-annotated project to generate **Swagger specs** and **
 Import the plugin in your project by adding following configuration: 
 
 ```groovy
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
+    }
+}
+
+apply plugin: 'com.benjaminsproule.swagger'
+
 swagger {
     apiSource {
         ...
@@ -24,6 +35,11 @@ One `apiSource` can be considered as a version of APIs of your service.
 
 You can specify several `apiSource`s. Generally, one is enough.
 
+# Configuration for `swagger`
+
+| **name** | **description** |
+| `skipSwaggerGeneration` | If `true`, swagger generation will be skipped. Default is `false`. User property is `swagger.skip` |
+| `apiSources` | List of `apiSource` closures. One `apiSource` can be considered as a version of APIs of your service. You can specify several `apiSource` closures, though generally one is enough. |
 
 # Configuration for `apiSource`
 
@@ -48,7 +64,7 @@ You can specify several `apiSource`s. Generally, one is enough.
 | `typesToSkip` | Nodes of class names to explicitly skip during parameter processing. More details [below](#typesToSkip)|
 | `apiModelPropertyAccessExclusionsList` | Allows the exclusion of specified `@ApiModelProperty` fields. This can be used to hide certain model properties from the swagger spec. More details [below](#apiModelPropertyAccessExclusionsList)|
 | `jsonExampleValues` | If `true`, all example values in `@ApiModelProperty` will be handled as json raw values. This is useful for creating valid examples in the generated json for all property types, including non-string ones. |
-| `skipSwaggerGeneration` | If `true`, swagger generation will be skipped. Default is `false`. |
+| `modelConverters` | List of custom implementations of `io.swagger.converter.ModelConverter` that should be used when generating the swagger files. |
 
 # <a id="templatefile">Template File</a>
 

@@ -80,6 +80,11 @@ class ApiSourceExtension extends ApiSource {
     }
 
     @Override
+    String getSwaggerFileName() {
+        return super.swaggerFileName != null ? super.swaggerFileName : "swagger.json"
+    }
+
+    @Override
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
         Set<Class<?>> classes = new HashSet<Class<?>>()
         ClassLoader classLoader = prepareClassLoader()

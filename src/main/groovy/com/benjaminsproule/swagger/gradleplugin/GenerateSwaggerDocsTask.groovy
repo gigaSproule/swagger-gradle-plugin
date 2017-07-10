@@ -86,7 +86,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
             String classifierName = new File(swaggerPluginExtension.getSwaggerDirectory()).getName()
-            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), 'swagger.json')
+            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), swaggerPluginExtension.getSwaggerFileName())
 
             project.task('createSwaggerArtifact', type: Jar, dependsOn: project.tasks.classes) {
                 classifier = classifierName

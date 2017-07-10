@@ -1,31 +1,27 @@
-group = 'com.benjaminsproule'
-version = '0.1.0'
-
 buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
         jcenter()
     }
-
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
-    }
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        url "https://dl.bintray.com/gigasproule/maven"
-    }
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
 }
 
 apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'com.jfrog.bintray'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://dl.bintray.com/gigasproule/maven'
+    }
+}
 
 idea {
     module {
@@ -33,6 +29,9 @@ idea {
         downloadSources = true
     }
 }
+
+group = 'com.benjaminsproule'
+version = '0.1.1'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -61,11 +60,13 @@ if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')
 
         configurations = ['archives']
         pkg {
-            repo = "maven"
-            name = "swagger-gradle-plugin"
-//            websiteUrl = siteUrl
-            vcsUrl = "https://github.com/gigaSproule/swagger-gradle-plugin"
-            licenses = ["Apache-2.0"]
+            repo = 'maven'
+            name = 'swagger-gradle-plugin'
+            websiteUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+            vcsUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+            githubRepo = 'gigaSproule/swagger-gradle-plugin'
+            githubReleaseNotesFile = 'README.md'
+            licenses = ['Apache-2.0']
             publish = true
             version {
                 name = project.version

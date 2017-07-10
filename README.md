@@ -1,4 +1,4 @@
-# Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin)
+# Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin)  [ ![Download](https://api.bintray.com/packages/gigasproule/maven/swagger-gradle-plugin/images/download.svg) ](https://bintray.com/gigasproule/maven/swagger-gradle-plugin/_latestVersion)
 
 This plugin is a wrapper around [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)
 

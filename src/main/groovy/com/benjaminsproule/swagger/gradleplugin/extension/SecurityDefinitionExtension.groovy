@@ -4,4 +4,5 @@ class SecurityDefinitionExtension {
     String name
     String type
     String json
+    String jsonPath
 }

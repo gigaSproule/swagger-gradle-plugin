@@ -57,10 +57,11 @@ class ApiSourceExtension extends ApiSource {
 
     void securityDefinition(Closure closure) {
         SecurityDefinitionExtension securityDefinitionExtension = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
-        SecurityDefinition securityDefinition = new SecurityDefinition();
+        SecurityDefinition securityDefinition = new SecurityDefinition()
         securityDefinition.setName(securityDefinitionExtension.name)
         securityDefinition.setType(securityDefinitionExtension.type)
         securityDefinition.setJson(securityDefinitionExtension.json)
+        securityDefinition.setJsonPath(securityDefinitionExtension.jsonPath)
 
         if (this.securityDefinitions == null) {
             this.securityDefinitions = new ArrayList<>()

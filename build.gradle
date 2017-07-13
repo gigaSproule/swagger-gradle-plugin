@@ -3,6 +3,12 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        dependencies {
+            classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
+        }
     }
 }
 
@@ -11,6 +17,7 @@ plugins {
     id 'net.researchgate.release' version '2.4.0'
 }
 
+apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'groovy'
@@ -73,6 +80,20 @@ if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')
                 name = project.version
                 released = new Date()
             }
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+    vcsUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+    description = 'Plugin to create Swagger documentation using Gradle'
+    tags = ['swagger', 'documentation']
+
+    plugins {
+        swagger {
+            id = 'com.benjaminsproule.swagger'
+            displayName = 'Swagger Gradle Plugin'
         }
     }
 }

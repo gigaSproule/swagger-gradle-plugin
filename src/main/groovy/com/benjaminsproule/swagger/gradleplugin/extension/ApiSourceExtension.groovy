@@ -77,7 +77,9 @@ class ApiSourceExtension extends ApiSource {
                 urls.add(it.toURI().toURL())
             }
         }
-        urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
+        project.sourceSets.main.output.classesDirs.each {
+            urls.add(it.toURI().toURL())
+        }
         return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
     }
 

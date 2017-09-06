@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.extension
 
 import com.github.kongchen.swagger.docgen.mavenplugin.ApiSource
-import com.github.kongchen.swagger.docgen.mavenplugin.SecurityDefinition
 import groovy.transform.ToString
 import io.swagger.models.Contact
 import io.swagger.models.Info
@@ -57,30 +56,12 @@ class ApiSourceExtension extends ApiSource {
     }
 
     void securityDefinition(Closure closure) {
-        SecurityDefinitionExtension securityDefinitionExtension = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
-        SecurityDefinition securityDefinition = new SecurityDefinition()
-        securityDefinition.setName(securityDefinitionExtension.name)
-        securityDefinition.setType(securityDefinitionExtension.type)
-        securityDefinition.setJson(securityDefinitionExtension.json)
-        securityDefinition.setJsonPath(securityDefinitionExtension.jsonPath)
+        SecurityDefinitionExtension securityDefinitionExtension = project.configure(new SecurityDefinitionExtension(project), closure) as SecurityDefinitionExtension
 
         if (this.securityDefinitions == null) {
             this.securityDefinitions = new ArrayList<>()
         }
-        this.securityDefinitions.add(securityDefinition)
-    }
-
-    private ClassLoader prepareClassLoader() {
-        List<URL> urls = new ArrayList<>();
-        project.configurations.runtime.resolve().each {
-            if (!it.name.matches(excludePattern)) {
-                urls.add(it.toURI().toURL())
-            }
-        }
-        project.sourceSets.main.output.classesDirs.each {
-            urls.add(it.toURI().toURL())
-        }
-        return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
+        this.securityDefinitions.add(securityDefinitionExtension)
     }
 
     @Override
@@ -108,5 +89,18 @@ class ApiSourceExtension extends ApiSource {
         }
 
         return classes
+    }
+
+    private ClassLoader prepareClassLoader() {
+        List<URL> urls = new ArrayList<>()
+        project.configurations.runtime.resolve().each {
+            if (!it.name.matches(excludePattern)) {
+                urls.add(it.toURI().toURL())
+            }
+        }
+        project.sourceSets.main.output.classesDirs.each {
+            urls.add(it.toURI().toURL())
+        }
+        return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
     }
 }

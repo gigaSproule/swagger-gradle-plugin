@@ -114,10 +114,10 @@ The file will be read by `getClass().getResourceAsStream`, so please note the pa
 
 Alternatively, specify the __absolute__ file path to the json definition file: 
 
-```xml
-<securityDefinition>
-    <jsonPath>${basedir}/securityDefinition.json</jsonPath>
-</securityDefinition>
+```groovy
+securityDefinition {
+    jsonPath = "${basedir}/securityDefinition.json"
+}
 ```
 
 The `securityDefinition.json` file should also follow the spec, one sample file like this:

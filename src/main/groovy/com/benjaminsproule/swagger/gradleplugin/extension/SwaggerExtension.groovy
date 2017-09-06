@@ -8,12 +8,11 @@ class SwaggerExtension {
     Collection<ApiSourceExtension> apiSourceExtensions = new ArrayList<>()
 
     private Project project
+    boolean skipSwaggerGeneration
 
     SwaggerExtension(Project project) {
         this.project = project
     }
-
-    boolean skipSwaggerGeneration
 
     boolean getSkipSwaggerGeneration() {
         if (project.hasProperty('swagger.skip')) {

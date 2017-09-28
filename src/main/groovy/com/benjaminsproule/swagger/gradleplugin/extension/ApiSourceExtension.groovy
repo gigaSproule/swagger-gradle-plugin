@@ -74,17 +74,18 @@ class ApiSourceExtension extends ApiSource {
         Set<Class<?>> classes = new HashSet<Class<?>>()
         ClassLoader classLoader = prepareClassLoader()
         if (getLocations() == null) {
-            Set<Class<?>> c = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz)
+            Set<Class<?>> c = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz, true)
             classes.addAll(c)
+
+            Set<Class<?>> inherited = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz)
+            classes.addAll(inherited)
         } else {
-            if (locations.contains('')) {
-                String[] sources = locations.split('')
-                for (String source : sources) {
-                    Set<Class<?>> c = new Reflections(classLoader, source).getTypesAnnotatedWith(clazz)
-                    classes.addAll(c)
-                }
-            } else {
-                classes.addAll(new Reflections(classLoader, locations).getTypesAnnotatedWith(clazz))
+            for (String location : locations) {
+                Set<Class<?>> c = new Reflections(classLoader, location).getTypesAnnotatedWith(clazz, true)
+                classes.addAll(c)
+
+                Set<Class<?>> inherited = new Reflections(classLoader, location).getTypesAnnotatedWith(clazz)
+                classes.addAll(inherited)
             }
         }
 

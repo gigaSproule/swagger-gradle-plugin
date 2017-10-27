@@ -1,5 +1,8 @@
 buildscript {
-    ext.kotlinVersion = '1.1.51'
+    ext {
+        kotlinVersion = '1.1.51'
+        springBootVersion = '1.5.4.RELEASE'
+    }
     repositories {
         mavenLocal()
         mavenCentral()
@@ -7,12 +10,15 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
         classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
     }
 }
 
 apply plugin: 'kotlin'
-apply plugin: 'war'
+apply plugin: 'kotlin-spring'
+apply plugin: 'org.springframework.boot'
 apply plugin: 'com.benjaminsproule.swagger'
 
 repositories {
@@ -20,14 +26,14 @@ repositories {
 }
 
 dependencies {
-    compile 'javax:javaee-api:7.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'io.swagger:swagger-annotations:1.5.15'
 }
 
 swagger {
     apiSource {
-        springmvc = false
+        springmvc = true
         locations = ['com.benjaminsproule.sample']
         schemes = ['http', 'https']
         host = 'www.example.com:8080'

@@ -14,7 +14,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 
 /**
- * GradleSwaggerTask copied from {@link com.github.kongchen.swagger.docgen.mavenplugin.ApiDocumentMojo}
+ * GradleSwaggerTask copied from {@link com.github.kongchen.swagger.docgen.mavenplugin.ApiDocumentMojo} with
+ * added classpath logic
  */
 class GenerateSwaggerDocsTask extends DefaultTask {
     public static final String TASK_NAME = 'generateSwaggerDocumentation'
@@ -23,8 +24,14 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     String group = 'swagger'
 
+    String excludePattern = '.*\\.pom'
+
     @TaskAction
     generateSwaggerDocuments() {
+        getClasspath().each {
+            this.class.getClassLoader().addURL(it)
+        }
+
         SwaggerExtension swaggerExtension = project.swagger
 
         if (swaggerExtension == null) {
@@ -91,17 +98,19 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             documentSource.toDocuments()
         }
 
+        String swaggerFileName = getSwaggerFileName(swaggerPluginExtension.getSwaggerFileName())
+
         documentSource.toSwaggerDocuments(
             swaggerPluginExtension.getSwaggerUIDocBasePath() == null
                 ? swaggerPluginExtension.getBasePath()
                 : swaggerPluginExtension.getSwaggerUIDocBasePath(),
             swaggerPluginExtension.getOutputFormats(),
-            swaggerPluginExtension.getSwaggerFileName(),
+            swaggerFileName,
             encoding)
 
         if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
             String classifierName = new File(swaggerPluginExtension.getSwaggerDirectory()).getName()
-            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), swaggerPluginExtension.getSwaggerFileName())
+            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), swaggerFileName)
 
             project.task('createSwaggerArtifact', type: Jar, dependsOn: project.tasks.classes) {
                 classifier = classifierName
@@ -162,5 +171,33 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         } catch (ClassNotFoundException ignored) {
             return false
         }
+    }
+
+    private String getSwaggerFileName(String swaggerFileName) {
+        return swaggerFileName == null || "".equals(swaggerFileName.trim()) ? "swagger" : swaggerFileName
+    }
+
+    private String getSwaggerDirectoryName(String swaggerDirectory) {
+        return new File(swaggerDirectory).getName()
+    }
+
+    private ArrayList<URL> getClasspath() {
+        List<URL> urls = new ArrayList<>()
+        project.configurations.runtime.resolve().each {
+            if (!it.name.matches(excludePattern)) {
+                urls.add(it.toURI().toURL())
+            }
+        }
+
+        def mainSourceSetsOutput = project.sourceSets.main.output
+        if (!mainSourceSetsOutput.properties.classesDirs) {
+            urls.add(mainSourceSetsOutput.classesDir.toURI().toURL())
+        } else {
+            mainSourceSetsOutput.classesDirs.each {
+                urls.add(it.toURI().toURL())
+            }
+        }
+        urls.add(mainSourceSetsOutput.resourcesDir.toURI().toURL())
+        urls
     }
 }

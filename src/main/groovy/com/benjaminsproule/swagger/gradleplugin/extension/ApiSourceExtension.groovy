@@ -1,22 +1,15 @@
 package com.benjaminsproule.swagger.gradleplugin.extension
 
 import com.github.kongchen.swagger.docgen.mavenplugin.ApiSource
+import com.github.kongchen.swagger.docgen.mavenplugin.SecurityDefinition
 import groovy.transform.ToString
-import io.swagger.models.Contact
-import io.swagger.models.Info
-import io.swagger.models.License
 import org.gradle.api.Project
-import org.reflections.Reflections
-
-import java.lang.annotation.Annotation
 
 @ToString(includeNames = true)
 class ApiSourceExtension extends ApiSource {
     private Project project
     List<String> apiModelPropertyAccessExclusionsList
     List<String> typesToSkipList
-    boolean attachSwaggerArtifact
-    String excludePattern = '.*\\.pom'
 
     ApiSourceExtension(Project project) {
         this.project = project
@@ -31,84 +24,15 @@ class ApiSourceExtension extends ApiSource {
     }
 
     void info(Closure closure) {
-        InfoExtension infoExtension = project.configure(new InfoExtension(project), closure) as InfoExtension
-        Info info = new Info()
-        info.setDescription(infoExtension.description)
-        info.setTermsOfService(infoExtension.termsOfService)
-        info.setVersion(infoExtension.version)
-        info.setTitle(infoExtension.title)
-
-        if (infoExtension.contactExtension != null) {
-            Contact contact = new Contact()
-            contact.setName(infoExtension.contactExtension.name)
-            contact.setUrl(infoExtension.contactExtension.url)
-            contact.setEmail(infoExtension.contactExtension.email)
-            info.setContact(contact)
-        }
-
-        if (infoExtension.licenseExtension != null) {
-            License license = new License()
-            license.setName(infoExtension.licenseExtension.name)
-            license.setUrl(infoExtension.licenseExtension.url)
-            info.setLicense(license)
-        }
-        this.info = info
+        this.info = project.configure(new InfoExtension(project), closure) as InfoExtension
     }
 
     void securityDefinition(Closure closure) {
-        SecurityDefinitionExtension securityDefinitionExtension = project.configure(new SecurityDefinitionExtension(project), closure) as SecurityDefinitionExtension
-
         if (this.securityDefinitions == null) {
             this.securityDefinitions = new ArrayList<>()
         }
+
+        SecurityDefinition securityDefinitionExtension = project.configure(new SecurityDefinition(), closure) as SecurityDefinition
         this.securityDefinitions.add(securityDefinitionExtension)
-    }
-
-    @Override
-    String getSwaggerFileName() {
-        return super.getSwaggerFileName() == null || super.getSwaggerFileName().isEmpty() ? "swagger" : super.getSwaggerFileName()
-    }
-
-    @Override
-    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
-        Set<Class<?>> classes = new HashSet<Class<?>>()
-        ClassLoader classLoader = prepareClassLoader()
-        if (getLocations() == null) {
-            Set<Class<?>> c = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz, true)
-            classes.addAll(c)
-
-            Set<Class<?>> inherited = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz)
-            classes.addAll(inherited)
-        } else {
-            for (String location : locations) {
-                Set<Class<?>> c = new Reflections(classLoader, location).getTypesAnnotatedWith(clazz, true)
-                classes.addAll(c)
-
-                Set<Class<?>> inherited = new Reflections(classLoader, location).getTypesAnnotatedWith(clazz)
-                classes.addAll(inherited)
-            }
-        }
-
-        return classes
-    }
-
-    private ClassLoader prepareClassLoader() {
-        List<URL> urls = new ArrayList<>()
-        project.configurations.runtime.resolve().each {
-            if (!it.name.matches(excludePattern)) {
-                urls.add(it.toURI().toURL())
-            }
-        }
-
-        def mainSourceSetsOutput = project.sourceSets.main.output
-        if (!mainSourceSetsOutput.properties.classesDirs) {
-            urls.add(mainSourceSetsOutput.classesDir.toURI().toURL())
-        } else {
-            mainSourceSetsOutput.classesDirs.each {
-                urls.add(it.toURI().toURL())
-            }
-        }
-
-        return new URLClassLoader(urls as URL[], this.getClass().getClassLoader())
     }
 }

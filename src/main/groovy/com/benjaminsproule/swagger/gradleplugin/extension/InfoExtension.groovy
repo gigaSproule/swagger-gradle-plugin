@@ -1,16 +1,13 @@
 package com.benjaminsproule.swagger.gradleplugin.extension
 
 import groovy.transform.ToString
+import io.swagger.models.Contact
+import io.swagger.models.Info
+import io.swagger.models.License
 import org.gradle.api.Project
 
 @ToString(includeNames = true)
-class InfoExtension {
-    String description
-    String termsOfService
-    String title
-    String version
-    ContactExtension contactExtension
-    LicenseExtension licenseExtension
+class InfoExtension extends Info {
     private Project project
 
     InfoExtension(Project project) {
@@ -18,10 +15,10 @@ class InfoExtension {
     }
 
     void contact(Closure closure) {
-        this.contactExtension = project.configure(new ContactExtension(), closure) as ContactExtension
+        this.contact = project.configure(new Contact(), closure) as Contact
     }
 
     void license(Closure closure) {
-        this.licenseExtension = project.configure(new LicenseExtension(), closure) as LicenseExtension
+        this.license = project.configure(new License(), closure) as License
     }
 }

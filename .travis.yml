@@ -1,5 +1,6 @@
 language: java
-dist: precise
+dist: trusty
+sudo: false
 jdk:
   - oraclejdk9
   - oraclejdk8

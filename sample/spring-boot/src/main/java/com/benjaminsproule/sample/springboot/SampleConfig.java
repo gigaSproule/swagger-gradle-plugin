@@ -1,4 +1,4 @@
-package com.benjaminsproule.sample;
+package com.benjaminsproule.sample.springboot;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;

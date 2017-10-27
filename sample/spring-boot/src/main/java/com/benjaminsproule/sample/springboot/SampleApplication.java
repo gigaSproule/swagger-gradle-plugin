@@ -1,4 +1,4 @@
-package com.benjaminsproule.sample;
+package com.benjaminsproule.sample.springboot;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;

@@ -1,4 +1,4 @@
-package com.benjaminsproule.sample;
+package com.benjaminsproule.sample.springboot;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

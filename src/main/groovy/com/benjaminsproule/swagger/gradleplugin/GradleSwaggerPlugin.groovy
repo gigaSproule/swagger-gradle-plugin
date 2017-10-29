@@ -1,6 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.extension.SwaggerExtension
+import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

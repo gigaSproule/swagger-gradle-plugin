@@ -33,7 +33,7 @@ class ApiDocsPluginTest {
         //Template path is not actually a template path but a template file and it propbably has to be the root
         def expectedSwaggerDocsDirectory = "${project.buildDir}/swaggerdocs-${randomizer}"
         def expectedSwaggerApiDocsFile = "${expectedSwaggerDocsDirectory}/api.html"
-        def templatePathValue = "/Users/aedwards/Documents/DataRealm/3rdparty/swagger-gradle-plugin/src/test/resources/api-doc-template/strapdown.html.hbs"
+        def templatePathValue = "classpath:/api-doc-template/strapdown.html.hbs"
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {

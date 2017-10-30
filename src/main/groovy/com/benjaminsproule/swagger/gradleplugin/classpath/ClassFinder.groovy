@@ -61,8 +61,15 @@ class ClassFinder {
                 urls.add(it.toURI().toURL())
             }
         }
-        project.sourceSets.main.output.classesDirs.each {
-            urls.add(it.toURI().toURL())
+
+        if (project.sourceSets.main.output.classesDirs) {
+            project.sourceSets.main.output.classesDirs.each {
+                urls.add(it.toURI().toURL())
+            }
+        } else {
+            project.sourceSets.main.output.classesDir.each {
+                urls.add(it.toURI().toURL())
+            }
         }
 
         return new URLClassLoader(urls as URL[], getClass().getClassLoader())

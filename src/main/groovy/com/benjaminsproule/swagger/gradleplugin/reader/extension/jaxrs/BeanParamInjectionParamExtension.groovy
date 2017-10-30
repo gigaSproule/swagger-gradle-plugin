@@ -74,7 +74,7 @@ class BeanParamInjectionParamExtension extends AbstractSwaggerExtension {
                     parameter.setAccess(param.access())
 
                     if (parameter instanceof AbstractSerializableParameter && StringUtils.isNotEmpty(param.defaultValue())) {
-                        ((AbstractSerializableParameter)parameter).setDefaultValue(param.defaultValue())
+                        ((AbstractSerializableParameter) parameter).setDefaultValue(param.defaultValue())
                     }
 
                     AllowableValues allowableValues = AllowableValuesUtils.create(param.allowableValues())

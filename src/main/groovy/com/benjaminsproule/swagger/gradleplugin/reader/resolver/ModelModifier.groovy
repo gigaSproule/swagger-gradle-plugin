@@ -42,7 +42,7 @@ class ModelModifier extends ModelResolver {
         } catch (ClassNotFoundException ignored) {
             LOGGER.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
-        if(type != null && toType != null) {
+        if (type != null && toType != null) {
             modelSubtitutes.put(type, toType)
         }
     }

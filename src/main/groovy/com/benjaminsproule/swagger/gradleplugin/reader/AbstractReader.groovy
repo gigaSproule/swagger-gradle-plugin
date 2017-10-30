@@ -65,7 +65,7 @@ abstract class AbstractReader {
 
     protected static List<SecurityRequirement> getSecurityRequirements(Api api) {
         List<SecurityRequirement> securities = new ArrayList<SecurityRequirement>()
-        if(api == null) {
+        if (api == null) {
             return securities
         }
 
@@ -195,7 +195,7 @@ abstract class AbstractReader {
 
     protected static Set<Tag> extractTags(Api api) {
         def output = new LinkedHashSet<Tag>()
-        if(!api) {
+        if (!api) {
             return output
         }
 
@@ -216,7 +216,7 @@ abstract class AbstractReader {
     }
 
     protected static void updateOperationProtocols(ApiOperation apiOperation, Operation operation) {
-        if(!apiOperation) {
+        if (!apiOperation) {
             return
         }
         def protocols = apiOperation.protocols().split(',')

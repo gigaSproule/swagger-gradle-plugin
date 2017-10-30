@@ -16,6 +16,8 @@ import java.lang.reflect.Method
 class Utils {
     public static final String CLASSPATH = "classpath:"
 
+    private static final HTTP_METHODS = ["Get", "Delete", "Post", "Put", "Options", "Patch"]
+
     /**
      * Extracts all routes from the annotated class
      *
@@ -45,15 +47,11 @@ class Utils {
         }
 
         TreeMap<String, Path> sortedMap = new TreeMap<String, Path>()
-        if (swagger.getPaths() == null) {
-            return
-        }
         sortedMap.putAll(swagger.getPaths())
         swagger.paths(sortedMap)
 
         for (Path path : swagger.getPaths().values()) {
-            def methods = ["Get", "Delete", "Post", "Put", "Options", "Patch"]
-            for (String m : methods) {
+            for (String m : HTTP_METHODS) {
                 sortResponses(path, m)
             }
         }

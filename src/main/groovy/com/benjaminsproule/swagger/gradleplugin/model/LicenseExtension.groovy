@@ -8,10 +8,6 @@ class LicenseExtension implements ModelValidator {
     String name
     String url
 
-    protected LicenseExtension() {
-        //For mocking
-    }
-
     License getSwaggerLicence() {
         License license = new License()
         license.setName(name)

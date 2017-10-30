@@ -40,7 +40,7 @@ class ClassFinder {
         ClassLoader classLoader = prepareClassLoader(excludes)
 
         if (packages) {
-            packages.each {location ->
+            packages.each { location ->
                 Set<Class<?>> c = new Reflections(classLoader, location).getTypesAnnotatedWith(clazz)
                 classes.addAll(c)
             }

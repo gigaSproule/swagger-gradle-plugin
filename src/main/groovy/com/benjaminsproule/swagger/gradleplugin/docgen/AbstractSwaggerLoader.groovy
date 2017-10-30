@@ -43,7 +43,7 @@ abstract class AbstractSwaggerLoader {
     }
 
     protected Set<Type> loadTypesToSkip() throws GenerateException {
-        def typesToSkip= []
+        def typesToSkip = []
 
         if (!apiSource.getTypesToSkip()) {
             return typesToSkip
@@ -73,7 +73,7 @@ abstract class AbstractSwaggerLoader {
     /**
      * Returns the set of classes which should be included in the scanning.
      *
-     * @return Set<Class<?>> containing all valid classes
+     * @return Set < Class < ? > > containing all valid classes
      */
     protected abstract Set<Class<?>> getValidClasses()
 
@@ -84,7 +84,7 @@ abstract class AbstractSwaggerLoader {
     /**
      * Resolves all {@link SwaggerExtension} instances configured to be added to the Swagger configuration.
      *
-     * @return Collection<SwaggerExtension> which should be added to the swagger configuration
+     * @return Collection < SwaggerExtension >  which should be added to the swagger configuration
      * @throws GenerateException if the swagger extensions could not be created / resolved
      */
     protected List<SwaggerExtension> resolveSwaggerExtensions() throws GenerateException {

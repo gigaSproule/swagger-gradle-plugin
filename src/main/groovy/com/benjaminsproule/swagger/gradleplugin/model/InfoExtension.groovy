@@ -12,10 +12,6 @@ class InfoExtension implements ModelValidator, Swagerable<Info> {
     LicenseExtension license
     Project project
 
-    protected InfoExtension() {
-        //For mocking
-    }
-
     InfoExtension(Project project) {
         this.project = project
     }

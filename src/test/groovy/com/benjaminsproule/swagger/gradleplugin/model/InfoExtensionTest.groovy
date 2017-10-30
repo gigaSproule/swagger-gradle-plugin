@@ -15,7 +15,7 @@ class InfoExtensionTest {
     void 'Valid info returns no errors'() {
         infoExtension.title = 'title'
         infoExtension.version = 'v1.0'
-        infoExtension.license = [isValid: { new ArrayList<>()} ] as LicenseExtension
+        infoExtension.license = [isValid: { new ArrayList<>() }] as LicenseExtension
 
         def result = infoExtension.isValid()
 
@@ -32,7 +32,7 @@ class InfoExtensionTest {
 
     @Test
     void 'Info with no title should provide missing title error'() {
-        infoExtension.license = [isValid: { new ArrayList<>()} ] as LicenseExtension
+        infoExtension.license = [isValid: { new ArrayList<>() }] as LicenseExtension
         infoExtension.version = 'v1.0'
         def result = infoExtension.isValid()
 
@@ -42,7 +42,7 @@ class InfoExtensionTest {
 
     @Test
     void 'Info with no version should provide missing version error'() {
-        infoExtension.license = [isValid: { new ArrayList<>()} ] as LicenseExtension
+        infoExtension.license = [isValid: { new ArrayList<>() }] as LicenseExtension
         infoExtension.title = 'title'
         def result = infoExtension.isValid()
 
@@ -54,7 +54,7 @@ class InfoExtensionTest {
     void 'Info with nested errors should return them'() {
         infoExtension.title = 'title'
         infoExtension.version = 'v1.0'
-        infoExtension.license = [isValid: {['nested error']}] as LicenseExtension
+        infoExtension.license = [isValid: { ['nested error'] }] as LicenseExtension
 
         def result = infoExtension.isValid()
 

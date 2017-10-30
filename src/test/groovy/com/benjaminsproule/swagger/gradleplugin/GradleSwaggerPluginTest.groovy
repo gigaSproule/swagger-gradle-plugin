@@ -43,7 +43,7 @@ class GradleSwaggerPluginTest {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin
 
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + RandomStringUtils.randomAlphabetic(5 )
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + RandomStringUtils.randomAlphabetic(5)
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
@@ -141,7 +141,7 @@ class GradleSwaggerPluginTest {
         project.tasks.generateSwaggerDocumentation.execute()
 
         def swaggerFile = new File("${project.buildDir}/libs/${project.archivesBaseName}-${swaggerRelativeDirectory}.jar")
-            assert swaggerFile.exists()
+        assert swaggerFile.exists()
     }
 
     @Test

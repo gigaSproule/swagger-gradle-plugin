@@ -82,7 +82,7 @@ class SwaggerSpecGenerator implements Generator {
                 }
             } else {
                 // Default to json
-               writeAsJsonFormat(dir, fileName,source)
+                writeAsJsonFormat(dir, fileName, source)
             }
         } catch (IOException e) {
             throw new GenerateException(e)

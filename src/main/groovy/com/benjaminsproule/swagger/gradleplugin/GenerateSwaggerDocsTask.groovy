@@ -43,11 +43,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         def swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME)
         ClassFinder.createInstance(project)
 
-        //FIXME Not sure if its even possible to get here because GradleSwaggerPlugin creates a swagger extension object
-        if (swaggerExtension == null) {
-            throw new GradleException('You must configure at least one swaggerPluginExtensions element')
-        }
-
         ensureCompatibleSwaggerSpec()
 
         try {

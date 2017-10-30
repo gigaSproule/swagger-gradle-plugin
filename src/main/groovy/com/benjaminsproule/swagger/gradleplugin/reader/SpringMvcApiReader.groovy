@@ -153,7 +153,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
 
         ApiOperation apiOperation = AnnotatedElementUtils.findMergedAnnotation(method, ApiOperation.class)
 
-        if(apiOperation != null) {
+        if (apiOperation != null) {
             if (apiOperation.hidden()) {
                 return null
             }
@@ -305,7 +305,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
             List<Parameter> parameters = getParameters(type, annotations)
 
             for (Parameter parameter : parameters) {
-                if(parameter.getName().isEmpty()) {
+                if (parameter.getName().isEmpty()) {
                     parameter.setName(parameterNames[i])
                 }
                 operation.parameter(parameter)
@@ -323,8 +323,6 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
 
         return operation
     }
-
-
 
     private Map<String, List<Method>> collectApisByRequestMapping(List<Method> methods) {
         Map<String, List<Method>> apiMethodMap = new HashMap<String, List<Method>>()
@@ -358,7 +356,8 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         }
     }
 
-    @Deprecated // TODO: Delete method never used
+    @Deprecated
+    // TODO: Delete method never used
     private Class<?> getGenericSubtype(Class<?> clazz, Type type) {
         if (!(clazz.getName().equals("void") || type.toString().equals("void"))) {
             try {

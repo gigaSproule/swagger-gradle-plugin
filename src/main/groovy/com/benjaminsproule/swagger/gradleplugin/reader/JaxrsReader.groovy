@@ -157,14 +157,14 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
         ClassFinder.instance()
             .getValidClasses(SwaggerDefinition, apiSource.locations, apiSource.excludePattern)
             .each {
-                def swaggerDefinition = AnnotationUtils.findAnnotation(it, SwaggerDefinition)
+            def swaggerDefinition = AnnotationUtils.findAnnotation(it, SwaggerDefinition)
 
-                swaggerDefinition.tags().each {
-                    if (it.name()) {
-                        tags.put(it.name(), new Tag().name(it.name()).description(it.description()))
-                    }
+            swaggerDefinition.tags().each {
+                if (it.name()) {
+                    tags.put(it.name(), new Tag().name(it.name()).description(it.description()))
                 }
             }
+        }
 
         return tags
     }
@@ -355,7 +355,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
         def paramAnnotations = findParamAnnotations(method)
 
         parameterTypes.eachWithIndex { entry, i ->
-            getParameters(genericParameterTypes[i], Arrays.asList(paramAnnotations[i])).each {parameter ->
+            getParameters(genericParameterTypes[i], Arrays.asList(paramAnnotations[i])).each { parameter ->
                 operation.parameter(parameter)
             }
         }
@@ -376,7 +376,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
         Annotation[][] paramAnnotation = method.getParameterAnnotations()
 
         Method overriddenMethod = ReflectionUtils.getOverriddenMethod(method)
-        while(overriddenMethod != null) {
+        while (overriddenMethod != null) {
             paramAnnotation = merge(overriddenMethod.getParameterAnnotations(), paramAnnotation)
             overriddenMethod = ReflectionUtils.getOverriddenMethod(overriddenMethod)
         }
@@ -388,7 +388,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
                                         Annotation[][] currentParamAnnotations) {
         Annotation[][] mergedAnnotations = new Annotation[overriddenMethodParamAnnotation.length][]
 
-        for(int i=0; i<overriddenMethodParamAnnotation.length; i++) {
+        for (int i = 0; i < overriddenMethodParamAnnotation.length; i++) {
             mergedAnnotations[i] = merge(overriddenMethodParamAnnotation[i], currentParamAnnotations[i])
         }
         return mergedAnnotations

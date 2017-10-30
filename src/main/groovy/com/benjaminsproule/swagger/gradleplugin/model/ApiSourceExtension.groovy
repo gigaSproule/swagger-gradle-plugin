@@ -43,10 +43,6 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     List<String> apiModelPropertyAccessExclusionsList
     String excludePattern = '.*\\.pom'
 
-    protected ApiSourceExtension() {
-        //For Mocking
-    }
-
     ApiSourceExtension(Project project) {
         this.project = project
 

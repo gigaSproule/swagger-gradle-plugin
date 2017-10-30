@@ -1,48 +1,60 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
-import org.junit.Before
-import org.junit.Test
+import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Specification
 
-class SwaggerExtensionTest {
+class SwaggerExtensionTest extends Specification {
     SwaggerExtension swaggerExtension
 
-    @Before
-    void setup() {
-        swaggerExtension = new SwaggerExtension(null)
+    def setup() {
+        def project = ProjectBuilder.builder().build()
+        swaggerExtension = new SwaggerExtension(project)
     }
 
-    @Test
-    void 'Valid swagger extension validation returns no errors'() {
-        swaggerExtension.apiSourceExtensions.push([isValid: { new ArrayList<>()} ] as ApiSourceExtension)
+    def 'Valid swagger extension validation returns no errors'() {
+        setup:
+        def mock = Mock(ApiSourceExtension)
+        mock.isValid() >> []
+        swaggerExtension.apiSourceExtensions.push(mock)
 
+        when:
         def result = swaggerExtension.isValid()
 
+        then:
         assert !result
     }
 
-    @Test
-    void 'Swagger extension with missing api source should provide missing api source error'() {
+    def 'Swagger extension with missing api source should provide missing api source error'() {
+        when:
         def result = swaggerExtension.isValid()
 
+        then:
         assert result
         assert result.contains('You must specify at least one apiSource element')
     }
 
-    @Test
-    void 'Swagger extension empty api source should provide missing api source error'() {
+    def 'Swagger extension empty api source should provide missing api source error'() {
+        setup:
         swaggerExtension.apiSourceExtensions = []
+
+        when:
         def result = swaggerExtension.isValid()
 
+        then:
         assert result
         assert result.contains('You must specify at least one apiSource element')
     }
 
-    @Test
-    void 'Errors from nested objects should be returned'() {
-        swaggerExtension.apiSourceExtensions.push([isValid: {['nested error']}] as ApiSourceExtension)
+    def 'Errors from nested objects should be returned'() {
+        setup:
+        def mock = Mock(ApiSourceExtension)
+        mock.isValid() >> ['nested error']
+        swaggerExtension.apiSourceExtensions.push(mock)
 
+        when:
         def result = swaggerExtension.isValid()
 
+        then:
         assert result
         assert result.contains('nested error')
     }

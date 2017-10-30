@@ -19,7 +19,7 @@ class SpringResource {
         this.description = description
         methods = new ArrayList<>()
 
-        String[] controllerRequestMappingValues = Utils.getControllerResquestMapping(controllerClass)
+        String[] controllerRequestMappingValues = Utils.getControllerRequestMapping(controllerClass)
 
         this.controllerMapping = StringUtils.removeEnd(controllerRequestMappingValues[0], "/")
     }

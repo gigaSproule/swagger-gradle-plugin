@@ -1,5 +1,5 @@
 {{#deprecated}}-deprecated-{{/deprecated}}
-<a id="{{operationId}}">{{summary}}</a>
+[{{summary}}]({{operationId}})
 
 {{description}}
 
@@ -7,60 +7,28 @@
 {{/if}}
 
 {{#if security}}
-    #### Security
+#### Security
 {{/if}}
 
 {{#security}}
-    {{#each this}}
-        * {{@key}}
-        {{#this}}   * {{this}}
-        {{/this}}
-    {{/each}}
+{{#each this}}
+* {{@key}}
+{{#this}}   * {{this}}
+{{/this}}
+{{/each}}
 {{/security}}
 
 #### Request
 
 {{#if consumes}}
-    **Content-Type: ** {{join consumes ", "}}{{/if}}
+**Content-Type: ** {{join consumes ", "}}{{/if}}
 
 ##### Parameters
 {{#if parameters}}
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Located in</th>
-            <th>Required</th>
-            <th>Description</th>
-            <th>Default</th>
-            <th>Schema</th>
-        </tr>
+| Name | Located in | Required | Description | Default | Schema |
+| --- | --- | --- | --- | --- | --- |
+{{#parameters}}| {{name}} | {{in}} | {{#if required}}yes{{else}}no{{/if}} | {{description}}{{#if pattern}} (**Pattern**: `{{pattern}}`){{/if}} | - | {{#ifeq in "body"}}{{#ifeq schema.type "array"}}Array[{{basename schema.items.$ref}}]({{schema.items.$ref}}){{else}}{{#schema.$ref}}[{{basename schema.$ref}}]({{schema.$ref}}){{/schema.$ref}}{{/ifeq}}{{else}}{{#ifeq type "array"}}Array[{{items.type}}]({{collectionFormat}}){{else}}{{type}} {{#format}}({{format}}){{/format}}{{/ifeq}}{{/ifeq}} |{{/parameters}}
 {{/if}}
-
-{{#parameters}}
-        <tr>
-            <th>{{name}}</th>
-            <td>{{in}}</td>
-            <td>{{#if required}}yes{{else}}no{{/if}}</td>
-            <td>{{description}}{{#if pattern}} (**Pattern**: `{{pattern}}`){{/if}}</td>
-            <td> - </td>
-            {{#ifeq in "body"}}
-                <td>
-                    {{#ifeq schema.type "array"}}Array[<a href="{{schema.items.$ref}}">{{basename schema.items.$ref}}</a>]{{/ifeq}}
-                    {{#schema.$ref}}<a href="{{schema.$ref}}">{{basename schema.$ref}}</a> {{/schema.$ref}}
-                </td>
-            {{else}}
-                {{#ifeq type "array"}}
-                    <td>Array[{{items.type}}] ({{collectionFormat}})</td>
-                {{else}}
-                    <td>{{type}} {{#format}}({{format}}){{/format}}</td>
-                {{/ifeq}}
-            {{/ifeq}}
-        </tr>
-{{/parameters}}
-{{#if parameters}}
-    </table>
-{{/if}}
-
 
 #### Response
 

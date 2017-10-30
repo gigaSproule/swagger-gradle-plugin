@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.generator
 
 import com.benjaminsproule.swagger.gradleplugin.Utils
+import com.benjaminsproule.swagger.gradleplugin.example.PropertyExampleMixIn
 import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -35,7 +36,7 @@ class SwaggerSpecGenerator implements Generator {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 
         if (apiSource.jsonExampleValues) {
-            mapper.addMixIn(Property.class, PropertyExampleMixIn.class)
+            mapper.addMixIn(Property, PropertyExampleMixIn)
         }
 
         if (!apiSource.swaggerDirectory) {

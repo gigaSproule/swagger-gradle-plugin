@@ -1,4 +1,6 @@
-#{{#info}}{{title}}
+{{#info}}
+
+# {{title}}
 
 
 ## {{join schemes " | "}}://{{host}}{{basePath}}
@@ -6,9 +8,7 @@
 
 {{description}}
 
-{{#contact}}
-    [**Contact the developer**](mailto:{{email}})
-{{/contact}}
+{{#contact}}[**Contact the developer**](mailto:{{email}}){{/contact}}
 
 **Version** {{version}}
 
@@ -23,85 +23,59 @@
 {{#if produces}}**Produces:** {{join produces ", "}}{{/if}}
 
 {{#if securityDefinitions}}
-    # Security Definitions
+# Security Definitions
 {{/if}}
 {{> security}}
 
 # APIs
 
 {{#each paths}}
-    ## {{@key}}
-    {{#this}}
-        {{#get}}
-            ### GET
-            {{> operation}}
-        {{/get}}
+## {{@key}}
+{{#this}}
+{{#get}}
+### GET
+{{> operation}}
+{{/get}}
 
-        {{#put}}
-            ### PUT
-            {{> operation}}
-        {{/put}}
+{{#put}}
+### PUT
+{{> operation}}
+{{/put}}
 
-        {{#post}}
-            ### POST
+{{#post}}
+### POST
 
-            {{> operation}}
+{{> operation}}
 
-        {{/post}}
+{{/post}}
 
-        {{#delete}}
-            ### DELETE
-            {{> operation}}
-        {{/delete}}
+{{#delete}}
+### DELETE
+{{> operation}}
+{{/delete}}
 
-        {{#option}}
-            ### OPTION
-            {{> operation}}
-        {{/option}}
+{{#option}}
+### OPTION
+{{> operation}}
+{{/option}}
 
-        {{#patch}}
-            ### PATCH
-            {{> operation}}
-        {{/patch}}
+{{#patch}}
+### PATCH
+{{> operation}}
+{{/patch}}
 
-        {{#head}}
-            ### HEAD
-            {{> operation}}
-        {{/head}}
-
-    {{/this}}
+{{#head}}
+### HEAD
+{{> operation}}
+{{/head}}
+{{/this}}
 {{/each}}
 
 # Definitions
 {{#each definitions}}
-    ## <a name="/definitions/{{key}}">{{@key}}</a>
+## [{{@key}}](/definitions/{{key}})
 
-    <table border="1">
-        <tr>
-            <th>name</th>
-            <th>type</th>
-            <th>required</th>
-            <th>description</th>
-            <th>example</th>
-        </tr>
-        {{#each this.properties}}
-            <tr>
-                <td>{{@key}}</td>
-                <td>
-                    {{#ifeq type "array"}}
-                        {{#items.$ref}}
-                            {{type}}[<a href="{{items.$ref}}">{{basename items.$ref}}</a>]
-                        {{/items.$ref}}
-                        {{^items.$ref}}{{type}}[{{items.type}}]{{/items.$ref}}
-                    {{else}}
-                        {{#$ref}}<a href="{{$ref}}">{{basename $ref}}</a>{{/$ref}}
-                        {{^$ref}}{{type}}{{#format}} ({{format}}){{/format}}{{/$ref}}
-                    {{/ifeq}}
-                </td>
-                <td>{{#required}}required{{/required}}{{^required}}optional{{/required}}</td>
-                <td>{{#description}}{{{description}}}{{/description}}{{^description}}-{{/description}}</td>
-                <td>{{example}}</td>
-            </tr>
-        {{/each}}
-    </table>
+| name | type | required | description | example |
+| --- | --- | --- | --- | --- |
+{{#this.properties}}| {{@key}} | {{#ifeq type "array"}}{{#items.$ref}}{{type}}[{{basename items.$ref}}]({{items.$ref}})]{{/items.$ref}}{{^items.$ref}}{{type}}[{{items.type}}]{{/items.$ref}}{{else}}{{#$ref}}[{{basename $ref}}]({{$ref}}){{/$ref}}{{^$ref}}{{type}}{{#format}} ({{format}}){{/format}}{{/$ref}}{{/ifeq}} | {{#required}}required{{/required}}{{^required}}optional{{/required}} | {{#description}}{{{description}}}{{/description}}{{^description}}-{{/description}} | {{example}} |{{/this.properties}}
 {{/each}}

@@ -23,7 +23,7 @@ class Utils {
      *            Instrospected class
      * @return At least 1 route value (empty string)
      */
-    static String[] getControllerResquestMapping(Class<?> controllerClazz) {
+    static String[] getControllerRequestMapping(Class<?> controllerClazz) {
         String[] controllerRequestMappingValues = {}
 
         // Determine if we will use class-level requestmapping or dummy string

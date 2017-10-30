@@ -186,44 +186,6 @@ class GradleSwaggerPluginTest {
         assertSwaggerYaml(swaggerYamlFile)
     }
 
-    @Test
-    @Ignore("This seems to be broken, nothing is ever generated")
-    void useSpecifiedTemplatesToGenerateSwaggerDocs() {
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-
-        def randomizer = RandomStringUtils.randomAlphabetic(5)
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-${randomizer}"
-        //Template path is not actually a template path but a template file and it propbably has to be the root
-        def expectedSwaggerDocsDirectory = "${project.buildDir}/swaggerdocs-${randomizer}"
-        def templatePathValue = "/Users/aedwards/Documents/DataRealm/3rdparty/swagger-gradle-plugin/src/test/resources/api-doc-template/"
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule']
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                    }
-                    swaggerDirectory = expectedSwaggerDirectory
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
-                    templatePath = templatePathValue
-                    outputPath = expectedSwaggerDocsDirectory
-                }
-            }
-        ))
-
-        project.tasks.generateSwaggerDocumentation.execute()
-    }
-
     private static void assertSwaggerYaml(File swaggerYamlFile) {
         assertTrue(Files.exists(swaggerYamlFile.toPath()))
 
@@ -258,6 +220,6 @@ class GradleSwaggerPluginTest {
         def tags = producedSwaggerDocument.get('tags')
         assert tags
         assert tags.size() == 1
-        assert tags.get(0).get('name') == '/'
+        assert tags.get(0).get('name') == 'Test'
     }
 }

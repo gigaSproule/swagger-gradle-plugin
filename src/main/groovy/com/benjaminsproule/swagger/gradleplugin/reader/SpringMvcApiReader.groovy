@@ -376,7 +376,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
 
     //Helper method for loadDocuments()
     private Map<String, SpringResource> analyzeController(Class<?> controllerClazz, Map<String, SpringResource> resourceMap, String description) {
-        String[] controllerRequestMappingValues = Utils.getControllerResquestMapping(controllerClazz)
+        String[] controllerRequestMappingValues = Utils.getControllerRequestMapping(controllerClazz)
 
         // Iterate over all value attributes of the class-level RequestMapping annotation
         for (String controllerRequestMappingValue : controllerRequestMappingValues) {

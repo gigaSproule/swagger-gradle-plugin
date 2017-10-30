@@ -38,11 +38,19 @@ class ApiDocsPluginTest {
             {
                 apiSource {
                     locations = ['com.benjaminsproule']
+                    schemes = ['http']
                     info {
                         title = project.name
                         version = '1'
+                        termsOfService = 'http://localhost/tos'
+                        description = 'The Api description'
                         license {
                             name = 'Apache 2.0'
+                            url = 'http://localhost/license'
+                        }
+                        contact {
+                            name = 'Joe Blogs'
+                            email = 'joe.blogs@fake.com'
                         }
                     }
                     host = 'localhost:8080'
@@ -59,10 +67,7 @@ class ApiDocsPluginTest {
 
         project.tasks.generateSwaggerDocumentation.execute()
 
-        println expectedSwaggerDocsDirectory
-        def swaggerDir = new File(expectedSwaggerDocsDirectory)
-        swaggerDir.eachFile {file ->
-            println file.name
-        }
+        def swaggerDir = new File(expectedSwaggerApiDocsFile)
+        assert swaggerDir
     }
 }

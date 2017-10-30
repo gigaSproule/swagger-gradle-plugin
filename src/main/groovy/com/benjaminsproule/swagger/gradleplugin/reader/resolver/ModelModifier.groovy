@@ -65,23 +65,19 @@ class ModelModifier extends ModelResolver {
     Model resolve(Type type, ModelConverterContext context, Iterator<ModelConverter> chain) {
         // for method parameter types we get here Type but we need JavaType
         JavaType javaType = toJavaType(type)
+        def model
         if (modelSubtitutes.containsKey(javaType)) {
-            return super.resolve(modelSubtitutes.get(javaType), context, chain)
+            model = super.resolve(modelSubtitutes.get(javaType), context, chain)
         } else {
-            return super.resolve(type, context, chain)
+            model = super.resolve(type, context, chain)
         }
-    }
-
-    @Override
-    Model resolve(JavaType type, ModelConverterContext context, Iterator<ModelConverter> chain) {
-        Model model = super.resolve(type, context, chain)
 
         // If there are no @ApiModelPropety exclusions configured, return the untouched model
         if (apiModelPropertyAccessExclusions == null || apiModelPropertyAccessExclusions.isEmpty()) {
             return model
         }
 
-        Class<?> cls = type.getRawClass()
+        Class<?> cls = javaType.getRawClass()
 
         for (Method method : cls.getDeclaredMethods()) {
             ApiModelProperty apiModelPropertyAnnotation = AnnotationUtils.findAnnotation(method, ApiModelProperty.class)
@@ -97,7 +93,6 @@ class ModelModifier extends ModelResolver {
 
         return model
     }
-
 
     /**
      * Remove property from {@link Model} for provided {@link ApiModelProperty}.

@@ -85,6 +85,6 @@ class JaxrsPluginTest {
         def tags = producedSwaggerDocument.get('tags')
         assert tags
         assert tags.size() == 1
-        assert tags.get(0).get('name') == '/'
+        assert tags.get(0).get('name') == 'Test'
     }
 }

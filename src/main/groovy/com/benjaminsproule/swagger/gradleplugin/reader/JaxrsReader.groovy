@@ -341,7 +341,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
         }
 
         ApiResponses responseAnnotation = AnnotationUtils.findAnnotation(method, ApiResponses)
-        if (responseAnnotation != null) {
+        if (responseAnnotation) {
             updateApiResponse(operation, responseAnnotation)
         }
 

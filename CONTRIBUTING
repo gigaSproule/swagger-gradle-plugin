@@ -1,0 +1,24 @@
+# Contributing to swagger-gradle-plugin
+
+We are a lovely group of people who are only here to make this better. We will not be horrible and expect that to be the same in return.
+
+## Testing
+As I'm sure you  are aware, the current level of test coverage isn't fantastic, but with the new changes, all new code should _not_ reduce the line coverage of the tests and all code should be developed in a TDD manner.
+
+## Submitting changes
+Please send a [GitHub Pull Request to swagger-gradle-plugin](https://github.com/gigaSproule/swagger-gradle-plugin/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When the pull request is being merged, please ensure that the commits are squashed with a useful commit message (just a friendly reminder). Please follow our coding conventions (below).
+
+Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
+
+```
+$ git commit -m "A brief summary of the commit
+> 
+> A paragraph describing what changed and its impact."
+```
+
+## Coding conventions
+* Setup [editorconfig](http://editorconfig.org/#download) for formatting (so it's easy to enforce consistency)
+* So we can have smaller files, the IntelliJ default import config (5 or more use *, 3 or more use * for static imports)
+* We ALWAYS put spaces after list items and method parameters ([1, 2, 3], not [1,2,3]) and around operators (x += 1, not x+=1)
+* Try to avoid unnecessary changes (makes the pull requests easier to read)
+* This is open source software. Consider the people who will read your code, and make it look nice for them. It's sort of like driving a car: Perhaps you love doing donuts when you're alone, but with passengers the goal is to make the ride as smooth as possible

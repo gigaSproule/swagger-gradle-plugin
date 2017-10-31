@@ -28,10 +28,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     @TaskAction
     generateSwaggerDocuments() {
-        getClasspath().each {
-            this.class.getClassLoader().addURL(it)
-        }
-
         SwaggerExtension swaggerExtension = project.swagger
 
         if (swaggerExtension == null) {
@@ -65,6 +61,10 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     }
 
     private void processSwaggerPluginExtension(ApiSourceExtension swaggerPluginExtension) {
+        getClasspath().each {
+            this.class.getClassLoader().addURL(it)
+        }
+
         validateConfiguration(swaggerPluginExtension)
 
         AbstractDocumentSource documentSource

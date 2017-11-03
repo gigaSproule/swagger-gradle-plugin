@@ -1,0 +1,41 @@
+{{#deprecated}}-deprecated-{{/deprecated}}
+[{{summary}}]({{operationId}})
+
+{{description}}
+
+{{#if externalDocs.url}}{{externalDocs.description}}. [See external documents for more details]({{externalDocs.url}})
+{{/if}}
+
+{{#if security}}
+#### Security
+{{/if}}
+
+{{#security}}
+{{#each this}}
+* {{@key}}
+{{#this}}   * {{this}}
+{{/this}}
+{{/each}}
+{{/security}}
+
+#### Request
+
+{{#if consumes}}
+**Content-Type: ** {{join consumes ", "}}{{/if}}
+
+##### Parameters
+{{#if parameters}}
+| Name | Located in | Required | Description | Default | Schema |
+| --- | --- | --- | --- | --- | --- |
+{{#parameters}}| {{name}} | {{in}} | {{#if required}}yes{{else}}no{{/if}} | {{description}}{{#if pattern}} (**Pattern**: `{{pattern}}`){{/if}} | - | {{#ifeq in "body"}}{{#ifeq schema.type "array"}}Array[{{basename schema.items.$ref}}]({{schema.items.$ref}}){{else}}{{#schema.$ref}}[{{basename schema.$ref}}]({{schema.$ref}}){{/schema.$ref}}{{/ifeq}}{{else}}{{#ifeq type "array"}}Array[{{items.type}}]({{collectionFormat}}){{else}}{{type}} {{#format}}({{format}}){{/format}}{{/ifeq}}{{/ifeq}} |{{/parameters}}
+{{/if}}
+
+#### Response
+
+{{#if produces}}**Content-Type: ** {{join produces ", "}}{{/if}}
+
+
+| Status Code | Reason      | Response Model |
+|-------------|-------------|----------------|
+{{#each responses}}| {{@key}}    | {{description}} | {{#schema.$ref}}<a href="{{schema.$ref}}">{{basename schema.$ref}}</a>{{/schema.$ref}}{{^schema.$ref}}{{#ifeq schema.type "array"}}Array[<a href="{{schema.items.$ref}}">{{basename schema.items.$ref}}</a>]{{else}}{{schema.type}}{{/ifeq}}{{/schema.$ref}}{{^schema}} - {{/schema}}|
+{{/each}}

@@ -1,21 +1,26 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.extension.ApiSourceExtension
-import com.benjaminsproule.swagger.gradleplugin.extension.SwaggerExtension
-import com.benjaminsproule.swagger.gradleplugin.logger.Slf4jWrapper
-import com.github.kongchen.swagger.docgen.AbstractDocumentSource
-import com.github.kongchen.swagger.docgen.GenerateException
-import com.github.kongchen.swagger.docgen.mavenplugin.MavenDocumentSource
-import com.github.kongchen.swagger.docgen.mavenplugin.SpringMavenDocumentSource
-import org.apache.maven.monitor.logging.DefaultLog
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.docgen.LoaderFactory
+import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
+import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
+import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
+import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
+import io.swagger.models.Swagger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.InvalidUserDataException
+import org.gradle.api.Task
+import org.gradle.api.internal.TaskInternal
+import org.gradle.api.specs.AndSpec
+import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 
+import static com.benjaminsproule.swagger.gradleplugin.VersionUtils.ensureCompatibleSwaggerSpec
+
 /**
- * GradleSwaggerTask copied from {@link com.github.kongchen.swagger.docgen.mavenplugin.ApiDocumentMojo} with
- * added classpath logic
+ * GradleSwaggerTask originally from kongchen swagger maven plugin.
  */
 class GenerateSwaggerDocsTask extends DefaultTask {
     public static final String TASK_NAME = 'generateSwaggerDocumentation'
@@ -24,39 +29,28 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     String group = 'swagger'
 
-    String excludePattern = '.*\\.pom'
+    @Override
+    Spec<? super TaskInternal> getOnlyIf() {
+        return new AndSpec<Task>(new Spec<Task>() {
+            boolean isSatisfiedBy(Task element) {
+                return element == GenerateSwaggerDocsTask.this && enabled && !(project.findProperty('swagger.skip') ?: false)
+            }
+        })
+    }
 
     @TaskAction
     generateSwaggerDocuments() {
-        getClasspath().each {
-            this.class.getClassLoader().addURL(it)
-        }
+        def swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME)
+        ClassFinder.createInstance(project)
 
-        SwaggerExtension swaggerExtension = project.swagger
-
-        if (swaggerExtension == null) {
-            throw new GradleException('You must configure at least one swaggerPluginExtensions element')
-        }
-
-        if (swaggerExtension.skipSwaggerGeneration) {
-            getLogger().info('Swagger generation is skipped.')
-            return
-        }
-
-        if (useSwaggerSpec11()) {
-            throw new GradleException('You may use an old version of swagger which is not supported by swagger-maven-plugin 2.0+\n' +
-                'swagger-maven-plugin 2.0+ only supports swagger-core 1.3.x')
-        }
-
-        if (useSwaggerSpec13()) {
-            throw new GradleException('You may use an old version of swagger which is not supported by swagger-maven-plugin 3.0+\n' +
-                'swagger-maven-plugin 3.0+ only supports swagger spec 2.0')
-        }
+        ensureCompatibleSwaggerSpec()
 
         try {
             for (ApiSourceExtension apiSourceExtension : swaggerExtension.apiSourceExtensions) {
                 processSwaggerPluginExtension(apiSourceExtension)
             }
+        } catch (InvalidUserDataException iude) {
+            throw iude
         } catch (GenerateException e) {
             throw new GradleException(e.getMessage(), e)
         } catch (Exception e) {
@@ -64,53 +58,24 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
     }
 
-    private void processSwaggerPluginExtension(ApiSourceExtension swaggerPluginExtension) {
-        validateConfiguration(swaggerPluginExtension)
+    private void processSwaggerPluginExtension(ApiSourceExtension apiSourceExtension) {
+        def errors = apiSourceExtension.isValid()
 
-        AbstractDocumentSource documentSource
-
-        def encoding = project.compileJava.options.encoding
-        if (encoding == null) {
-            encoding = 'UTF-8'
+        if (errors) {
+            throw new InvalidUserDataException(errors.join(","))
         }
 
-        if (swaggerPluginExtension.isSpringmvc()) {
-            documentSource = new SpringMavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()), encoding)
-        } else {
-            documentSource = new MavenDocumentSource(swaggerPluginExtension, new DefaultLog(new Slf4jWrapper()), encoding)
-        }
+        def documentSource = LoaderFactory.loader(apiSourceExtension)
 
-        documentSource.loadTypesToSkip()
-        documentSource.loadModelModifier()
-        documentSource.loadModelConverters()
-        documentSource.loadDocuments()
+        Swagger swagger = apiSourceExtension.asSwaggerType()
+        swagger = documentSource.loadDocuments(swagger)
 
-        if (swaggerPluginExtension.getOutputPath() != null) {
-            File outputDirectory = new File(swaggerPluginExtension.getOutputPath()).getParentFile()
-            if (outputDirectory != null && !outputDirectory.exists()) {
-                if (!outputDirectory.mkdirs()) {
-                    throw new GradleException("Create directory[${swaggerPluginExtension.getOutputPath()}] for output failed.")
-                }
-            }
-        }
+        def generator = GeneratorFactory.generator(apiSourceExtension)
+        generator.generate(swagger)
 
-        if (swaggerPluginExtension.getTemplatePath() != null) {
-            documentSource.toDocuments()
-        }
-
-        String swaggerFileName = getSwaggerFileName(swaggerPluginExtension.getSwaggerFileName())
-
-        documentSource.toSwaggerDocuments(
-            swaggerPluginExtension.getSwaggerUIDocBasePath() == null
-                ? swaggerPluginExtension.getBasePath()
-                : swaggerPluginExtension.getSwaggerUIDocBasePath(),
-            swaggerPluginExtension.getOutputFormats(),
-            swaggerFileName,
-            encoding)
-
-        if (swaggerPluginExtension.isAttachSwaggerArtifact() && swaggerPluginExtension.getSwaggerDirectory() != null && this.project != null) {
-            String classifierName = new File(swaggerPluginExtension.getSwaggerDirectory()).getName()
-            File swaggerFile = new File(swaggerPluginExtension.getSwaggerDirectory(), swaggerFileName)
+        if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory && this.project) {
+            String classifierName = new File(apiSourceExtension.swaggerDirectory).getName()
+            File swaggerFile = new File(apiSourceExtension.swaggerDirectory)
 
             project.task('createSwaggerArtifact', type: Jar, dependsOn: project.tasks.classes) {
                 classifier = classifierName
@@ -123,81 +88,5 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
             project.tasks.createSwaggerArtifact.execute()
         }
-    }
-
-    /**
-     * validate configuration according to swagger spec and plugin requirement
-     *
-     * @param apiSourceExtension
-     * @throws GenerateException
-     */
-    private static void validateConfiguration(ApiSourceExtension apiSourceExtension) throws GenerateException {
-        if (apiSourceExtension == null) {
-            throw new GenerateException('You do not configure any apiSourceExtension!')
-        } else if (apiSourceExtension.getInfo() == null) {
-            throw new GenerateException('`<info>` is required by Swagger Spec.')
-        }
-        if (apiSourceExtension.getInfo().getTitle() == null) {
-            throw new GenerateException('`<info><title>` is required by Swagger Spec.')
-        }
-
-        if (apiSourceExtension.getInfo().getVersion() == null) {
-            throw new GenerateException('`<info><version>` is required by Swagger Spec.')
-        }
-
-        if (apiSourceExtension.getInfo().getLicense() != null && apiSourceExtension.getInfo().getLicense().getName() == null) {
-            throw new GenerateException('`<info><license><name>` is required by Swagger Spec.')
-        }
-
-        if (apiSourceExtension.getLocations() == null) {
-            throw new GenerateException('<locations> is required by this plugin.')
-        }
-
-    }
-
-    private static boolean useSwaggerSpec11() {
-        try {
-            Class.forName('com.wordnik.swagger.annotations.ApiErrors')
-            return true
-        } catch (ClassNotFoundException ignored) {
-            return false
-        }
-    }
-
-    private static boolean useSwaggerSpec13() {
-        try {
-            Class.forName('com.wordnik.swagger.model.ApiListing')
-            return true
-        } catch (ClassNotFoundException ignored) {
-            return false
-        }
-    }
-
-    private String getSwaggerFileName(String swaggerFileName) {
-        return swaggerFileName == null || "".equals(swaggerFileName.trim()) ? "swagger" : swaggerFileName
-    }
-
-    private String getSwaggerDirectoryName(String swaggerDirectory) {
-        return new File(swaggerDirectory).getName()
-    }
-
-    private ArrayList<URL> getClasspath() {
-        List<URL> urls = new ArrayList<>()
-        project.configurations.runtime.resolve().each {
-            if (!it.name.matches(excludePattern)) {
-                urls.add(it.toURI().toURL())
-            }
-        }
-
-        def mainSourceSetsOutput = project.sourceSets.main.output
-        if (!mainSourceSetsOutput.properties.classesDirs) {
-            urls.add(mainSourceSetsOutput.classesDir.toURI().toURL())
-        } else {
-            mainSourceSetsOutput.classesDirs.each {
-                urls.add(it.toURI().toURL())
-            }
-        }
-        urls.add(mainSourceSetsOutput.resourcesDir.toURI().toURL())
-        urls
     }
 }

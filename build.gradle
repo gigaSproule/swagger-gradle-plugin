@@ -37,11 +37,12 @@ dependencies {
 
     compile 'commons-io:commons-io:2.6'
     compile 'org.apache.commons:commons-lang3:3.6'
+    compile 'org.apache.commons:commons-text:1.1'
     compile 'com.github.jknack:handlebars:4.0.6'
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.2'
     compile 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.2'
     compile 'javax.xml.bind:jaxb-api:2.2.4'
-    
+
     //These should be pinned here until reflections/reflections#194 has been resolved
     compile 'io.swagger:swagger-jaxrs:1.5.13'
     compile 'io.swagger:swagger-jersey-jaxrs:1.5.13'

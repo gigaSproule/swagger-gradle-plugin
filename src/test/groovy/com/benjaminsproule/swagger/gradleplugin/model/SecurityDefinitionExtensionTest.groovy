@@ -50,7 +50,7 @@ class SecurityDefinitionExtensionTest {
 
     @Test
     void 'Load Security Definitions from file'() {
-        securityDefinitionExtension.json = '/security-definition/securityDefinitionExtensionTest.json'
+        securityDefinitionExtension.json = 'security-definition/securityDefinitionExtensionTest.json'
 
         def result = securityDefinitionExtension.asSwaggerType()
 

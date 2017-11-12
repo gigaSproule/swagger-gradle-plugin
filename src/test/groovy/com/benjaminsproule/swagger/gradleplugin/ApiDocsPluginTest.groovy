@@ -2,6 +2,7 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.text.RandomStringGenerator
 import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction
 import org.gradle.api.plugins.JavaPlugin
@@ -29,7 +30,7 @@ class ApiDocsPluginTest {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin
 
-        def randomizer = RandomStringUtils.randomAlphabetic(5)
+        def randomizer = new RandomStringGenerator.Builder().build().generate(5)
         //Template path is not actually a template path but a template file and it propbably has to be the root
         def expectedSwaggerDocsDirectory = "${project.buildDir}/swaggerdocs-${randomizer}"
         def expectedSwaggerApiDocsFile = "${expectedSwaggerDocsDirectory}/api.html"

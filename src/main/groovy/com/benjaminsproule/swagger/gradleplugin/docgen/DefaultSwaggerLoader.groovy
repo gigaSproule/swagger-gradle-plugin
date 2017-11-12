@@ -20,7 +20,7 @@ class DefaultSwaggerLoader extends AbstractSwaggerLoader {
     Set<Class<?>> getValidClasses() {
         return Sets.union(
             getApiClasses(),
-            ClassFinder.instance().getValidClasses(Path, apiSource.locations, apiSource.excludePattern))
+            ClassFinder.instance().getValidClasses(Path, apiSource.locations))
     }
 
     @Override

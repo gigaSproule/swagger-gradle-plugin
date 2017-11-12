@@ -28,16 +28,16 @@ class ClassFinder {
     }
 
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
-        return getValidClasses(clazz, [], '')
+        return getValidClasses(clazz, [])
     }
 
-    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages, String excludes) {
+    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages) {
         if (classCache.containsKey(clazz)) {
             return classCache.get(clazz)
         }
 
         Set<Class<?>> classes = new HashSet<Class<?>>()
-        ClassLoader classLoader = prepareClassLoader(excludes)
+        ClassLoader classLoader = prepareClassLoader()
 
         if (packages) {
             packages.each { location ->
@@ -54,12 +54,10 @@ class ClassFinder {
         return classes
     }
 
-    private ClassLoader prepareClassLoader(String excludes) {
-        def urls = new ArrayList<>()
+    private ClassLoader prepareClassLoader() {
+        def urls = []
         project.configurations.runtime.resolve().each {
-            if (!it.name.matches(excludes)) {
                 urls.add(it.toURI().toURL())
-            }
         }
 
         if (project.sourceSets.main.output.classesDirs) {

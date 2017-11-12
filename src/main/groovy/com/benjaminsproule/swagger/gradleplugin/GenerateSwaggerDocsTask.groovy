@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import com.benjaminsproule.swagger.gradleplugin.docgen.LoaderFactory
 import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
@@ -42,6 +43,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     generateSwaggerDocuments() {
         def swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME)
         ClassFinder.createInstance(project)
+        ResourceFinder.createInstance(project)
 
         ensureCompatibleSwaggerSpec()
 

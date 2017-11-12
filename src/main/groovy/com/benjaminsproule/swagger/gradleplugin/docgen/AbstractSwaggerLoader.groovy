@@ -78,7 +78,7 @@ abstract class AbstractSwaggerLoader {
     protected abstract Set<Class<?>> getValidClasses()
 
     protected Set<Class<?>> getApiClasses() {
-        return ClassFinder.instance().getValidClasses(Api, apiSource.locations, apiSource.excludePattern)
+        return ClassFinder.instance().getValidClasses(Api, apiSource.locations)
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class AbstractSwaggerLoader {
             for (String clazz : clazzes) {
                 SwaggerExtension extension
                 try {
-                    extension = (SwaggerExtension) Class.forName(clazz).newInstance()
+                    extension = (SwaggerExtension) Class.forName(clazz).newInstance([])
                 } catch (Exception e) {
                     throw new GenerateException("Cannot load Swagger extension: " + clazz, e)
                 }

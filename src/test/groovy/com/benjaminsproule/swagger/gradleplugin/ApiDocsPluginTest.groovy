@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
-import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.text.RandomStringGenerator
 import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction

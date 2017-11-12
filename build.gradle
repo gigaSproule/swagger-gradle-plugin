@@ -9,7 +9,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: "jacoco" //Currently this does not exclude methods generated via Annotations (toString in this plugin)
+apply plugin: 'jacoco' //Currently this does not exclude methods generated via Annotations (toString in this plugin)
 
 repositories {
     mavenLocal()
@@ -54,9 +54,9 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'cglib:cglib-nodep:3.2.5'
-    testCompile ('org.spockframework:spock-core:1.1-groovy-2.4') {
+    testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
         //We want to depend on the gradle version of groovy since this is a plugin
-        exclude module : 'groovy-all'
+        exclude module: 'groovy-all'
     }
     testCompile 'org.yaml:snakeyaml:1.19'
 }
@@ -109,11 +109,11 @@ pluginBundle {
 
 publishing {
     publications {
-        pluginPublication (MavenPublication) {
-            from    components.java
-            groupId    project.group
-            artifactId    project.name
-            version    "${project.version}-SNAPSHOT"
+        pluginPublication(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId project.name
+            version "${project.version}-SNAPSHOT"
         }
     }
 }

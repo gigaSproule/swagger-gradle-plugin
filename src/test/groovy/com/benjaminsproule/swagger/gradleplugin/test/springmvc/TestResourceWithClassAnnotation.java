@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.List;
 
 @Api(tags = "Test", description = "Test resource", authorizations = {@Authorization("basic")})
-@RequestMapping(value = "/root", produces = {"application/json"})
-public class TestResource {
+@RequestMapping(value = "/root/withannotation", produces = {"application/json"})
+public class TestResourceWithClassAnnotation {
     @ApiOperation("A basic operation")
     @RequestMapping(path = "/basic", method = RequestMethod.GET)
     public String basic() {
@@ -24,8 +24,8 @@ public class TestResource {
         return "";
     }
 
-    @ApiOperation(value = "A generic operation", hidden = true)
-    @RequestMapping(path = "/generic", method = RequestMethod.GET)
+    @ApiOperation(value = "A generic operation")
+    @RequestMapping(path = "/generics", method = RequestMethod.POST)
     public List<String> generic() {
         return Lists.newArrayList("");
     }

@@ -86,5 +86,35 @@ class JaxrsPluginTest {
         assert tags
         assert tags.size() == 1
         assert tags.get(0).get('name') == 'Test'
+
+        def paths = producedSwaggerDocument.get('paths')
+        assert paths
+        assert paths.size() == 13
+        assert paths.get('/root/withannotation/basic')
+        assert paths.get('/root/withannotation/basic').get('get')
+        assert paths.get('/root/withannotation/datatype')
+        assert paths.get('/root/withannotation/datatype').get('post')
+        assert paths.get('/root/withannotation/deprecated')
+        assert paths.get('/root/withannotation/deprecated').get('get')
+        assert paths.get('/root/withannotation/extended')
+        assert paths.get('/root/withannotation/extended').get('get')
+        assert paths.get('/root/withannotation/generics')
+        assert paths.get('/root/withannotation/generics').get('post')
+        assert paths.get('/root/withannotation/method')
+        assert paths.get('/root/withannotation/method').get('get')
+        assert paths.get('/root/withannotation/model')
+        assert paths.get('/root/withannotation/model').get('post')
+        assert paths.get('/root/withoutannotation/basic')
+        assert paths.get('/root/withoutannotation/basic').get('get')
+        assert paths.get('/root/withoutannotation/datatype')
+        assert paths.get('/root/withoutannotation/datatype').get('post')
+        assert paths.get('/root/withoutannotation/deprecated')
+        assert paths.get('/root/withoutannotation/deprecated').get('get')
+        assert paths.get('/root/withoutannotation/generics')
+        assert paths.get('/root/withoutannotation/generics').get('post')
+        assert paths.get('/root/withoutannotation/method')
+        assert paths.get('/root/withoutannotation/method').get('get')
+        assert paths.get('/root/withoutannotation/model')
+        assert paths.get('/root/withoutannotation/model').get('post')
     }
 }

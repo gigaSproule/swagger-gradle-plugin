@@ -87,5 +87,17 @@ class SpringMvcPluginTest {
         assert tags
         assert tags.size() == 1
         assert tags.get(0).get('name') == 'Test'
+
+        def paths = producedSwaggerDocument.get('paths')
+        assert paths
+        assert paths.size() == 4
+        assert paths.get('/root/withannotation/basic')
+        assert paths.get('/root/withannotation/basic').get('get')
+        assert paths.get('/root/withannotation/generics')
+        assert paths.get('/root/withannotation/generics').get('post')
+        assert paths.get('/root/withoutannotation/basic')
+        assert paths.get('/root/withoutannotation/basic').get('get')
+        assert paths.get('/root/withoutannotation/generics')
+        assert paths.get('/root/withoutannotation/generics').get('post')
     }
 }

@@ -7,7 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-public class ExtendedResource extends TestResource {
+public class ExtendedResource extends TestResourceWithAnnotation {
 
     @ApiOperation("A extended operation")
     @Path("/extended")

@@ -1,22 +1,14 @@
 package com.benjaminsproule.swagger.gradleplugin.test.jaxrs;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.annotations.*;
 
-import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Api(tags = "Test", description = "Test resource", authorizations = {@Authorization("basic")})
-@Path("/root")
-public class TestResource {
+@Path("/root/withannotation")
+public class TestResourceWithAnnotation {
 
     @ApiOperation("A basic operation")
     @Path("/method")
@@ -76,7 +68,7 @@ public class TestResource {
 
 
     @ApiOperation("A extended operation")
-    @Path("/base")
+    @Path("/basic")
     @GET
     public Response extended(@ApiParam SubclassModel subclass) {
         return Response.ok().build();

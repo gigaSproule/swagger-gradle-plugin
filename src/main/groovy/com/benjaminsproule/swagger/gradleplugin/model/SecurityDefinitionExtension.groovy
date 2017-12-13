@@ -82,8 +82,7 @@ class SecurityDefinitionExtension implements ModelValidator, Swagerable<Map<Stri
         return securityDefinitions
     }
 
-    private
-    static SecuritySchemeDefinition getSecuritySchemeDefinitionByType(String type, JsonNode node) throws GenerateException {
+    private static SecuritySchemeDefinition getSecuritySchemeDefinitionByType(String type, JsonNode node) throws GenerateException {
         try {
             ObjectMapper mapper = new ObjectMapper()
             SecuritySchemeDefinition securityDef = null

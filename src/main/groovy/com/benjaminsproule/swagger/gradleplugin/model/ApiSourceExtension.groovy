@@ -36,12 +36,11 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     boolean attachSwaggerArtifact
     File descriptionFile
     List<String> swaggerExtensions
-    Set<String> typesToSkip = new HashSet<String>()
-    List<String> apiModelPropertyAccessExclusions = new ArrayList<String>()
+    Set<String> typesToSkip = new HashSet<>()
+    List<String> apiModelPropertyAccessExclusions = []
     List<String> typesToSkipList
     List<String> modelConverters
     List<String> apiModelPropertyAccessExclusionsList
-    String excludePattern = '.*\\.pom'
 
     ApiSourceExtension(Project project) {
         this.project = project
@@ -118,22 +117,26 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     private String setHostFromAnnotation() {
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations, excludePattern)) {
+        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             return swaggerDefinition.host()
         }
+
+        return null
     }
 
     private String setBasePathFromAnnotation() {
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations, excludePattern)) {
+        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             return swaggerDefinition.basePath()
         }
+
+        return null
     }
 
     private InfoExtension setInfoFromAnnotation() {
         def resultInfo = new InfoExtension(project)
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition, locations, excludePattern)) {
+        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             Info infoAnnotation = swaggerDefinition.info()
             def info = new InfoExtension(project)

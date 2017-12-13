@@ -19,7 +19,7 @@ class SpringSwaggerLoader extends AbstractSwaggerLoader {
     Set<Class<?>> getValidClasses() {
         return Sets.union(
             getApiClasses(),
-            ClassFinder.instance().getValidClasses(RestController, apiSource.locations, apiSource.excludePattern))
+            ClassFinder.instance().getValidClasses(RestController, apiSource.locations))
     }
 
     @Override

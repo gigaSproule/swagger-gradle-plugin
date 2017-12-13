@@ -5,20 +5,11 @@ import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.spring.SpringSwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.model.SpringResource
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiResponses
-import io.swagger.annotations.Authorization
-import io.swagger.annotations.AuthorizationScope
+import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
-import io.swagger.models.Model
-import io.swagger.models.Operation
-import io.swagger.models.Response
-import io.swagger.models.SecurityRequirement
-import io.swagger.models.Swagger
-import io.swagger.models.Tag
+import io.swagger.models.*
 import io.swagger.models.parameters.Parameter
 import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
@@ -93,7 +84,11 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
             resourceSecurities = getSecurityRequirements(api)
         }
 
-        resourcePath = resource.controllerMapping
+        if (resource.controllerClass.isAnnotationPresent(RequestMapping)) {
+            resourcePath = resource.controllerMapping
+        } else {
+            resourcePath = ""
+        }
 
         //collect api from method with @RequestMapping
         Map<String, List<Method>> apiMethodMap = collectApisByRequestMapping(methods)

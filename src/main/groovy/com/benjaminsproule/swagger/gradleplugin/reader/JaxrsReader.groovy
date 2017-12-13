@@ -155,7 +155,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
         def tags = new HashMap<>()
 
         ClassFinder.instance()
-            .getValidClasses(SwaggerDefinition, apiSource.locations, apiSource.excludePattern)
+            .getValidClasses(SwaggerDefinition, apiSource.locations)
             .each {
             def swaggerDefinition = AnnotationUtils.findAnnotation(it, SwaggerDefinition)
 

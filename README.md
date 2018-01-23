@@ -19,7 +19,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:1.0.0'
     }
 }
 

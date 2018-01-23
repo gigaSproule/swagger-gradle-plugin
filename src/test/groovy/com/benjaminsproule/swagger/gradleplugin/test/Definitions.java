@@ -1,10 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.test;
 
-import io.swagger.annotations.Contact;
-import io.swagger.annotations.Info;
-import io.swagger.annotations.License;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
+import io.swagger.annotations.*;
 
 @SwaggerDefinition(host = "http://annotated",
     basePath = "/annotated",

@@ -1,35 +1,12 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiImplicitParam
-import io.swagger.annotations.ApiImplicitParams
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
-import io.swagger.annotations.Authorization
-import io.swagger.annotations.AuthorizationScope
-import io.swagger.annotations.Extension
-import io.swagger.annotations.ExtensionProperty
-import io.swagger.annotations.ResponseHeader
+import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
-import io.swagger.models.Model
-import io.swagger.models.Operation
-import io.swagger.models.Path
-import io.swagger.models.Response
-import io.swagger.models.Scheme
-import io.swagger.models.SecurityRequirement
-import io.swagger.models.Swagger
-import io.swagger.models.Tag
-import io.swagger.models.parameters.BodyParameter
-import io.swagger.models.parameters.FormParameter
-import io.swagger.models.parameters.HeaderParameter
-import io.swagger.models.parameters.Parameter
-import io.swagger.models.parameters.PathParameter
-import io.swagger.models.parameters.QueryParameter
+import io.swagger.models.*
+import io.swagger.models.parameters.*
 import io.swagger.models.properties.ArrayProperty
 import io.swagger.models.properties.MapProperty
 import io.swagger.models.properties.Property
@@ -40,6 +17,7 @@ import org.apache.commons.lang3.reflect.TypeUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationUtils
+
 import java.lang.annotation.Annotation
 import java.lang.reflect.Method
 import java.lang.reflect.Type

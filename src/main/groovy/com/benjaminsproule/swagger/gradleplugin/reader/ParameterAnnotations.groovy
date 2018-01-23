@@ -2,19 +2,9 @@ package com.benjaminsproule.swagger.gradleplugin.reader
 
 import com.sun.jersey.api.core.InjectParam
 import io.swagger.annotations.ApiParam
-import org.springframework.web.bind.annotation.CookieValue
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.*
 
-import javax.ws.rs.BeanParam
-import javax.ws.rs.FormParam
-import javax.ws.rs.HeaderParam
-import javax.ws.rs.PathParam
-import javax.ws.rs.QueryParam
+import javax.ws.rs.*
 import java.lang.annotation.Annotation
 import java.lang.reflect.Type
 

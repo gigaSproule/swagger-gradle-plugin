@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.misc
 
+import com.fasterxml.jackson.databind.Module.SetupContext
 import com.fasterxml.jackson.databind.module.SimpleModule
 
 /**

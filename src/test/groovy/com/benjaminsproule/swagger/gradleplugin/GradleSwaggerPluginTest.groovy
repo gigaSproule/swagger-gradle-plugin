@@ -9,7 +9,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.yaml.snakeyaml.Yaml
 

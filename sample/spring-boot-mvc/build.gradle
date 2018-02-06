@@ -56,7 +56,7 @@ swagger {
         }
         swaggerDirectory = "${project.buildDir}/swagger-ui"
         securityDefinition {
-            json = '/securityDefinition.json'
+            json = 'securityDefinition.json'
         }
     }
 }

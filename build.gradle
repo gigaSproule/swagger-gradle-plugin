@@ -91,6 +91,8 @@ if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')
             }
         }
     }
+
+    afterReleaseBuild.dependsOn bintrayUpload
 }
 
 pluginBundle {
@@ -120,3 +122,5 @@ publishing {
 
 tasks.jacocoTestReport.dependsOn('test')
 tasks.build.dependsOn('jacocoTestReport')
+
+afterReleaseBuild.dependsOn publishPlugins

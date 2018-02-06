@@ -13,14 +13,23 @@ This enables your Swagger-annotated project to generate **Swagger specs** and **
 # Usage
 Import the plugin in your project by adding following configuration: 
 
+Gradle version >= 2.1
+```groovy
+plugins {
+    id 'com.benjaminsproule.swagger' version '1.0.0'
+}
+```
+Gradle versions < 2.1
 ```groovy
 buildscript {
-    repositories {
-        jcenter()
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
     }
-    dependencies {
-        classpath 'com.benjaminsproule:swagger-gradle-plugin:1.0.0'
-    }
+  }
+  dependencies {
+    classpath 'gradle.plugin.com.benjaminsproule:swagger-gradle-plugin:1.0.0'
+  }
 }
 
 apply plugin: 'com.benjaminsproule.swagger'
@@ -122,7 +131,7 @@ securityDefinition {
 
 The `securityDefinition.json` file should also follow the spec, one sample file like this:
 
-```js
+```json
 {
   "api_key": {
     "type": "apiKey",
@@ -151,7 +160,7 @@ com.foo.bar.PetName : java.lang.String
 
 The above model substitution configuration would tell the plugin to substitute `com.foo.bar.PetName` with `java.lang.String`.  As a result, the generated `swagger.json` would look like this ...
 
-```js
+```json
  "definitions" : {
     "Pet" : {
       "properties" : {
@@ -165,7 +174,7 @@ The above model substitution configuration would tell the plugin to substitute `
 ```
 ... instead of like this:
 
-```js
+```json
  "definitions" : {
     "Pet" : {
       "properties" : {
@@ -233,17 +242,9 @@ The above setting attaches the generated file to Gradle for install/deploy purpo
 # Example
 
 ```groovy
-buildscript {
-    repositories {
-        mavenLocal()
-        jcenter()
-        ...
-    }
-    dependencies {
-        classpath 'com.benjaminsproule:swagger-gradle-plugin:0.1.0'
-    }
+plugins {
+    id "com.benjaminsproule.swagger" version "1.0.0"
 }
-apply plugin: 'com.benjaminsproule.swagger'
 
 swagger {
     apiSource {
@@ -255,8 +256,8 @@ swagger {
         info {
             title = 'Swagger Gradle Plugin Sample'
             version = 'v1'
-            <!-- use markdown here because I'm using markdown for output,
-            if you need to use html or other markup language, you need to use your target language -->
+            // use markdown here because I'm using markdown for output,
+            // if you need to use html or other markup language, you need to use your target language
             description = 'This is a sample.'
             termsOfService = 'http://www.example.com/termsOfService'
             contact {
@@ -289,5 +290,13 @@ swagger {
         // attachSwaggerArtifact = true - WILL BE ADDED IN THE FUTURE
     }
 }
-...
+```
+
+# To release
+This plugin uses the [gradle-release](https://github.com/researchgate/gradle-release) plugin, so to release the plugin.
+
+In `~/.gradle/gradle.properties`, `bintray_user` and `bintray_apiKey` need to be set for publishing to Bintray and `gradle.publish.key` and `gradle.publish.secret` for publishing to the central Gradle repository.
+
+```bash
+./gradlew release
 ```

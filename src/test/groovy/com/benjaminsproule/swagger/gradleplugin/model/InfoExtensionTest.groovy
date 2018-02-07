@@ -16,6 +16,7 @@ class InfoExtensionTest {
         infoExtension.title = 'title'
         infoExtension.version = 'v1.0'
         infoExtension.license = [isValid: { new ArrayList<>() }] as LicenseExtension
+        infoExtension.contact = [isValid: { new ArrayList<>() }] as ContactExtension
 
         def result = infoExtension.isValid()
 
@@ -23,11 +24,14 @@ class InfoExtensionTest {
     }
 
     @Test
-    void 'Info with missing licence should provide missing licence error'() {
+    void 'Valid info returns no errors with null license and contact'() {
+        infoExtension.title = 'title'
+        infoExtension.version = 'v1.0'
+        infoExtension.license = [isValid: { new ArrayList<>() }] as LicenseExtension
+
         def result = infoExtension.isValid()
 
-        assert result
-        assert result.contains('info.licence is required by the swagger spec')
+        assert !result
     }
 
     @Test

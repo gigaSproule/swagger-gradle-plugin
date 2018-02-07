@@ -73,10 +73,6 @@ class InfoExtension implements ModelValidator, Swagerable<Info> {
 
     @Override
     List<String> isValid() {
-        if (!license) {
-            return ['info.licence is required by the swagger spec']
-        }
-
         def errors = []
         if (!title) {
             errors.add('info.title is required by the swagger spec')
@@ -86,7 +82,10 @@ class InfoExtension implements ModelValidator, Swagerable<Info> {
             errors.add('info.version is required by the swagger spec')
         }
 
-        errors.addAll(license.isValid())
+        if(license){
+            errors.addAll(license.isValid())
+        }
+
         return errors
     }
 }

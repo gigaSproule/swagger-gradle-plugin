@@ -19,6 +19,8 @@ class SecurityDefinitionExtension implements ModelValidator, Swagerable<Map<Stri
     String type
     @JsonProperty("in")
     String keyLocation
+    @JsonProperty("name")
+    String keyName
     String description
     String json
     String jsonPath

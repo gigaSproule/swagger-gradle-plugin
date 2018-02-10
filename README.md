@@ -103,16 +103,39 @@ There're 3 types of security definitions according to Swagger Spec: `basic`, `ap
 
 You can define multi definitions here, but you should fully follow [the spec](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#securitySchemeObject).
 
+## Basic - Security Definitions
 You can define a `basic` definition like this:
 
 ```groovy
 securityDefinition {
+    // `name` can be used refer to this security schemes from elsewhere
     name = 'MyBasicAuth'
     type = 'basic'
 }
 ```
 
-or define several definitions in a json file and specify the json path like this:
+## ApiKeyAuth - Security Definitions
+You can also define a `ApiKeyAuth` definition link this:
+
+```groovy
+swagger {
+    apiSource {
+        ...
+        securityDefinition {
+            // `name` can be used refer to this security schemes from elsewhere
+            name = 'ApiKeyAuth'
+            type = 'apiKey'
+            // The location of the API key. Valid values are "query" or "header".
+            keyLocation = 'header'
+            // The name of the header
+            keyName = 'X-API-Key'
+        }
+    }
+}
+```
+
+## Json - Security Definitions
+It is also possible to define several definitions in a json file and specify the json path like this:
 
 ```groovy
 securityDefinition {
@@ -149,6 +172,9 @@ The `securityDefinition.json` file should also follow the spec, one sample file 
   }
 }
 ```
+
+__Note:__ It is only possible to define the OAuth2 type in a json file and not directly in the gradle configuration.
+
 # <a id="modelSubstitute">Model Substitution</a>
 Throughout the course of working with Swagger, you may find that you need to substitute non-primitive objects for primitive objects. This is called model substituion, and it is supported by swagger-gradle-plugin. In order to configure model substitution, you'll need to create a model substitute file. This file is a simple text file containing `n` lines, where each line tells swagger-gradle-plugin to substitutes a model class with the supplied substitute. These two classes should be seperated by a colone (`:`).
 

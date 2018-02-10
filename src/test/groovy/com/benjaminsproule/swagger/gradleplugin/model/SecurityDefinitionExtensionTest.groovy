@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
+import io.swagger.models.auth.In
 import io.swagger.models.auth.SecuritySchemeDefinition
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +14,7 @@ class SecurityDefinitionExtensionTest {
     }
 
     @Test
-    void 'Valid security definition returns no errors'() {
+    void 'Valid security definition of type basic returns no errors'() {
         securityDefinitionExtension.name = 'secure'
         securityDefinitionExtension.type = 'basic'
 
@@ -21,6 +22,19 @@ class SecurityDefinitionExtensionTest {
 
         assert !result
     }
+
+    @Test
+    void 'Valid security definition of type apiKey returns no errors'() {
+        securityDefinitionExtension.name = 'ApiKeyAuth'
+        securityDefinitionExtension.type = 'apiKey'
+        securityDefinitionExtension.keyName = 'X-API-Key'
+        securityDefinitionExtension.keyLocation = 'header'
+
+        def result = securityDefinitionExtension.isValid()
+
+        assert !result
+    }
+
 
     @Test
     void 'Security definition with missing name source should provide missing name error'() {
@@ -49,6 +63,40 @@ class SecurityDefinitionExtensionTest {
     }
 
     @Test
+    void 'Security definition of type apiKey without keyLocation should provide missing data error'() {
+        securityDefinitionExtension.name = 'ApiKeyAuth'
+        securityDefinitionExtension.type = 'apiKey'
+        securityDefinitionExtension.keyName = 'X-API-Key'
+        def result = securityDefinitionExtension.isValid()
+
+        assert result
+        assert result.contains('When type is "apiKey" - you must specify keyLocation and keyName')
+    }
+
+    @Test
+    void 'Security definition of type apiKey without keyName should provide missing data error'() {
+        securityDefinitionExtension.name = 'ApiKeyAuth'
+        securityDefinitionExtension.type = 'apiKey'
+        securityDefinitionExtension.keyLocation = 'header'
+        def result = securityDefinitionExtension.isValid()
+
+        assert result
+        assert result.contains('When type is "apiKey" - you must specify keyLocation and keyName')
+    }
+
+    @Test
+    void 'Security definition of type apiKey with bad keyLocation should provide missing data error'() {
+        securityDefinitionExtension.name = 'ApiKeyAuth'
+        securityDefinitionExtension.type = 'apiKey'
+        securityDefinitionExtension.keyName = 'X-API-Key'
+        securityDefinitionExtension.keyLocation = 'unknownproperty'
+        def result = securityDefinitionExtension.isValid()
+
+        assert result
+        assert result.contains('When type is "apiKey" - keyLocation must be "query" or "header"')
+    }
+
+    @Test
     void 'Load Security Definitions from file'() {
         securityDefinitionExtension.json = 'security-definition/securityDefinitionExtensionTest.json'
 
@@ -69,7 +117,8 @@ class SecurityDefinitionExtensionTest {
     private static void assertApiKey(SecuritySchemeDefinition definition) {
         assert definition
         assert definition.type == 'apiKey'
-        assert definition.in
+        assert definition.in == In.HEADER
+        assert definition.name == 'X-API-Key'
     }
 
     private static void assertOauth(SecuritySchemeDefinition definition) {

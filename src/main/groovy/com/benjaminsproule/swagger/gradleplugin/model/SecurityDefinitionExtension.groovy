@@ -19,6 +19,8 @@ class SecurityDefinitionExtension implements ModelValidator, Swagerable<Map<Stri
     String type
     @JsonProperty("in")
     String keyLocation
+    @JsonProperty("name")
+    String keyName
     String description
     String json
     String jsonPath
@@ -31,6 +33,14 @@ class SecurityDefinitionExtension implements ModelValidator, Swagerable<Map<Stri
 
         if (!name && !type && !json && !jsonPath) {
             return ['Security definition must specify json or jsonPath or (name and type)']
+        }
+
+        if ((type == 'apiKey') && (!keyLocation || !keyName)) {
+            return ['When type is "apiKey" - you must specify keyLocation and keyName']
+        }
+
+        if ((type == 'apiKey') && (keyLocation != 'header' && keyLocation != 'query')) {
+            return ['When type is "apiKey" - keyLocation must be "query" or "header"']
         }
 
         return []

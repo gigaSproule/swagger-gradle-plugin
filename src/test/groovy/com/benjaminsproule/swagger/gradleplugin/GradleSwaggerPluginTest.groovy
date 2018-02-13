@@ -2,7 +2,6 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
-import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction
 import org.gradle.api.plugins.JavaPlugin
@@ -42,20 +41,19 @@ class GradleSwaggerPluginTest {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin
 
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + RandomStringUtils.randomAlphabetic(5)
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule']
-                    info {
-                        title = project.name
-                        version = '1'
-                    }
-                    swaggerDirectory = expectedSwaggerDirectory
-                    host = 'localhost:8080'
-                    basePath = '/'
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+            apiSource {
+                locations = ['com.benjaminsproule']
+                info {
+                    title = project.name
+                    version = '1'
                 }
+                swaggerDirectory = expectedSwaggerDirectory
+                host = 'localhost:8080'
+                basePath = '/'
             }
+        }
         ))
 
         project.tasks.generateSwaggerDocumentation.execute()
@@ -70,19 +68,18 @@ class GradleSwaggerPluginTest {
         project.plugins.apply JavaPlugin
 
 
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + RandomStringUtils.randomAlphabetic(5)
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule']
-                    schemes = ['http']
-                    swaggerDirectory = expectedSwaggerDirectory
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+            apiSource {
+                locations = ['com.benjaminsproule']
+                schemes = ['http']
+                swaggerDirectory = expectedSwaggerDirectory
+                securityDefinition {
+                    name = 'MyBasicAuth'
+                    type = 'basic'
                 }
             }
+        }
         ))
 
         project.tasks.generateSwaggerDocumentation.execute()
@@ -108,33 +105,28 @@ class GradleSwaggerPluginTest {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin
 
-        def swaggerRelativeDirectory = "swaggerui-" + RandomStringUtils.randomAlphabetic(5)
+        def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
         def expectedSwaggerDirectory = "${project.buildDir}/${swaggerRelativeDirectory}"
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    attachSwaggerArtifact = true
-                    locations = ['com.benjaminsproule']
-                    schemes = ['http']
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                        contact {
-                            name = 'Joe Blogs'
-                        }
-                    }
-                    swaggerDirectory = expectedSwaggerDirectory
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+            apiSource {
+                attachSwaggerArtifact = true
+                locations = ['com.benjaminsproule']
+                schemes = ['http']
+                info {
+                    title = project.name
+                    version = '1'
+                    license { name = 'Apache 2.0' }
+                    contact { name = 'Joe Blogs' }
+                }
+                swaggerDirectory = expectedSwaggerDirectory
+                host = 'localhost:8080'
+                basePath = '/'
+                securityDefinition {
+                    name = 'MyBasicAuth'
+                    type = 'basic'
                 }
             }
+        }
         ))
 
         project.tasks.generateSwaggerDocumentation.execute()
@@ -148,32 +140,27 @@ class GradleSwaggerPluginTest {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin
 
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + RandomStringUtils.randomAlphabetic(5)
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule']
-                    schemes = ['http']
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                        contact {
-                            name = 'Joe Blogs'
-                        }
-                    }
-                    swaggerDirectory = expectedSwaggerDirectory
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
-                    outputFormats = ['json', 'yaml']
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+            apiSource {
+                locations = ['com.benjaminsproule']
+                schemes = ['http']
+                info {
+                    title = project.name
+                    version = '1'
+                    license { name = 'Apache 2.0' }
+                    contact { name = 'Joe Blogs' }
                 }
+                swaggerDirectory = expectedSwaggerDirectory
+                host = 'localhost:8080'
+                basePath = '/'
+                securityDefinition {
+                    name = 'MyBasicAuth'
+                    type = 'basic'
+                }
+                outputFormats = ['json', 'yaml']
             }
+        }
         ))
 
         project.tasks.generateSwaggerDocumentation.execute()

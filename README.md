@@ -65,7 +65,7 @@ You can specify several `apiSource`s. Generally, one is enough.
 | `securityDefinitions` | You can put your [security definitions](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#security-definitions-object) here, see more details [below](#securityDefinitions)|
 | `templatePath` | The path of a [handlebars](http://handlebarsjs.com/) template file, see more details [below](#templatefile).|
 | `outputPath` | The path of the generated static document, not existed parent directories will be created. If you don't want to generate a static document, just don't set it. |
-| `outputFormats` | The format types of the generated swagger spec. Valid values are `json`, `yaml` or both `json,yaml`. The `json` format is default.|
+| `outputFormats` | The format types of the generated swagger spec. Valid values are `json`, `yaml` or both (as a list, e.g. `['json']`). The `json` format is default.|
 | `swaggerDirectory` | The directory of generated `swagger.json` file. If null, no `swagger.json` will be generated. |
 | `swaggerFileName` | The filename of generated filename.json file. If null, `swagger.json` will be generated. |
 | `swaggerApiReader` | If not null, the value should be a full name of the class implementing `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader` |
@@ -139,7 +139,7 @@ It is also possible to define several definitions in a json file and specify the
 
 ```groovy
 securityDefinition {
-    json = '/securityDefinition.json'
+    json = 'securityDefinition.json'
 }
 ```
 The file will be read by `getClass().getResourceAsStream`, so please note the path you configured.
@@ -148,7 +148,7 @@ Alternatively, specify the __absolute__ file path to the json definition file:
 
 ```groovy
 securityDefinition {
-    jsonPath = "${basedir}/securityDefinition.json"
+    jsonPath = "${project.projectDir}/securityDefinition.json"
 }
 ```
 
@@ -301,7 +301,7 @@ swagger {
             type = 'basic'
         }
         securityDefinition {
-            json = '/securityDefinition.json'
+            json = 'securityDefinition.json'
         }
         /**
             Support classpath or file absolute path here.

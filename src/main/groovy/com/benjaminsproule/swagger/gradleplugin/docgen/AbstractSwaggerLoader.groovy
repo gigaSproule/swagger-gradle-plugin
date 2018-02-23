@@ -104,13 +104,14 @@ abstract class AbstractSwaggerLoader {
         return resolved
     }
 
-    protected static ClassSwaggerReader getCustomApiReader(Swagger swagger, String customReaderClassName) throws GenerateException {
+    protected ClassSwaggerReader getCustomApiReader(Swagger swagger, String customReaderClassName) throws GenerateException {
         try {
             LOG.info("Reading custom API reader: " + customReaderClassName)
             Class<?> clazz = Class.forName(customReaderClassName)
+
             if (AbstractReader.class.isAssignableFrom(clazz)) {
-                Constructor<?> constructor = clazz.getConstructor(Swagger.class)
-                return (ClassSwaggerReader) constructor.newInstance(swagger)
+                Constructor<?> constructor = clazz.getConstructor(ApiSourceExtension.class, Swagger.class, Set.class, List.class)
+                return (ClassSwaggerReader) constructor.newInstance(apiSource, swagger, null, null)
             } else {
                 return (ClassSwaggerReader) clazz.newInstance()
             }

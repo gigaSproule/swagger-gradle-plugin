@@ -48,7 +48,6 @@ You can specify several `apiSource`s. Generally, one is enough.
 
 | **name** | **description** |
 |----------|-----------------|
-| `skipSwaggerGeneration` | If `true`, swagger generation will be skipped. Default is `false`. User property is `swagger.skip` |
 | `apiSources` | List of `apiSource` closures. One `apiSource` can be considered as a version of APIs of your service. You can specify several `apiSource` closures, though generally one is enough. |
 
 # Configuration for `apiSource`
@@ -252,6 +251,9 @@ Note: In order to use `apiModelPropertyAccessExclusionsList`, you must specify b
 To generate the swagger documentation, you need to run `./gradlew generateSwaggerDocumentation`.
 
 _N.B_ In previous versions (< 0.1.0) the task was `swagger`, but this caused a conflict with another plugin, `swagger-codegen`, (issue #8).
+
+## Skipping generating the swagger documentation
+To skip generating the swagger documentation, you need to include the property `swagger.skip` (e.g. `./gradlew clean build -Pswagger.skip`)
 
 # Install/Deploy `swagger.json`
 

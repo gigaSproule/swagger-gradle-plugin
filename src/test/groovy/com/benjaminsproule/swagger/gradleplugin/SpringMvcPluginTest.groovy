@@ -103,7 +103,7 @@ class SpringMvcPluginTest {
         assert paths.'/root/withannotation/default'.get.description == 'Test resource'
         assert paths.'/root/withannotation/default'.get.operationId == 'defaultResponse'
         assert paths.'/root/withannotation/default'.get.produces == null
-        assert paths.'/root/withannotation/default'.get.responses.default.description == 'successful operation'
+        assert paths.'/root/withannotation/default'.get.responses.'200'.description == 'successful operation'
         assert paths.'/root/withannotation/default'.get.security.basic
         assert paths.'/root/withannotation/generics'.post.tags == ['Test']
         assert paths.'/root/withannotation/generics'.post.summary == 'A generics operation'
@@ -119,7 +119,7 @@ class SpringMvcPluginTest {
         assert paths.'/root/withannotation/datatype'.post.description == 'Test resource'
         assert paths.'/root/withannotation/datatype'.post.operationId == 'dataType'
         assert paths.'/root/withannotation/datatype'.post.produces == ['application/json']
-        assert paths.'/root/withannotation/datatype'.post.responses.default.description == 'successful operation'
+        assert paths.'/root/withannotation/datatype'.post.responses.'200'.description == 'successful operation'
         assert paths.'/root/withannotation/datatype'.post.security.basic
         assert paths.'/root/withannotation/response'.post.tags == ['Test']
         assert paths.'/root/withannotation/response'.post.summary == 'A response operation'
@@ -194,7 +194,7 @@ class SpringMvcPluginTest {
         assert paths.'/root/withoutannotation/default'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/default'.get.operationId == 'defaultResponse'
         assert paths.'/root/withoutannotation/default'.get.produces == null
-        assert paths.'/root/withoutannotation/default'.get.responses.default.description == 'successful operation'
+        assert paths.'/root/withoutannotation/default'.get.responses.'200'.description == 'successful operation'
         assert paths.'/root/withoutannotation/default'.get.security.basic
         assert paths.'/root/withoutannotation/generics'.post.tags == ['Test']
         assert paths.'/root/withoutannotation/generics'.post.summary == 'A generics operation'
@@ -210,7 +210,7 @@ class SpringMvcPluginTest {
         assert paths.'/root/withoutannotation/datatype'.post.description == 'Test resource'
         assert paths.'/root/withoutannotation/datatype'.post.operationId == 'dataType'
         assert paths.'/root/withoutannotation/datatype'.post.produces == ['application/json']
-        assert paths.'/root/withoutannotation/datatype'.post.responses.default.description == 'successful operation'
+        assert paths.'/root/withoutannotation/datatype'.post.responses.'200'.description == 'successful operation'
         assert paths.'/root/withoutannotation/datatype'.post.security.basic
         assert paths.'/root/withoutannotation/response'.post.tags == ['Test']
         assert paths.'/root/withoutannotation/response'.post.summary == 'A response operation'

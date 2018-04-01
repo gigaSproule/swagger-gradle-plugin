@@ -26,7 +26,7 @@ class Utils {
      * @return At least 1 route value (empty string)
      */
     static String[] getControllerRequestMapping(Class<?> controllerClazz) {
-        String[] controllerRequestMappingValues = {}
+        String[] controllerRequestMappingValues = []
 
         // Determine if we will use class-level requestmapping or dummy string
         RequestMapping classRequestMapping = AnnotationUtils.findAnnotation(controllerClazz, RequestMapping.class)

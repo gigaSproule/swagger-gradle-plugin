@@ -61,15 +61,10 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
     protected Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
         Map<String, SpringResource> resourceMap = new HashMap<String, SpringResource>()
         for (Class<?> aClass : validClasses) {
-            RequestMapping requestMapping = AnnotationUtils.findAnnotation(aClass, RequestMapping.class)
             //This try/catch block is to stop a bamboo build from failing due to NoClassDefFoundError
             //This occurs when a class or method loaded by reflections contains a type that has no dependency
             try {
                 resourceMap = analyzeController(aClass, resourceMap, "")
-                List<Method> mList = new ArrayList<Method>(Arrays.asList(aClass.getMethods()))
-                if (aClass.getSuperclass() != null) {
-                    mList.addAll(Arrays.asList(aClass.getSuperclass().getMethods()))
-                }
             } catch (NoClassDefFoundError e) {
                 LOG.error(e.getMessage())
                 LOG.info(aClass.getName())
@@ -110,6 +105,8 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
 
         if (resource.controllerClass.isAnnotationPresent(RequestMapping)) {
             resourcePath = resource.controllerMapping
+        } else if (controllerRM != null) {
+            resourcePath = controllerRM.path()[0]
         } else {
             resourcePath = ""
         }
@@ -398,7 +395,8 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
     }
 
     //Helper method for loadDocuments()
-    private Map<String, SpringResource> analyzeController(Class<?> controllerClazz, Map<String, SpringResource> resourceMap, String description) {
+    private
+    static Map<String, SpringResource> analyzeController(Class<?> controllerClazz, Map<String, SpringResource> resourceMap, String description) {
         String[] controllerRequestMappingValues = Utils.getControllerRequestMapping(controllerClazz)
 
         // Iterate over all value attributes of the class-level RequestMapping annotation

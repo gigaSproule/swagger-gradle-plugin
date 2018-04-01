@@ -70,7 +70,7 @@ class ApiSourceExtensionTest extends Specification {
     def 'Should generate swagger type from contents'() {
         setup:
         apiSourceExtension.host = "http://localhost"
-        apiSourceExtension.basePath ='/'
+        apiSourceExtension.basePath = '/'
         apiSourceExtension.locations = ['com.benjaminsproule']
         apiSourceExtension.schemes = ['http']
         apiSourceExtension.descriptionFile = new File("src/test/resources/api-description/description.txt")

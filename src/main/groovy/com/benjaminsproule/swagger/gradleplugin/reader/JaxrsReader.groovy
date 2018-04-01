@@ -44,7 +44,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaxrsReader)
+    private static final Logger LOG = LoggerFactory.getLogger(JaxrsReader.class)
 
     JaxrsReader(ApiSourceExtension apiSourceExtension, Swagger swagger, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions) {
         super(apiSourceExtension, swagger, typesToSkip, swaggerExtensions)
@@ -86,6 +86,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
         Map<String, Tag> tags = updateTagsForApi(parentTags, api)
         List<SecurityRequirement> securities = getSecurityRequirements(api)
         Map<String, Tag> discoveredTags = scanClasspathForTags()
+        String apiDescription = api.description()
 
         // merge consumes, produces
 
@@ -133,6 +134,10 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
                 updateTagsForOperation(operation, apiOperation)
                 updateOperation(apiConsumes, apiProduces, tags, securities, operation)
                 updatePath(operationPath, httpMethod, operation)
+                if (apiDescription) {
+                    LOG.error("Using deprecated description {} on Api annotation", apiDescription)
+                    operation.description(apiDescription)
+                }
             }
             updateTagDescriptions(discoveredTags)
         }
@@ -178,7 +183,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
 
     protected static boolean isSubResource(String httpMethod, Method method) {
         Class<?> responseClass = method.getReturnType()
-        return (responseClass != null) && (httpMethod == null) && (AnnotationUtils.findAnnotation(method, Path) != null)
+        return responseClass != null && httpMethod == null && AnnotationUtils.findAnnotation(method, Path) != null
     }
 
     private static String getPath(Path classLevelPath, Path methodLevelPath, String parentPath) {
@@ -255,7 +260,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
                 }
             }
 
-            if (apiOperation.response() != Void && apiOperation.response() != void.class) {
+            if (apiOperation.response() != Void.class && apiOperation.response() != void.class) {
                 responseClassType = apiOperation.response()
             }
             if (!apiOperation.responseContainer().isEmpty()) {
@@ -277,17 +282,17 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
 
         if (responseClassType == null) {
             // pick out response from method declaration
-            LOGGER.debug("picking up response class from method " + method)
+            LOG.debug("picking up response class from method " + method)
             responseClassType = method.getGenericReturnType()
         }
         boolean hasApiAnnotation = false
         if (responseClassType instanceof Class) {
             hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api) != null
         }
-        if ((responseClassType != null)
-            && responseClassType != Void
+        if (responseClassType != null
+            && responseClassType != Void.class
             && responseClassType != void.class
-            && responseClassType != javax.ws.rs.core.Response
+            && responseClassType != javax.ws.rs.core.Response.class
             && !hasApiAnnotation
             && !isSubResource(httpMethod, method)) {
             if (isPrimitive(responseClassType)) {
@@ -311,7 +316,6 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
                 }
                 for (String key : models.keySet()) {
                     Property responseProperty = withResponseContainer(responseContainer, new RefProperty().asDefault(key))
-
 
                     operation.response(responseCode, new Response()
                         .description("successful operation")

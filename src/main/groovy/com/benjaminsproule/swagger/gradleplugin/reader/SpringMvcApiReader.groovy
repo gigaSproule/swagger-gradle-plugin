@@ -39,7 +39,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
 
     @Override
     void updateExtensionChain(List<SwaggerExtension> swaggerExtensions) {
-        List<SwaggerExtension> extensions = swaggerExtensions == null ? new ArrayList<SwaggerExtension>() : swaggerExtensions
+        List<SwaggerExtension> extensions = swaggerExtensions ?: new ArrayList<SwaggerExtension>()
         extensions.add(new SpringSwaggerExtension())
         SwaggerExtensions.setExtensions(extensions)
     }
@@ -58,11 +58,34 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         return swagger
     }
 
+    protected Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
+        Map<String, SpringResource> resourceMap = new HashMap<String, SpringResource>()
+        for (Class<?> aClass : validClasses) {
+            RequestMapping requestMapping = AnnotationUtils.findAnnotation(aClass, RequestMapping.class)
+            //This try/catch block is to stop a bamboo build from failing due to NoClassDefFoundError
+            //This occurs when a class or method loaded by reflections contains a type that has no dependency
+            try {
+                resourceMap = analyzeController(aClass, resourceMap, "")
+                List<Method> mList = new ArrayList<Method>(Arrays.asList(aClass.getMethods()))
+                if (aClass.getSuperclass() != null) {
+                    mList.addAll(Arrays.asList(aClass.getSuperclass().getMethods()))
+                }
+            } catch (NoClassDefFoundError e) {
+                LOG.error(e.getMessage())
+                LOG.info(aClass.getName())
+                //exception occurs when a method type or annotation is not recognized by the plugin
+            }
+        }
+
+        return resourceMap
+    }
+
     Swagger read(SpringResource resource) {
         List<Method> methods = resource.methods
         Map<String, Tag> tags = new HashMap<String, Tag>()
 
         List<SecurityRequirement> resourceSecurities = new ArrayList<SecurityRequirement>()
+        String apiDescription
 
         // Add the description from the controller api
         Class<?> controller = resource.controllerClass
@@ -82,6 +105,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
             }
             tags = updateTagsForApi(null, api)
             resourceSecurities = getSecurityRequirements(api)
+            apiDescription = api.description()
         }
 
         if (resource.controllerClass.isAnnotationPresent(RequestMapping)) {
@@ -128,6 +152,10 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                     updateTagsForOperation(operation, apiOperation)
                     updateOperation(apiConsumes, apiProduces, tags, resourceSecurities, operation)
                     updatePath(operationPath, httpMethod, operation)
+                    if (apiDescription) {
+                        LOG.error("Using deprecated description [{}] on Api annotation", apiDescription)
+                        operation.description(apiDescription)
+                    }
                 }
             }
         }
@@ -139,7 +167,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         Operation operation = new Operation()
 
         RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class)
-        Type responseClass = null
+        Type responseClassType = null
         List<String> produces = new ArrayList<String>()
         List<String> consumes = new ArrayList<String>()
         String responseContainer = null
@@ -175,8 +203,8 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                 }
             }
 
-            if (!apiOperation.response().equals(Void.class)) {
-                responseClass = apiOperation.response()
+            if (apiOperation.response() != Void.class && apiOperation.response() != void.class) {
+                responseClassType = apiOperation.response()
             }
             if (!apiOperation.responseContainer().isEmpty()) {
                 responseContainer = apiOperation.responseContainer()
@@ -203,24 +231,25 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
             responseCode = apiOperation.code()
         }
 
-        if (responseClass == null) {
+        if (responseClassType == null) {
             // pick out response from method declaration
             LOG.info("picking up response class from method " + method)
-            responseClass = method.getGenericReturnType()
+            responseClassType = method.getGenericReturnType()
         }
-        if (responseClass instanceof ParameterizedType && ResponseEntity.class.equals(((ParameterizedType) responseClass).getRawType())) {
-            responseClass = ((ParameterizedType) responseClass).getActualTypeArguments()[0]
+        if (responseClassType instanceof ParameterizedType && ResponseEntity.class == ((ParameterizedType) responseClassType).getRawType()) {
+            responseClassType = ((ParameterizedType) responseClassType).getActualTypeArguments()[0]
         }
         boolean hasApiAnnotation = false
-        if (responseClass instanceof Class) {
-            hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClass, Api.class) != null
+        if (responseClassType instanceof Class) {
+            hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api.class) != null
         }
-        if (responseClass != null
-            && !responseClass.equals(Void.class)
-            && !responseClass.equals(ResponseEntity.class)
+        if (responseClassType != null
+            && responseClassType != Void.class
+            && responseClassType != void.class
+            && responseClassType != ResponseEntity.class
             && !hasApiAnnotation) {
-            if (isPrimitive(responseClass)) {
-                Property property = ModelConverters.getInstance().readAsProperty(responseClass)
+            if (isPrimitive(responseClassType)) {
+                Property property = ModelConverters.getInstance().readAsProperty(responseClassType)
                 if (property != null) {
                     Property responseProperty = withResponseContainer(responseContainer, property)
                     operation.response(responseCode, new Response()
@@ -228,10 +257,10 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                         .schema(responseProperty)
                         .headers(defaultResponseHeaders))
                 }
-            } else if (!responseClass.equals(Void.class) && !responseClass.equals(void.class)) {
-                Map<String, Model> models = ModelConverters.getInstance().read(responseClass)
+            } else if (responseClassType != Void.class && responseClassType != void.class) {
+                Map<String, Model> models = ModelConverters.getInstance().read(responseClassType)
                 if (models.isEmpty()) {
-                    Property pp = ModelConverters.getInstance().readAsProperty(responseClass)
+                    Property pp = ModelConverters.getInstance().readAsProperty(responseClassType)
                     operation.response(responseCode, new Response()
                         .description("successful operation")
                         .schema(pp)
@@ -246,7 +275,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                     swagger.model(key, models.get(key))
                 }
             }
-            Map<String, Model> models = ModelConverters.getInstance().readAll(responseClass)
+            Map<String, Model> models = ModelConverters.getInstance().readAll(responseClassType)
             for (Map.Entry<String, Model> entry : models.entrySet()) {
                 swagger.model(entry.getKey(), entry.getValue())
             }
@@ -354,7 +383,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
     @Deprecated
     // TODO: Delete method never used
     private Class<?> getGenericSubtype(Class<?> clazz, Type type) {
-        if (!(clazz.getName().equals("void") || type.toString().equals("void"))) {
+        if (!(clazz.getName() == "void" || type.toString() == "void")) {
             try {
                 ParameterizedType paramType = (ParameterizedType) type
                 Type[] argTypes = paramType.getActualTypeArguments()
@@ -423,28 +452,6 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         controllerClazz.getFields()
         controllerClazz.getDeclaredFields() //<--In case developer declares a field without an associated getter/setter.
         //this will allow NoClassDefFoundError to be caught before it triggers bamboo failure.
-
-        return resourceMap
-    }
-
-    protected Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
-        Map<String, SpringResource> resourceMap = new HashMap<String, SpringResource>()
-        for (Class<?> aClass : validClasses) {
-            RequestMapping requestMapping = AnnotationUtils.findAnnotation(aClass, RequestMapping.class)
-            //This try/catch block is to stop a bamboo build from failing due to NoClassDefFoundError
-            //This occurs when a class or method loaded by reflections contains a type that has no dependency
-            try {
-                resourceMap = analyzeController(aClass, resourceMap, "")
-                List<Method> mList = new ArrayList<Method>(Arrays.asList(aClass.getMethods()))
-                if (aClass.getSuperclass() != null) {
-                    mList.addAll(Arrays.asList(aClass.getSuperclass().getMethods()))
-                }
-            } catch (NoClassDefFoundError e) {
-                LOG.error(e.getMessage())
-                LOG.info(aClass.getName())
-                //exception occurs when a method type or annotation is not recognized by the plugin
-            }
-        }
 
         return resourceMap
     }

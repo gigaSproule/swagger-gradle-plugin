@@ -23,7 +23,7 @@ class ModelModifier extends ModelResolver {
     private Map<JavaType, JavaType> modelSubtitutes = new HashMap<JavaType, JavaType>()
     List<String> apiModelPropertyAccessExclusions = new ArrayList<String>()
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ModelModifier)
+    private static Logger LOG = LoggerFactory.getLogger(ModelModifier)
 
     ModelModifier(ObjectMapper mapper) {
         super(mapper)
@@ -35,12 +35,12 @@ class ModelModifier extends ModelResolver {
         try {
             type = _mapper.constructType(Class.forName(fromClass))
         } catch (ClassNotFoundException ignored) {
-            LOGGER.warn("Problem with loading class: ${fromClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
+            LOG.warn("Problem with loading class: ${fromClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
         try {
             toType = _mapper.constructType(Class.forName(toClass))
         } catch (ClassNotFoundException ignored) {
-            LOGGER.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
+            LOG.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
         if (type != null && toType != null) {
             modelSubtitutes.put(type, toType)

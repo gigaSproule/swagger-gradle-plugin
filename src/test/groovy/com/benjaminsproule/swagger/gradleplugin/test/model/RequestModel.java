@@ -1,6 +1,6 @@
-package com.benjaminsproule.swagger.gradleplugin.test.jaxrs;
+package com.benjaminsproule.swagger.gradleplugin.test.model;
 
-public class SubclassModel {
+public class RequestModel {
     private String name;
     private String value;
 

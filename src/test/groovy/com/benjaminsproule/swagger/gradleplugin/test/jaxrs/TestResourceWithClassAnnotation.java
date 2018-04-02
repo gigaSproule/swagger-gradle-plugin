@@ -109,6 +109,13 @@ public class TestResourceWithClassAnnotation {
         return "";
     }
 
+    @ApiOperation("An overriden operation")
+    @Path("/overridenWithoutDescription")
+    @GET
+    public String overridenWithoutDescription() {
+        return "";
+    }
+
     @ApiOperation(value = "A hidden operation", hidden = true)
     @Path("/hidden")
     @GET

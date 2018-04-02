@@ -9,7 +9,7 @@ class LoaderFactory {
         if (apiSourceExtension.springmvc) {
             return new SpringSwaggerLoader(apiSourceExtension)
         } else {
-            return new DefaultSwaggerLoader(apiSourceExtension)
+            return new JaxrsSwaggerLoader(apiSourceExtension)
         }
     }
 

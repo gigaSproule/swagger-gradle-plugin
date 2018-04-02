@@ -58,13 +58,13 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         return swagger
     }
 
-    protected Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
+    protected static Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
         Map<String, SpringResource> resourceMap = new HashMap<String, SpringResource>()
         for (Class<?> aClass : validClasses) {
             //This try/catch block is to stop a bamboo build from failing due to NoClassDefFoundError
             //This occurs when a class or method loaded by reflections contains a type that has no dependency
             try {
-                resourceMap = analyzeController(aClass, resourceMap, "")
+                analyzeController(aClass, resourceMap, "")
             } catch (NoClassDefFoundError e) {
                 LOG.error(e.getMessage())
                 LOG.info(aClass.getName())
@@ -379,7 +379,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
 
     @Deprecated
     // TODO: Delete method never used
-    private Class<?> getGenericSubtype(Class<?> clazz, Type type) {
+    private static Class<?> getGenericSubtype(Class<?> clazz, Type type) {
         if (!(clazz.getName() == "void" || type.toString() == "void")) {
             try {
                 ParameterizedType paramType = (ParameterizedType) type
@@ -387,7 +387,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                 if (argTypes.length > 0) {
                     return (Class<?>) argTypes[0]
                 }
-            } catch (ClassCastException e) {
+            } catch (ClassCastException ignore) {
                 //FIXME: find out why this happens to only certain types
             }
         }
@@ -418,8 +418,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                             //   1. The controller package
                             //   2. The controller class name
                             //   3. The controller-level @RequestMapping#value
-                            String resourceKey = controllerClazz.getCanonicalName() +
-                                controllerRequestMappingValue +
+                            String resourceKey = controllerRequestMappingValue +
                                 requestMappingRequestMethod
                             if (!resourceMap.containsKey(resourceKey)) {
                                 resourceMap.put(
@@ -431,8 +430,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
                             // Here we know that method-level @RequestMapping#value is populated, so
                             // iterate over all the @RequestMapping#value attributes, and add them to the resource map.
                             for (String methodRequestMappingValue : methodRequestMappingValues) {
-                                String resourceKey = controllerClazz.getCanonicalName() +
-                                    controllerRequestMappingValue +
+                                String resourceKey = controllerRequestMappingValue +
                                     methodRequestMappingValue +
                                     requestMappingRequestMethod
                                 if (!methodRequestMappingValue.isEmpty()) {

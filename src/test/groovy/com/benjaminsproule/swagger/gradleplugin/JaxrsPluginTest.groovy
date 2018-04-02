@@ -88,7 +88,7 @@ class JaxrsPluginTest {
 
         def paths = producedSwaggerDocument.get('paths')
         assert paths
-        assert paths.size() == 22
+        assert paths.size() == 24
         assert paths.'/root/withannotation/basic'.get.tags == ['Test']
         assert paths.'/root/withannotation/basic'.get.summary == 'A basic operation'
         assert paths.'/root/withannotation/basic'.get.description == 'Test resource'
@@ -172,13 +172,21 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/model'.get.responses.'200'.schema.type == 'string'
         assert paths.'/root/withannotation/model'.get.security.basic
         assert paths.'/root/withannotation/overriden'.get.tags == ['Test']
-// FIXME        assert paths.'/root/withannotation/overriden'.get.summary == 'An overriden operation description'
+        assert paths.'/root/withannotation/overriden'.get.summary == 'An overriden operation description'
         assert paths.'/root/withannotation/overriden'.get.description == 'Test resource'
         assert paths.'/root/withannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withannotation/overriden'.get.produces == null
         assert paths.'/root/withannotation/overriden'.get.responses.'200'.description == 'successful operation'
         assert paths.'/root/withannotation/overriden'.get.responses.'200'.schema.type == 'string'
         assert paths.'/root/withannotation/overriden'.get.security.basic
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.tags == ['Test']
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.summary == 'An overriden operation'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.description == 'Test resource'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.produces == null
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.security.basic
         assert paths.'/root/withannotation/hidden' == null
         assert paths.'/root/withoutannotation/basic'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/basic'.get.summary == 'A basic operation'
@@ -263,13 +271,21 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/model'.get.responses.'200'.schema.type == 'string'
         assert paths.'/root/withoutannotation/model'.get.security.basic
         assert paths.'/root/withoutannotation/overriden'.get.tags == ['Test']
-// FIXME        assert paths.'/root/withoutannotation/overriden'.get.summary == 'An overriden operation description'
+        assert paths.'/root/withoutannotation/overriden'.get.summary == 'An overriden operation description'
         assert paths.'/root/withoutannotation/overriden'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withoutannotation/overriden'.get.produces == null
         assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.description == 'successful operation'
         assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.schema.type == 'string'
         assert paths.'/root/withoutannotation/overriden'.get.security.basic
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.tags == ['Test']
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.summary == 'An overriden operation'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.description == 'Test resource'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.produces == null
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.security.basic
         assert paths.'/root/withoutannotation/hidden' == null
     }
 }

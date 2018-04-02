@@ -17,9 +17,16 @@ class SpringSwaggerLoader extends AbstractSwaggerLoader {
 
     @Override
     Set<Class<?>> getValidClasses() {
-        return Sets.union(
-            getApiClasses(),
-            ClassFinder.instance().getValidClasses(RestController, apiSource.locations))
+        Set<Class<?>> classes = Sets.union(getApiClasses(), ClassFinder.instance().getValidClasses(RestController, apiSource.locations))
+        Set<Class<?>> copied = new HashSet<>(classes)
+        for (Class<?> clazz : classes) {
+            for (Class<?> aClazz : classes) {
+                if (clazz != aClazz && clazz.isAssignableFrom(aClazz)) {
+                    copied.remove(clazz)
+                }
+            }
+        }
+        copied
     }
 
     @Override

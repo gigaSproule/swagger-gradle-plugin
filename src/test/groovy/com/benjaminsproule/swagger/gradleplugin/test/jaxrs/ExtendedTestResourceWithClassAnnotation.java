@@ -14,4 +14,10 @@ public class ExtendedTestResourceWithClassAnnotation extends TestResourceWithCla
     public String overriden() {
         return "";
     }
+
+    @Path("/overridenWithoutDescription")
+    @GET
+    public String overridenWithoutDescription() {
+        return "";
+    }
 }

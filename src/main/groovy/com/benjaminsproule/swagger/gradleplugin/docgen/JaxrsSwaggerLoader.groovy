@@ -10,17 +10,24 @@ import io.swagger.models.Swagger
 
 import javax.ws.rs.Path
 
-class DefaultSwaggerLoader extends AbstractSwaggerLoader {
+class JaxrsSwaggerLoader extends AbstractSwaggerLoader {
 
-    DefaultSwaggerLoader(ApiSourceExtension apiSource) {
+    JaxrsSwaggerLoader(ApiSourceExtension apiSource) {
         super(apiSource)
     }
 
     @Override
     Set<Class<?>> getValidClasses() {
-        return Sets.union(
-            getApiClasses(),
-            ClassFinder.instance().getValidClasses(Path, apiSource.locations))
+        Set<Class<?>> classes = Sets.union(getApiClasses(), ClassFinder.instance().getValidClasses(Path, apiSource.locations))
+        Set<Class<?>> copied = new HashSet<>(classes)
+        for (Class<?> clazz : classes) {
+            for (Class<?> aClazz : classes) {
+                if (clazz != aClazz && clazz.isAssignableFrom(aClazz)) {
+                    copied.remove(clazz)
+                }
+            }
+        }
+        copied
     }
 
     @Override

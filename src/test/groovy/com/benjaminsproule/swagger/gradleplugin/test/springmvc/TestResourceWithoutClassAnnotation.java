@@ -93,6 +93,12 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
+    @ApiOperation("An overriden operation")
+    @RequestMapping(path = "/root/withoutannotation/overridenWithoutDescription", method = RequestMethod.GET)
+    public String overridenWithoutDescription() {
+        return "";
+    }
+
     @ApiOperation(value = "A hidden operation", hidden = true)
     @RequestMapping(path = "/root/withoutannotation/hidden", method = RequestMethod.GET)
     public String hidden() {

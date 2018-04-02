@@ -27,11 +27,8 @@ abstract class AbstractSwaggerLoader {
 
     Swagger loadDocuments(Swagger swagger) throws GenerateException {
         ClassSwaggerReader reader = resolveApiReader(swagger)
-
         swagger = reader.read(getValidClasses())
-        swagger = applySwaggerFilter(swagger)
-
-        return swagger
+        applySwaggerFilter(swagger)
     }
 
     private static Swagger applySwaggerFilter(Swagger swagger) {

@@ -108,6 +108,13 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
+    @ApiOperation("An overriden operation")
+    @Path("/root/withoutannotaiton/overridenWithoutDescription")
+    @GET
+    public String overridenWithoutDescription() {
+        return "";
+    }
+
     @ApiOperation(value = "A hidden operation", hidden = true)
     @Path("/root/withoutannotation/hidden")
     @GET

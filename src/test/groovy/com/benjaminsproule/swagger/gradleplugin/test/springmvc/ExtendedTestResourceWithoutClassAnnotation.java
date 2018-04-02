@@ -13,4 +13,10 @@ public class ExtendedTestResourceWithoutClassAnnotation extends TestResourceWith
     public String overriden() {
         return "";
     }
+
+    @RequestMapping(path = "/root/withoutannotation/overridenWithoutDescription", method = RequestMethod.GET)
+    @Override
+    public String overridenWithoutDescription() {
+        return "";
+    }
 }

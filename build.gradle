@@ -58,7 +58,6 @@ dependencies {
         //We want to depend on the gradle version of groovy since this is a plugin
         exclude module: 'groovy-all'
     }
-    testCompile 'org.yaml:snakeyaml:1.19'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

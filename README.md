@@ -67,13 +67,13 @@ You can specify several `apiSource`s. Generally, one is enough.
 | `outputFormats` | The format types of the generated swagger spec. Valid values are `json`, `yaml` or both (as a list, e.g. `['json']`). The `json` format is default.|
 | `swaggerDirectory` | The directory of generated `swagger.json` file. If null, no `swagger.json` will be generated. |
 | `swaggerFileName` | The filename of generated filename.json file. If null, `swagger.json` will be generated. |
-| `swaggerApiReader` | If not null, the value should be a full name of the class implementing `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader` |
+| `swaggerApiReader` | If not null, the value should be a full name of the class implementing `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader`. More details [below](#swaggerApiReader)|
 | `attachSwaggerArtifact` | If enabled, the generated `swagger.json` file will be attached as a gradle artifact. The `swaggerDirectory`'s name will be used as an artifact classifier. Default is `false`. |
 | `modelSubstitute` | The model substitute file's path, see more details [below](#model-substitution)|
 | `typesToSkip` | Nodes of class names to explicitly skip during parameter processing. More details [below](#typesToSkip)|
 | `apiModelPropertyAccessExclusionsList` | Allows the exclusion of specified `@ApiModelProperty` fields. This can be used to hide certain model properties from the swagger spec. More details [below](#apiModelPropertyAccessExclusionsList)|
 | `jsonExampleValues` | If `true`, all example values in `@ApiModelProperty` will be handled as json raw values. This is useful for creating valid examples in the generated json for all property types, including non-string ones. |
-| `modelConverters` | List of custom implementations of `io.swagger.converter.ModelConverter` that should be used when generating the swagger files. |
+| `modelConverters` | List of custom implementations of `io.swagger.converter.ModelConverter` that should be used when generating the swagger files. More details [below](#modelConverters)|
 | `excludePattern` | Regex of files that will be excluded from the swagger documentation. The default is `.*\\.pom` so it ignores all pom files. |
 
 # <a id="templatefile">Template File</a>
@@ -174,6 +174,28 @@ The `securityDefinition.json` file should also follow the spec, one sample file 
 
 __Note:__ It is only possible to define the OAuth2 type in a json file and not directly in the gradle configuration.
 
+# <a id="swaggerApiReader">Swagger API Reader</a>
+You can instruct `swagger-gradle-plugin` to use a custom swagger api reader rather than use the default by adding the following to your build.gradle:
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.custom:swagger-api-reader:1.0.0'
+    }
+}
+...
+swagger {
+    apiSource {
+        ...
+        swaggerApiReader = [ 'com.custom.swagger.ApiReader' ]
+    }
+}
+```
+
+It is important to note that the class has to be available in the buildscript's classpath.
+
 # <a id="modelSubstitute">Model Substitution</a>
 Throughout the course of working with Swagger, you may find that you need to substitute non-primitive objects for primitive objects. This is called model substituion, and it is supported by swagger-gradle-plugin. In order to configure model substitution, you'll need to create a model substitute file. This file is a simple text file containing `n` lines, where each line tells swagger-gradle-plugin to substitutes a model class with the supplied substitute. These two classes should be seperated by a colone (`:`).
 
@@ -222,8 +244,31 @@ You can instruct `swagger-gradle-plugin` to skip processing the parameters of ce
 typesToSkip = [
     'com.foobar.skipper.SkipThisClassPlease',
     'com.foobar.skipper.AlsoSkipThisClassPlease'
+]
+```
+
+# <a id="modelConverters">Model Converters</a>
+
+You can instruct `swagger-gradle-plugin` to use a custom model converter rather than use the default by adding the following to your build.gradle:
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.custom:model-converter:1.0.0'
+    }
+}
+...
+swagger {
+    apiSource {
+        ...
+        modelConverters = [ 'com.custom.model.Converter' ]
+    }
 }
 ```
+
+It is important to note that the class has to be available in the buildscript's classpath.
 
 # <a id="apiModelPropertyAccessExclusionsList">Excluding certain `@ApiModelProperty` items</a>
 If you'd like to exclude certain `@ApiModelProperty`s based on their `access` values, you may do so by adding the following as a child node of `apiSource` in your build.gradle:

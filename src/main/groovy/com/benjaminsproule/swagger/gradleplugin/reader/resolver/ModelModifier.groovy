@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.reader.resolver
 
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -33,12 +34,12 @@ class ModelModifier extends ModelResolver {
         JavaType type = null
         JavaType toType = null
         try {
-            type = _mapper.constructType(Class.forName(fromClass))
+            type = _mapper.constructType(ClassFinder.loadClass(fromClass))
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${fromClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
         try {
-            toType = _mapper.constructType(Class.forName(toClass))
+            toType = _mapper.constructType(ClassFinder.loadClass(toClass))
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }

@@ -51,6 +51,7 @@ class ModelModifier extends ModelResolver {
     Property resolveProperty(Type type, ModelConverterContext context, Annotation[] annotations, Iterator<ModelConverter> chain) {
         // for method parameter types we get here Type but we need JavaType
         JavaType javaType = toJavaType(type)
+
         if (modelSubtitutes.containsKey(javaType)) {
             return super.resolveProperty(modelSubtitutes.get(javaType), context, annotations, chain)
         } else if (chain.hasNext()) {

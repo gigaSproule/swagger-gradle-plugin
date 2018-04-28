@@ -4,15 +4,17 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import io.swagger.models.Info
 import io.swagger.models.Scheme
 import io.swagger.models.auth.BasicAuthDefinition
+import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
 class ApiSourceExtensionTest extends Specification {
+    Project project
     ApiSourceExtension apiSourceExtension
 
     def setup() {
-        def project = ProjectBuilder.builder().build()
-        ClassFinder.createInstance(project)
+        project = ProjectBuilder.builder().build()
         apiSourceExtension = new ApiSourceExtension(project)
     }
 
@@ -31,6 +33,9 @@ class ApiSourceExtensionTest extends Specification {
 
     def 'Api Source with missing info should provide missing info error'() {
         setup:
+        project.configurations.create('runtime')
+        project.plugins.apply JavaPlugin
+        ClassFinder.createInstance(project)
         apiSourceExtension.locations = ['com.github.junk'] //make sure we don't discover any annotations
 
         when:

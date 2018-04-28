@@ -56,20 +56,16 @@ class ClassFinder {
 
     private ClassLoader prepareClassLoader() {
         def urls = []
-        if (project.configurations.find { it.name == 'runtime' }) {
-            project.configurations.runtime.resolve().each {
-                urls.add(it.toURI().toURL())
-            }
+        project.configurations.runtime.resolve().each {
+            urls.add(it.toURI().toURL())
         }
 
-        if (project.find { it.name == 'sourceSets' }) {
-            if (project.sourceSets.main.output.getProperties()['classesDirs']) {
-                project.sourceSets.main.output.classesDirs.each {
-                    urls.add(it.toURI().toURL())
-                }
-            } else {
-                urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
+        if (project.sourceSets.main.output.getProperties()['classesDirs']) {
+            project.sourceSets.main.output.classesDirs.each {
+                urls.add(it.toURI().toURL())
             }
+        } else {
+            urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
         }
 
         return new URLClassLoader(urls as URL[], getClass().getClassLoader())

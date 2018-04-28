@@ -1,10 +1,10 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import io.swagger.models.Info
 import io.swagger.models.Scheme
 import io.swagger.models.auth.BasicAuthDefinition
 import org.gradle.testfixtures.ProjectBuilder
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class ApiSourceExtensionTest extends Specification {
@@ -12,6 +12,7 @@ class ApiSourceExtensionTest extends Specification {
 
     def setup() {
         def project = ProjectBuilder.builder().build()
+        ClassFinder.createInstance(project)
         apiSourceExtension = new ApiSourceExtension(project)
     }
 
@@ -28,7 +29,6 @@ class ApiSourceExtensionTest extends Specification {
         assert !result
     }
 
-    @Ignore("Need to sort out the classfinder before this is going to work")
     def 'Api Source with missing info should provide missing info error'() {
         setup:
         apiSourceExtension.locations = ['com.github.junk'] //make sure we don't discover any annotations
@@ -38,7 +38,8 @@ class ApiSourceExtensionTest extends Specification {
 
         then:
         assert result
-        assert result.contains('Info is required by the swagger spec.')
+        assert result.contains('info.title is required by the swagger spec')
+        assert result.contains('info.version is required by the swagger spec')
     }
 
     def 'Api Source with no locations should provide missing locations error'() {

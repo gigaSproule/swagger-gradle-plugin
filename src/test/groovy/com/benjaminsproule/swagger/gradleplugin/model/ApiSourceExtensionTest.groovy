@@ -73,7 +73,7 @@ class ApiSourceExtensionTest extends Specification {
         apiSourceExtension.basePath = '/'
         apiSourceExtension.locations = ['com.benjaminsproule']
         apiSourceExtension.schemes = ['http']
-        apiSourceExtension.descriptionFile = new File("src/test/resources/api-description/description.txt")
+        apiSourceExtension.descriptionFile = loadFileFromClasspath("/api-description/description.txt")
         apiSourceExtension.info = Mock(InfoExtension)
         apiSourceExtension.info.asSwaggerType() >> new Info()
         apiSourceExtension.securityDefinition = Mock(SecurityDefinitionExtension)
@@ -92,4 +92,10 @@ class ApiSourceExtensionTest extends Specification {
 with multiple lines'''
         assert result.securityDefinitions
     }
+
+    private static File loadFileFromClasspath(String path) {
+        URL url = ApiSourceExtensionTest.class.getResource(path)
+        return new File(url.toURI())
+    }
+
 }

@@ -44,7 +44,7 @@ class GradleSwaggerPluginTest {
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
             apiSource {
-                locations = ['com.benjaminsproule']
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.jaxrs']
                 info {
                     title = project.name
                     version = '1'
@@ -71,7 +71,7 @@ class GradleSwaggerPluginTest {
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
             apiSource {
-                locations = ['com.benjaminsproule']
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.Definitions']
                 schemes = ['http']
                 swaggerDirectory = expectedSwaggerDirectory
                 securityDefinition {

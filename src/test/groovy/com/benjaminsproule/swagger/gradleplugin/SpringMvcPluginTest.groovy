@@ -38,7 +38,7 @@ class SpringMvcPluginTest {
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc']
                     springmvc = true
                     schemes = ['http']
                     modelSubstitute = ''

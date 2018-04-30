@@ -4,8 +4,8 @@ import static java.util.Collections.singletonList;
 
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-
+import com.benjaminsproule.swagger.gradleplugin.ignore.IgnoredModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -31,8 +31,8 @@ public class TestResourceWithClassAnnotation {
 
     @ApiOperation(value = "A default operation")
     @RequestMapping(path = "/default", method = RequestMethod.GET)
-    public Response defaultResponse() {
-        return Response.ok().build();
+    public ResponseEntity defaultResponse() {
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation(value = "A generics operation")
@@ -43,8 +43,8 @@ public class TestResourceWithClassAnnotation {
 
     @ApiOperation("Consumes and Produces operation")
     @RequestMapping(path = "/datatype", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public Response dataType(@ApiParam RequestModel requestModel) {
-        return Response.ok().build();
+    public ResponseEntity dataType(@ApiParam RequestModel requestModel) {
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation(value = "A response operation", response = ResponseModel.class)
@@ -103,6 +103,12 @@ public class TestResourceWithClassAnnotation {
     @ApiOperation(value = "A hidden operation", hidden = true)
     @RequestMapping(path = "/hidden", method = RequestMethod.GET)
     public String hidden() {
+        return "";
+    }
+
+    @ApiOperation(value = "An ignored model")
+    @RequestMapping(value = "/ignoredModel", method = RequestMethod.GET)
+    public String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
 }

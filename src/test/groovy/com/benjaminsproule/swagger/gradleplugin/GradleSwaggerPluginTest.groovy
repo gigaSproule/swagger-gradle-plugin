@@ -2,12 +2,7 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
-import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.yaml.snakeyaml.Yaml
 
@@ -16,19 +11,7 @@ import java.nio.file.Files
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class GradleSwaggerPluginTest {
-    Project project
-
-    @Before
-    void setUp() {
-        project = ProjectBuilder.builder().build()
-        project.pluginManager.apply 'com.benjaminsproule.swagger'
-    }
-
-    @After
-    void tearDown() {
-        project = null
-    }
+class GradleSwaggerPluginTest extends AbstractPluginTest {
 
     @Test
     void pluginAddsGenerateSwaggerTask() {
@@ -36,13 +19,11 @@ class GradleSwaggerPluginTest {
     }
 
     @Test
-    void shouldSkipSwaggerGeneartionWhenSkipSwaggerPropertySet() {
+    void shouldSkipSwaggerGenerationWhenSkipSwaggerPropertySet() {
         project.extensions.extraProperties.set('swagger.skip', true)
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
 
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
             apiSource {
                 locations = ['com.benjaminsproule']
                 info {
@@ -64,12 +45,8 @@ class GradleSwaggerPluginTest {
 
     @Test
     void shouldReadMissingConfigFromAnnotations() {
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-
-
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
             apiSource {
                 locations = ['com.benjaminsproule']
                 schemes = ['http']
@@ -102,12 +79,9 @@ class GradleSwaggerPluginTest {
 
     @Test
     void generateSwaggerArtifactWhenFlagIsSet() {
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-
         def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
         def expectedSwaggerDirectory = "${project.buildDir}/${swaggerRelativeDirectory}"
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
             apiSource {
                 attachSwaggerArtifact = true
                 locations = ['com.benjaminsproule']
@@ -137,11 +111,8 @@ class GradleSwaggerPluginTest {
 
     @Test
     void swaggerDocumentationGeneratedInMultipleFormats() {
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>( {
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
             apiSource {
                 locations = ['com.benjaminsproule']
                 schemes = ['http']

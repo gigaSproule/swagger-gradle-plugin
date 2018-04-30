@@ -1,9 +1,8 @@
 package com.benjaminsproule.swagger.gradleplugin.test.springmvc;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import io.swagger.annotations.ApiOperation;
 
 public class ExtendedTestResourceWithClassAnnotation extends TestResourceWithClassAnnotation {
 

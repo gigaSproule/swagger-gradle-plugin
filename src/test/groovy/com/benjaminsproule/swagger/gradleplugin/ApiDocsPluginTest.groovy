@@ -2,33 +2,13 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import org.apache.commons.text.RandomStringGenerator
-import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 
-class ApiDocsPluginTest {
-    Project project
-
-    @Before
-    void setUp() {
-        project = ProjectBuilder.builder().build()
-        project.pluginManager.apply 'com.benjaminsproule.swagger'
-    }
-
-    @After
-    void tearDown() {
-        project = null
-    }
+class ApiDocsPluginTest extends AbstractPluginTest {
 
     @Test
     void useSpecifiedTemplatesToGenerateSwaggerDocs() {
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-
         def randomizer = new RandomStringGenerator.Builder().build().generate(5)
         //Template path is not actually a template path but a template file and it propbably has to be the root
         def expectedSwaggerDocsDirectory = "${project.buildDir}/swaggerdocs-${randomizer}"

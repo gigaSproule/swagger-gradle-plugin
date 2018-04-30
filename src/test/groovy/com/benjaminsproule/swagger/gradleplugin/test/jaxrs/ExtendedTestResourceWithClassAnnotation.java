@@ -1,9 +1,9 @@
 package com.benjaminsproule.swagger.gradleplugin.test.jaxrs;
 
+import io.swagger.annotations.ApiOperation;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-
-import io.swagger.annotations.ApiOperation;
 
 public class ExtendedTestResourceWithClassAnnotation extends TestResourceWithClassAnnotation {
 

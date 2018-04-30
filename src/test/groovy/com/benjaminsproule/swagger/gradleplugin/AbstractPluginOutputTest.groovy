@@ -2,93 +2,55 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
-import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 
 import java.nio.file.Files
 
-class JaxrsPluginTest {
-    Project project
-
-    @Before
-    void setUp() {
-        project = ProjectBuilder.builder().build()
-        project.pluginManager.apply 'com.benjaminsproule.swagger'
-    }
-
-    @After
-    void tearDown() {
-        project = null
-    }
+abstract class AbstractPluginOutputTest extends AbstractPluginTest {
 
     @Test
     void producesSwaggerDocumentation() {
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-
-
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule']
-                    schemes = ['http']
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                        contact {
-                            name = 'Joe Blogs'
-                        }
-                    }
-                    swaggerDirectory = expectedSwaggerDirectory
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
-                }
-            }
-        ))
+        project.extensions.configure(SwaggerExtension, getSwaggerExtensionClosure(expectedSwaggerDirectory))
 
         project.tasks.generateSwaggerDocumentation.execute()
 
-        def swaggerFile = new File("${expectedSwaggerDirectory}/swagger.json")
-        assertSwaggerJson(swaggerFile)
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
     }
 
-    private static void assertSwaggerJson(File swaggerJsonFile) {
+    protected abstract ClosureBackedAction<SwaggerExtension> getSwaggerExtensionClosure(String expectedSwaggerDirectory)
+
+    private static void assertSwaggerJson(String swaggerJsonFilePath) {
+        def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
+        def producedSwaggerDocument = new JsonSlurper().parse(swaggerJsonFile, 'UTF-8')
 
-        JsonSlurper jsonSlurper = new JsonSlurper()
+        assert producedSwaggerDocument.swagger == '2.0'
+        assert producedSwaggerDocument.host == 'localhost:8080'
+        assert producedSwaggerDocument.basePath == '/'
 
-        def producedSwaggerDocument = jsonSlurper.parse(swaggerJsonFile)
-
-        assert producedSwaggerDocument.get('swagger') == '2.0'
-        assert producedSwaggerDocument.get('host') == 'localhost:8080'
-        assert producedSwaggerDocument.get('basePath') == '/'
-
-        def info = producedSwaggerDocument.get('info')
+        def info = producedSwaggerDocument.info
         assert info
-        assert info.get('version') == '1'
-        assert info.get('title') == 'test'
+        assert info.version == '1'
+        assert info.title == 'test'
+        assert info.contact.name == 'Joe Blogs'
+        assert info.license.name == 'Apache 2.0'
 
-        def tags = producedSwaggerDocument.get('tags')
+        def tags = producedSwaggerDocument.tags
         assert tags
         assert tags.size() == 1
-        assert tags.get(0).get('name') == 'Test'
+        assert tags.get(0).name == 'Test'
+        assert tags.get(0).description == 'Test tag description'
 
-        def paths = producedSwaggerDocument.get('paths')
+        def schemes = producedSwaggerDocument.schemes
+        assert schemes
+        assert schemes.size() == 1
+        assert schemes.get(0) == 'http'
+
+        def paths = producedSwaggerDocument.paths
         assert paths
-        assert paths.size() == 24
+        assert paths.size() == 26
         assert paths.'/root/withannotation/basic'.get.tags == ['Test']
         assert paths.'/root/withannotation/basic'.get.summary == 'A basic operation'
         assert paths.'/root/withannotation/basic'.get.description == 'Test resource'
@@ -188,6 +150,14 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.security.basic
         assert paths.'/root/withannotation/hidden' == null
+        assert paths.'/root/withannotation/ignoredModel'.get.tags == ['Test']
+        assert paths.'/root/withannotation/ignoredModel'.get.summary == 'An ignored model'
+        assert paths.'/root/withannotation/ignoredModel'.get.description == 'Test resource'
+        assert paths.'/root/withannotation/ignoredModel'.get.operationId == 'ignoredModel'
+        assert paths.'/root/withannotation/ignoredModel'.get.produces == null
+        assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.description == 'successful operation'
+        assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/ignoredModel'.get.security.basic
         assert paths.'/root/withoutannotation/basic'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/basic'.get.summary == 'A basic operation'
         assert paths.'/root/withoutannotation/basic'.get.description == 'Test resource'
@@ -287,5 +257,33 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.security.basic
         assert paths.'/root/withoutannotation/hidden' == null
+        assert paths.'/root/withoutannotation/ignoredModel'.get.tags == ['Test']
+        assert paths.'/root/withoutannotation/ignoredModel'.get.summary == 'An ignored model'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.description == 'Test resource'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.operationId == 'ignoredModel'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.produces == null
+        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.description == 'successful operation'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.security.basic
+
+        def securityDefinitions = producedSwaggerDocument.securityDefinitions
+        assert securityDefinitions
+        assert securityDefinitions.size() == 1
+        assert securityDefinitions.MyBasicAuth.type == 'basic'
+
+        def definitions = producedSwaggerDocument.definitions
+        assert definitions
+        assert definitions.size() == 3
+        assert definitions.RequestModel.type == 'object'
+        assert definitions.RequestModel.properties.size() == 2
+        assert definitions.RequestModel.properties.name.type == 'string'
+        assert definitions.RequestModel.properties.value.type == 'string'
+        assert definitions.ResponseModel.type == 'object'
+        assert definitions.ResponseModel.properties.size() == 1
+        assert definitions.ResponseModel.properties.name.type == 'string'
+        assert definitions.SubResponseModel.type == 'object'
+        assert definitions.SubResponseModel.properties.size() == 2
+        assert definitions.SubResponseModel.properties.name.type == 'string'
+        assert definitions.SubResponseModel.properties.value.type == 'string'
     }
 }

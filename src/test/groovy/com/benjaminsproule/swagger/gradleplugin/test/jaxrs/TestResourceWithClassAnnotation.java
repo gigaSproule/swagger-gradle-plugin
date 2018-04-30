@@ -1,25 +1,16 @@
 package com.benjaminsproule.swagger.gradleplugin.test.jaxrs;
 
-import static java.util.Collections.singletonList;
-
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-
+import com.benjaminsproule.swagger.gradleplugin.ignore.IgnoredModel;
 import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel;
 import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel;
 import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel;
+import io.swagger.annotations.*;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 @Api(tags = "Test", description = "Test resource", authorizations = {@Authorization("basic")})
 @Path("/root/withannotation")
@@ -120,6 +111,13 @@ public class TestResourceWithClassAnnotation {
     @Path("/hidden")
     @GET
     public String hidden() {
+        return "";
+    }
+
+    @ApiOperation(value = "An ignored model")
+    @Path("/ignoredModel")
+    @GET
+    public String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
 }

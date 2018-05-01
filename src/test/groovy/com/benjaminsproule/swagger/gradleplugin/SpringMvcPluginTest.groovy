@@ -19,6 +19,8 @@ class SpringMvcPluginTest {
     void setUp() {
         project = ProjectBuilder.builder().build()
         project.pluginManager.apply 'com.benjaminsproule.swagger'
+
+        ModelModifierRemover.removeAllModelModifiers()
     }
 
     @After

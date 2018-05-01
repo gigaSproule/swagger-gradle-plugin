@@ -8,7 +8,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 import java.nio.file.Files
@@ -20,6 +19,8 @@ class JaxrsPluginTest {
     void setUp() {
         project = ProjectBuilder.builder().build()
         project.pluginManager.apply 'com.benjaminsproule.swagger'
+
+        ModelModifierRemover.removeAllModelModifiers()
     }
 
     @After
@@ -68,12 +69,6 @@ class JaxrsPluginTest {
     }
 
     @Test
-    @Ignore
-    /* this test is ignored because it adversely impacts the spring MVC plugin test, it is fine when run in isolation,
-    but as part of a suite, once a model modifier is registered in EnvironmentConfigurer by calling
-    ModelConverters.getInstance().addConverter(modelModifier), it is not possible to remove or clear it again unless
-    a new JVM is spun up meaning it is retained when running SpringMVCPluginTest.producesSwaggerDocumentation so
-    any strings are substituted for integers by the model substitution that is registered in this test */
     void producesSwaggerDocumentationWithModelSubstitution() {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin

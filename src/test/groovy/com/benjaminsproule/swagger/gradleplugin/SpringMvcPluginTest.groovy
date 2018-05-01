@@ -70,11 +70,6 @@ class SpringMvcPluginTest {
     }
 
     @Test
-    /* IMPORTATNT NOTE as part of a suite, once a model modifier is registered in EnvironmentConfigurer by calling
-    ModelConverters.getInstance().addConverter(modelModifier), it is not possible to remove or clear it again unless
-    a new JVM is spun up meaning the model modifier is retained for all subsequent tests so
-    any strings will be substituted for integers by the model substitution that is registered in this test when any
-    other document generation tasks are called */
     void producesSwaggerDocumentationWithModelSubstitution() {
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin

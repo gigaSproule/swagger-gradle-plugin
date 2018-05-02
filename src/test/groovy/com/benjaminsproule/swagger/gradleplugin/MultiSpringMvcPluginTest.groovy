@@ -24,11 +24,6 @@ class MultiSpringMvcPluginTest {
         project.pluginManager.apply 'com.benjaminsproule.swagger'
     }
 
-    @After
-    void tearDown() {
-        project = null
-    }
-
     @Test
     void producesSwaggerDocumentation() {
         project.configurations.create('runtime')
@@ -40,7 +35,7 @@ class MultiSpringMvcPluginTest {
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.multispring.controller.OneController']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.TestResourceForMultiApiSource_One']
                     springmvc = true
                     schemes = ['http']
                     swaggerDirectory = expectedSwaggerDirectory
@@ -48,7 +43,7 @@ class MultiSpringMvcPluginTest {
                     basePath = 'One'
                 }
                 apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.multispring.controller.TwoController']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.TestResourceForMultiApiSource_Two']
                     springmvc = true
                     schemes = ['http']
                     swaggerDirectory = expectedSwaggerDirectory
@@ -82,7 +77,7 @@ class MultiSpringMvcPluginTest {
         assert paths
         assert paths.size() == 1
 
-        assert paths."${prefix}Api".get.responses.'200'.schema.'$ref' == "#/definitions/${prefix}Parent"
+        assert paths."${prefix}Api".get.responses.'200'.schema.'$ref' == "#/definitions/MultiApiSourceParent${prefix}ResponseModel"
 
     }
 }

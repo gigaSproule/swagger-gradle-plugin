@@ -1,6 +1,6 @@
-package com.benjaminsproule.swagger.gradleplugin.test.multispring.controller.api;
+package com.benjaminsproule.swagger.gradleplugin.test.model;
 
-public class ApiCommon {
+public class MultiApiSourceCommonResponseModel {
 
     private String commonProperty;
 

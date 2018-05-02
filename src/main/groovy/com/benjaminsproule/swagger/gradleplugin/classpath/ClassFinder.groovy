@@ -28,6 +28,10 @@ class ClassFinder {
         return instance
     }
 
+    void clearClassCache() {
+        this.classCache.clear()
+    }
+
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
         return getValidClasses(clazz, [])
     }

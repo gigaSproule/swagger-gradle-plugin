@@ -43,12 +43,13 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     generateSwaggerDocuments() {
         def swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME)
 
+        ClassFinder.createInstance(project)
+        ResourceFinder.createInstance(project)
         ensureCompatibleSwaggerSpec()
 
         try {
             for (ApiSourceExtension apiSourceExtension : swaggerExtension.apiSourceExtensions) {
-                ClassFinder.createInstance(project)
-                ResourceFinder.createInstance(project)
+                ClassFinder.instance().clearClassCache()
                 processSwaggerPluginExtension(apiSourceExtension)
             }
         } catch (InvalidUserDataException iude) {

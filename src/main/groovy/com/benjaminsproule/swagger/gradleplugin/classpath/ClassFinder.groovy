@@ -43,7 +43,6 @@ class ClassFinder {
         }
 
         Set<Class<?>> classes = new HashSet<Class<?>>()
-        ClassLoader classLoader = classLoader
 
         if (packages) {
             packages.each { location ->

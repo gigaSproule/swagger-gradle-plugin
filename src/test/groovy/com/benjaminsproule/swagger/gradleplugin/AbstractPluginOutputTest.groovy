@@ -44,14 +44,11 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
     }
 
-    protected
-    abstract ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure(String expectedSwaggerDirectory)
+    protected abstract ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure(String expectedSwaggerDirectory)
 
-    protected
-    abstract ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure(String expectedSwaggerDirectory)
+    protected abstract ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure(String expectedSwaggerDirectory)
 
-    protected
-    abstract ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure(String expectedSwaggerDirectory)
+    protected abstract ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure(String expectedSwaggerDirectory)
 
     private static void assertSwaggerJson(String swaggerJsonFilePath) {
         def swaggerJsonFile = new File(swaggerJsonFilePath)

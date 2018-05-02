@@ -7,10 +7,10 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 @SpringBootApplication
 public class SampleApplication extends SpringBootServletInitializer {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         new SampleApplication()
-				.configure(new SpringApplicationBuilder(SampleApplication.class))
-				.run(args);
-	}
+            .configure(new SpringApplicationBuilder(SampleApplication.class))
+            .run(args);
+    }
 
 }

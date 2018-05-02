@@ -29,6 +29,10 @@ class ClassFinder {
         return instance
     }
 
+    void clearClassCache() {
+        this.classCache.clear()
+    }
+
     static Class<?> loadClass(String name) {
         return instance.classLoader.loadClass(name)
     }

@@ -37,14 +37,6 @@ class ClassFinder {
         return instance.classLoader.loadClass(name)
     }
 
-    void clearClassCache() {
-        this.classCache.clear()
-    }
-
-    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
-        return getValidClasses(clazz, [])
-    }
-
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages) {
         if (classCache.containsKey(clazz)) {
             return classCache.get(clazz)

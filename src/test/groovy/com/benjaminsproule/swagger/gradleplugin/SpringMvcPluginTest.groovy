@@ -36,7 +36,7 @@ class SpringMvcPluginTest {
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc']
+                    locations = ['com.benjaminsproule']
                     springmvc = true
                     schemes = ['http']
                     info {
@@ -89,7 +89,7 @@ class SpringMvcPluginTest {
 
         def paths = producedSwaggerDocument.get('paths')
         assert paths
-        assert paths.size() == 24
+        assert paths.size() == 26
         assert paths.'/root/withannotation/basic'.get.tags == ['Test']
         assert paths.'/root/withannotation/basic'.get.summary == 'A basic operation'
         assert paths.'/root/withannotation/basic'.get.description == 'Test resource'

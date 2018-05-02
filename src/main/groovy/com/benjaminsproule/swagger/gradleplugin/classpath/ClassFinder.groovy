@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.classpath
 
 import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSetOutput
 import org.reflections.Reflections
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -13,10 +12,12 @@ class ClassFinder {
     static instance
     Map<Class<? extends Annotation>, Set<Class<?>>> classCache
     Project project
+    private ClassLoader classLoader
 
     private ClassFinder(Project project) {
         this.project = project
         this.classCache = new HashMap<>()
+        this.classLoader = prepareClassLoader()
     }
 
     //FIXME hack until we have some DI working
@@ -26,6 +27,10 @@ class ClassFinder {
 
     static ClassFinder instance() {
         return instance
+    }
+
+    static Class<?> loadClass(String name) {
+        return instance.classLoader.loadClass(name)
     }
 
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
@@ -38,7 +43,6 @@ class ClassFinder {
         }
 
         Set<Class<?>> classes = new HashSet<Class<?>>()
-        ClassLoader classLoader = prepareClassLoader()
 
         if (packages) {
             packages.each { location ->

@@ -19,6 +19,8 @@ class JaxrsPluginTest {
     void setUp() {
         project = ProjectBuilder.builder().build()
         project.pluginManager.apply 'com.benjaminsproule.swagger'
+
+        ModelModifierRemover.removeAllModelModifiers()
     }
 
     @After
@@ -38,6 +40,7 @@ class JaxrsPluginTest {
                 apiSource {
                     locations = ['com.benjaminsproule']
                     schemes = ['http']
+                    modelSubstitute = ''
                     info {
                         title = project.name
                         version = '1'
@@ -62,10 +65,50 @@ class JaxrsPluginTest {
         project.tasks.generateSwaggerDocumentation.execute()
 
         def swaggerFile = new File("${expectedSwaggerDirectory}/swagger.json")
-        assertSwaggerJson(swaggerFile)
+        assertSwaggerJson(swaggerFile, 'string')
     }
 
-    private static void assertSwaggerJson(File swaggerJsonFile) {
+    @Test
+    void producesSwaggerDocumentationWithModelSubstitution() {
+        project.configurations.create('runtime')
+        project.plugins.apply JavaPlugin
+
+
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
+            {
+                apiSource {
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    modelSubstitute = 'model-substitution'
+                    info {
+                        title = project.name
+                        version = '1'
+                        license {
+                            name = 'Apache 2.0'
+                        }
+                        contact {
+                            name = 'Joe Blogs'
+                        }
+                    }
+                    swaggerDirectory = expectedSwaggerDirectory
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        ))
+
+        project.tasks.generateSwaggerDocumentation.execute()
+
+        def swaggerFile = new File("${expectedSwaggerDirectory}/swagger.json")
+        assertSwaggerJson(swaggerFile, 'integer')
+    }
+
+    private static void assertSwaggerJson(File swaggerJsonFile, String type) {
         assert Files.exists(swaggerJsonFile.toPath())
 
         JsonSlurper jsonSlurper = new JsonSlurper()
@@ -95,7 +138,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/basic'.get.operationId == 'basic'
         assert paths.'/root/withannotation/basic'.get.produces == null
         assert paths.'/root/withannotation/basic'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/basic'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/basic'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/basic'.get.security.basic
         assert paths.'/root/withannotation/default'.get.tags == ['Test']
         assert paths.'/root/withannotation/default'.get.summary == 'A default operation'
@@ -111,7 +154,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/generics'.post.produces == null
         assert paths.'/root/withannotation/generics'.post.responses.'200'.description == 'successful operation'
         assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.items.type == 'string'
+        assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.items.type == type
         assert paths.'/root/withannotation/generics'.post.security.basic
         assert paths.'/root/withannotation/datatype'.post.tags == ['Test']
         assert paths.'/root/withannotation/datatype'.post.summary == 'Consumes and Produces operation'
@@ -153,7 +196,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/deprecated'.get.operationId == 'deprecated'
         assert paths.'/root/withannotation/deprecated'.get.produces == null
         assert paths.'/root/withannotation/deprecated'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/deprecated'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/deprecated'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/deprecated'.get.security.basic
         assert paths.'/root/withannotation/auth'.get.tags == ['Test']
         assert paths.'/root/withannotation/auth'.get.summary == 'An auth operation'
@@ -161,7 +204,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/auth'.get.operationId == 'withAuth'
         assert paths.'/root/withannotation/auth'.get.produces == null
         assert paths.'/root/withannotation/auth'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/auth'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/auth'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/auth'.get.security.basic
         assert paths.'/root/withannotation/model'.get.tags == ['Test']
         assert paths.'/root/withannotation/model'.get.summary == 'A model operation'
@@ -169,7 +212,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/model'.get.operationId == 'model'
         assert paths.'/root/withannotation/model'.get.produces == null
         assert paths.'/root/withannotation/model'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/model'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/model'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/model'.get.security.basic
         assert paths.'/root/withannotation/overriden'.get.tags == ['Test']
         assert paths.'/root/withannotation/overriden'.get.summary == 'An overriden operation description'
@@ -177,7 +220,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withannotation/overriden'.get.produces == null
         assert paths.'/root/withannotation/overriden'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/overriden'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/overriden'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/overriden'.get.security.basic
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.tags == ['Test']
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.summary == 'An overriden operation'
@@ -185,7 +228,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.produces == null
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.security.basic
         assert paths.'/root/withannotation/hidden' == null
         assert paths.'/root/withoutannotation/basic'.get.tags == ['Test']
@@ -194,7 +237,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/basic'.get.operationId == 'basic'
         assert paths.'/root/withoutannotation/basic'.get.produces == null
         assert paths.'/root/withoutannotation/basic'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/basic'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/basic'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/basic'.get.security.basic
         assert paths.'/root/withoutannotation/default'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/default'.get.summary == 'A default operation'
@@ -210,7 +253,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/generics'.post.produces == null
         assert paths.'/root/withoutannotation/generics'.post.responses.'200'.description == 'successful operation'
         assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.items.type == 'string'
+        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.items.type == type
         assert paths.'/root/withoutannotation/generics'.post.security.basic
         assert paths.'/root/withoutannotation/datatype'.post.tags == ['Test']
         assert paths.'/root/withoutannotation/datatype'.post.summary == 'Consumes and Produces operation'
@@ -252,7 +295,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/deprecated'.get.operationId == 'deprecated'
         assert paths.'/root/withoutannotation/deprecated'.get.produces == null
         assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/deprecated'.get.security.basic
         assert paths.'/root/withoutannotation/auth'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/auth'.get.summary == 'An auth operation'
@@ -260,7 +303,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/auth'.get.operationId == 'withAuth'
         assert paths.'/root/withoutannotation/auth'.get.produces == null
         assert paths.'/root/withoutannotation/auth'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/auth'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/auth'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/auth'.get.security.basic
         assert paths.'/root/withoutannotation/model'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/model'.get.summary == 'A model operation'
@@ -268,7 +311,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/model'.get.operationId == 'model'
         assert paths.'/root/withoutannotation/model'.get.produces == null
         assert paths.'/root/withoutannotation/model'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/model'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/model'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/model'.get.security.basic
         assert paths.'/root/withoutannotation/overriden'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/overriden'.get.summary == 'An overriden operation description'
@@ -276,7 +319,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withoutannotation/overriden'.get.produces == null
         assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/overriden'.get.security.basic
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.tags == ['Test']
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.summary == 'An overriden operation'
@@ -284,7 +327,7 @@ class JaxrsPluginTest {
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.produces == null
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.security.basic
         assert paths.'/root/withoutannotation/hidden' == null
     }

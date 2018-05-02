@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.docgen
 
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.misc.EnhancedSwaggerModule
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
@@ -84,7 +85,7 @@ class EnvironmentConfigurer {
         }
 
         if (apiSource.modelSubstitute) {
-            getClass().getResource(apiSource.modelSubstitute).eachLine { line ->
+            ResourceFinder.instance().getResourceAsStream(apiSource.modelSubstitute).eachLine { line ->
                 def classes = line.split(":")
                 if (classes.length != 2) {
                     throw new GenerateException('Bad format of override model file, it should be ${actualClassName}:${expectClassName}')

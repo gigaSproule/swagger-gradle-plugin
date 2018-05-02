@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-class MultiSpringMvcPluginTest {
+class MultiJaxrsPluginTest {
     Project project
 
     @Rule
@@ -34,16 +34,14 @@ class MultiSpringMvcPluginTest {
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.TestResourceForMultiApiSource_One']
-                    springmvc = true
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.jaxrs.TestResourceForMultiApiSource_One']
                     schemes = ['http']
                     swaggerDirectory = expectedSwaggerDirectory
                     swaggerFileName = expectedSwaggerFile1
                     basePath = 'One'
                 }
                 apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.TestResourceForMultiApiSource_Two']
-                    springmvc = true
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.jaxrs.TestResourceForMultiApiSource_Two']
                     schemes = ['http']
                     swaggerDirectory = expectedSwaggerDirectory
                     swaggerFileName = expectedSwaggerFile2
@@ -76,7 +74,7 @@ class MultiSpringMvcPluginTest {
         assert paths
         assert paths.size() == 1
 
-        assert paths."${prefix}Api".get.responses.'200'.schema.'$ref' == "#/definitions/MultiApiSourceParent${prefix}ResponseModel"
+        assert paths."/${prefix}Api".get.responses.'200'.schema.'$ref' == "#/definitions/MultiApiSourceParent${prefix}ResponseModel"
 
     }
 }

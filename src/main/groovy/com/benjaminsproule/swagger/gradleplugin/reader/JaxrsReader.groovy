@@ -14,7 +14,7 @@ import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.PATCH
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
-import io.swagger.jersey.SwaggerJerseyJaxrs
+import io.swagger.jersey.SwaggerJersey2Jaxrs
 import io.swagger.models.Model
 import io.swagger.models.Operation
 import io.swagger.models.Response
@@ -54,7 +54,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
     void updateExtensionChain(List<SwaggerExtension> swaggerExtensions) {
         List<SwaggerExtension> extensions = swaggerExtensions ?: new ArrayList<SwaggerExtension>()
         extensions.add(new BeanParamInjectionParamExtension())
-        extensions.add(new SwaggerJerseyJaxrs())
+        extensions.add(new SwaggerJersey2Jaxrs())
         extensions.add(new JaxrsParameterExtension())
         SwaggerExtensions.setExtensions(extensions)
     }
@@ -100,6 +100,12 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
             if (apiOperation != null && apiOperation.hidden()) {
                 continue //Skip processing for hidden operation
             }
+
+            if (!AnnotationUtils.findAnnotation(method, GET) && !AnnotationUtils.findAnnotation(method, POST)
+                && !AnnotationUtils.findAnnotation(method, PUT) && !AnnotationUtils.findAnnotation(method, DELETE)) {
+                continue // Skip processing for non-API methods
+            }
+
             Path methodPath = AnnotationUtils.findAnnotation(method, Path)
 
             String operationPath = getPath(apiPath, methodPath, parentPath)

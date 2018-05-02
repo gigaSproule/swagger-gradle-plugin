@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.classpath
 
 import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSetOutput
 import org.reflections.Reflections
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -59,6 +58,7 @@ class ClassFinder {
         def urls = []
         project.configurations.runtime.resolve().each {
             urls.add(it.toURI().toURL())
+//            println it
         }
 
         if (project.sourceSets.main.output.getProperties()['classesDirs']) {

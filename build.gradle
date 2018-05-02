@@ -44,14 +44,15 @@ dependencies {
     compile 'javax.xml.bind:jaxb-api:2.2.4'
 
     //These should be pinned here until reflections/reflections#194 has been resolved
-    compile 'io.swagger:swagger-jaxrs:1.5.13'
-    compile 'io.swagger:swagger-jersey-jaxrs:1.5.13'
+    compile 'io.swagger:swagger-jersey2-jaxrs:1.5.13'
 
     compile 'javax.ws.rs:javax.ws.rs-api:2.1'
     compile 'com.sun.jersey:jersey-server:1.19.4'
     compile 'org.springframework:spring-context:5.0.1.RELEASE'
     compile 'org.springframework:spring-web:5.0.1.RELEASE'
 
+    testCompile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.41'
+    testCompile 'org.jetbrains.kotlin:kotlin-reflect:1.2.41'
     testCompile 'junit:junit:4.12'
     testCompile 'cglib:cglib-nodep:3.2.5'
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {

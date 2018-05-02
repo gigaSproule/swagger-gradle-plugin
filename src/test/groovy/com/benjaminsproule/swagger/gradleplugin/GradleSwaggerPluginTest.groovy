@@ -68,13 +68,19 @@ class GradleSwaggerPluginTest extends AbstractPluginTest {
 
         def producedSwaggerDocument = jsonSlurper.parse(swaggerFile)
 
-        assert producedSwaggerDocument.get('host') == 'http://annotated'
-        assert producedSwaggerDocument.get('basePath') == '/annotated'
+        assert producedSwaggerDocument.host == 'http://annotated'
+        assert producedSwaggerDocument.basePath == '/annotated'
 
-        def info = producedSwaggerDocument.get('info')
+        def info = producedSwaggerDocument.info
         assert info
-        assert info.get('version') == 'annotated'
-        assert info.get('title') == 'annotated'
+        assert info.version == 'annotated'
+        assert info.title == 'annotated'
+
+        def tags = producedSwaggerDocument.tags
+        assert tags
+        assert tags.size() == 1
+        assert tags.get(0).name == 'Test'
+        assert tags.get(0).description == 'Test tag description'
     }
 
     @Test

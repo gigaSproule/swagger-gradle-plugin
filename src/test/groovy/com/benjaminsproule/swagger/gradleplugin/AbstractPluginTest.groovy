@@ -14,5 +14,6 @@ abstract class AbstractPluginTest {
         project.pluginManager.apply 'com.benjaminsproule.swagger'
         project.configurations.create('runtime')
         project.plugins.apply JavaPlugin
+        ModelModifierRemover.removeAllModelModifiers()
     }
 }

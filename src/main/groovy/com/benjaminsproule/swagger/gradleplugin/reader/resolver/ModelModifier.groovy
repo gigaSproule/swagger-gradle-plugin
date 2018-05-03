@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.reader.resolver
 
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -33,12 +34,12 @@ class ModelModifier extends ModelResolver {
         JavaType type = null
         JavaType toType = null
         try {
-            type = _mapper.constructType(Class.forName(fromClass))
+            type = _mapper.constructType(ClassFinder.loadClass(fromClass))
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${fromClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
         try {
-            toType = _mapper.constructType(Class.forName(toClass))
+            toType = _mapper.constructType(ClassFinder.loadClass(toClass))
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
@@ -51,6 +52,7 @@ class ModelModifier extends ModelResolver {
     Property resolveProperty(Type type, ModelConverterContext context, Annotation[] annotations, Iterator<ModelConverter> chain) {
         // for method parameter types we get here Type but we need JavaType
         JavaType javaType = toJavaType(type)
+
         if (modelSubtitutes.containsKey(javaType)) {
             return super.resolveProperty(modelSubtitutes.get(javaType), context, annotations, chain)
         } else if (chain.hasNext()) {

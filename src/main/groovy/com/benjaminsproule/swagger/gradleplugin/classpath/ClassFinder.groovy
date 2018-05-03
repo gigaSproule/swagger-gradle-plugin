@@ -12,10 +12,12 @@ class ClassFinder {
     static instance
     Map<Class<? extends Annotation>, Set<Class<?>>> classCache
     Project project
+    private ClassLoader classLoader
 
     private ClassFinder(Project project) {
         this.project = project
         this.classCache = new HashMap<>()
+        this.classLoader = prepareClassLoader()
     }
 
     //FIXME hack until we have some DI working
@@ -27,6 +29,10 @@ class ClassFinder {
         return instance
     }
 
+    static Class<?> loadClass(String name) {
+        return instance.classLoader.loadClass(name)
+    }
+
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
         return getValidClasses(clazz, [])
     }
@@ -36,16 +42,7 @@ class ClassFinder {
             return classCache.get(clazz)
         }
 
-        println "Looking for Annotation ${clazz} in packages ${packages}"
-
         Set<Class<?>> classes = new HashSet<Class<?>>()
-        ClassLoader classLoader = prepareClassLoader()
-
-        try {
-            Class cls = Class.forName("com.benjaminsproule.swagger.gradleplugin.test.kotlin.jaxrs.TestResourceWithClassAnnotation", false, classLoader)
-            println "Kotlin class: ${cls}"
-        } catch (ClassNotFoundException ignored) {
-        }
 
         if (packages) {
             packages.each { location ->

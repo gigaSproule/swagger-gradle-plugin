@@ -4,56 +4,189 @@ import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
 import org.gradle.api.internal.ClosureBackedAction
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.yaml.snakeyaml.Yaml
 
 import java.nio.file.Files
 
 import static org.junit.Assert.fail
 
-abstract class AbstractPluginOutputTest extends AbstractPluginTest {
+@RunWith(Parameterized)
+class PluginOutputTest extends AbstractPluginTest {
+
+    @Parameterized.Parameters
+    static Collection<ClosureBackedAction<SwaggerExtension>> data() {
+        [
+            getGroovySwaggerExtensionClosure(),
+            getJavaSwaggerExtensionClosure(),
+            getKotlinSwaggerExtensionClosure()
+        ]
+    }
+
+    private ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure
+
+    PluginOutputTest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
+        this.swaggerExtensionClosure = swaggerExtensionClosure
+    }
 
     @Test
-    void producesSwaggerDocumentationFromGroovy() {
+    void producesSwaggerDocumentationWithJaxRs() {
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        def swaggerExtensionClosure = getGroovySwaggerExtensionClosure(expectedSwaggerDirectory)
         project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
+        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
+            it.swaggerDirectory = expectedSwaggerDirectory
+        }
+
+        project.tasks.generateSwaggerDocumentation.execute()
+
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+    }
+
+    @Test
+    void producesSwaggerDocumentationWithSpringMvc() {
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
+        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
+            it.swaggerDirectory = expectedSwaggerDirectory
+            it.springmvc = true
+        }
+
+        project.tasks.generateSwaggerDocumentation.execute()
+
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+    }
+
+    @Test
+    void producesSwaggerDocumentationWithModelSubstitution() {
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
+        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
+            it.swaggerDirectory = expectedSwaggerDirectory
+            it.modelSubstitute = 'model-substitution'
+        }
+
+        project.tasks.generateSwaggerDocumentation.execute()
+
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'integer')
+    }
+
+    @Test
+    void produceSwaggerDocumentationInMultipleFormats() {
+        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
+        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
+        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
+            it.swaggerDirectory = expectedSwaggerDirectory
+            it.outputFormats = ['json', 'yaml']
+        }
 
         project.tasks.generateSwaggerDocumentation.execute()
 
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
+        assertSwaggerYaml("${expectedSwaggerDirectory}/swagger.yaml")
     }
 
-    @Test
-    void producesSwaggerDocumentationFromJava() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        def swaggerExtensionClosure = getJavaSwaggerExtensionClosure(expectedSwaggerDirectory)
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-
-        project.tasks.generateSwaggerDocumentation.execute()
-
-        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
+    static ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure() {
+        new ClosureBackedAction<SwaggerExtension>(
+            {
+                apiSource {
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+                    springmvc = true
+                    schemes = ['http']
+                    modelSubstitute = ''
+                    info {
+                        title = project.name
+                        version = '1'
+                        license {
+                            name = 'Apache 2.0'
+                        }
+                        contact {
+                            name = 'Joe Blogs'
+                        }
+                    }
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        )
     }
 
-    @Test
-    void producesSwaggerDocumentationFromKotlin() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        def swaggerExtensionClosure = getKotlinSwaggerExtensionClosure(expectedSwaggerDirectory)
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-
-        project.tasks.generateSwaggerDocumentation.execute()
-
-        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
+    static ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure() {
+        new ClosureBackedAction<SwaggerExtension>(
+            {
+                apiSource {
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
+                    springmvc = true
+                    schemes = ['http']
+                    modelSubstitute = ''
+                    info {
+                        title = project.name
+                        version = '1'
+                        license {
+                            name = 'Apache 2.0'
+                        }
+                        contact {
+                            name = 'Joe Blogs'
+                        }
+                    }
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        )
     }
 
-    abstract ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure(String expectedSwaggerDirectory)
+    static ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure() {
+        new ClosureBackedAction<SwaggerExtension>(
+            {
+                apiSource {
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+                    springmvc = true
+                    schemes = ['http']
+                    modelSubstitute = ''
+                    info {
+                        title = project.name
+                        version = '1'
+                        license {
+                            name = 'Apache 2.0'
+                        }
+                        contact {
+                            name = 'Joe Blogs'
+                        }
+                    }
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        )
+    }
 
-    abstract ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure(String expectedSwaggerDirectory)
-
-    abstract ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure(String expectedSwaggerDirectory)
-
-    private static void assertSwaggerJson(String swaggerJsonFilePath) {
+    private static Object assertSwaggerJson(String swaggerJsonFilePath) {
         def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
-        def producedSwaggerDocument = new JsonSlurper().parse(swaggerJsonFile, 'UTF-8')
+        new JsonSlurper().parse(swaggerJsonFile, 'UTF-8')
+    }
+
+    private static Object assertSwaggerYaml(String swaggerYamlFilePath) {
+        def swaggerYamlFile = new File(swaggerYamlFilePath)
+        assert Files.exists(swaggerYamlFile.toPath())
+        new Yaml().load(swaggerYamlFile.getText('UTF-8'))
+    }
+
+    private static void assertSwaggerJson(String swaggerJsonFilePath, String type) {
+        Object producedSwaggerDocument = assertSwaggerJson(swaggerJsonFilePath)
 
         assert producedSwaggerDocument.swagger == '2.0'
         assert producedSwaggerDocument.host == 'localhost:8080'
@@ -85,7 +218,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/basic'.get.operationId == 'basic'
         assert paths.'/root/withannotation/basic'.get.produces == null
         assert paths.'/root/withannotation/basic'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/basic'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/basic'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/basic'.get.security.basic
 
         assert paths.'/root/withannotation/default'.get.tags == ['Test']
@@ -109,7 +242,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/generics'.post.produces == null
         assert paths.'/root/withannotation/generics'.post.responses.'200'.description == 'successful operation'
         assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.items.type == 'string'
+        assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.items.type == type
         assert paths.'/root/withannotation/generics'.post.security.basic
 
         assert paths.'/root/withannotation/datatype'.post.tags == ['Test']
@@ -162,7 +295,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/deprecated'.get.operationId == 'deprecated'
         assert paths.'/root/withannotation/deprecated'.get.produces == null
         assert paths.'/root/withannotation/deprecated'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/deprecated'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/deprecated'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/deprecated'.get.security.basic
 
         assert paths.'/root/withannotation/auth'.get.tags == ['Test']
@@ -171,7 +304,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/auth'.get.operationId == 'withAuth'
         assert paths.'/root/withannotation/auth'.get.produces == null
         assert paths.'/root/withannotation/auth'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/auth'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/auth'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/auth'.get.security.basic
 
         assert paths.'/root/withannotation/model'.get.tags == ['Test']
@@ -180,7 +313,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/model'.get.operationId == 'model'
         assert paths.'/root/withannotation/model'.get.produces == null
         assert paths.'/root/withannotation/model'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/model'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/model'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/model'.get.security.basic
 
         assert paths.'/root/withannotation/overriden'.get.tags == ['Test']
@@ -189,7 +322,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withannotation/overriden'.get.produces == null
         assert paths.'/root/withannotation/overriden'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/overriden'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/overriden'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/overriden'.get.security.basic
 
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.tags == ['Test']
@@ -198,7 +331,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.produces == null
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.security.basic
 
         assert paths.'/root/withannotation/hidden' == null
@@ -209,7 +342,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withannotation/ignoredModel'.get.operationId == 'ignoredModel'
         assert paths.'/root/withannotation/ignoredModel'.get.produces == null
         assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.schema.type == type
         assert paths.'/root/withannotation/ignoredModel'.get.security.basic
 
         assert paths.'/root/withoutannotation/basic'.get.tags == ['Test']
@@ -218,7 +351,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/basic'.get.operationId == 'basic'
         assert paths.'/root/withoutannotation/basic'.get.produces == null
         assert paths.'/root/withoutannotation/basic'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/basic'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/basic'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/basic'.get.security.basic
 
         assert paths.'/root/withoutannotation/default'.get.tags == ['Test']
@@ -242,7 +375,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/generics'.post.produces == null
         assert paths.'/root/withoutannotation/generics'.post.responses.'200'.description == 'successful operation'
         assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.items.type == 'string'
+        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.items.type == type
         assert paths.'/root/withoutannotation/generics'.post.security.basic
 
         assert paths.'/root/withoutannotation/datatype'.post.tags == ['Test']
@@ -295,7 +428,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/deprecated'.get.operationId == 'deprecated'
         assert paths.'/root/withoutannotation/deprecated'.get.produces == null
         assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/deprecated'.get.security.basic
 
         assert paths.'/root/withoutannotation/auth'.get.tags == ['Test']
@@ -304,7 +437,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/auth'.get.operationId == 'withAuth'
         assert paths.'/root/withoutannotation/auth'.get.produces == null
         assert paths.'/root/withoutannotation/auth'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/auth'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/auth'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/auth'.get.security.basic
 
         assert paths.'/root/withoutannotation/model'.get.tags == ['Test']
@@ -313,7 +446,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/model'.get.operationId == 'model'
         assert paths.'/root/withoutannotation/model'.get.produces == null
         assert paths.'/root/withoutannotation/model'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/model'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/model'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/model'.get.security.basic
 
         assert paths.'/root/withoutannotation/overriden'.get.tags == ['Test']
@@ -322,7 +455,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withoutannotation/overriden'.get.produces == null
         assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/overriden'.get.security.basic
 
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.tags == ['Test']
@@ -331,7 +464,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.produces == null
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.security.basic
 
         assert paths.'/root/withoutannotation/hidden' == null
@@ -342,7 +475,7 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert paths.'/root/withoutannotation/ignoredModel'.get.operationId == 'ignoredModel'
         assert paths.'/root/withoutannotation/ignoredModel'.get.produces == null
         assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.schema.type == 'string'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.schema.type == type
         assert paths.'/root/withoutannotation/ignoredModel'.get.security.basic
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
@@ -355,14 +488,14 @@ abstract class AbstractPluginOutputTest extends AbstractPluginTest {
         assert definitions.size() == 3
         assert definitions.RequestModel.type == 'object'
         assert definitions.RequestModel.properties.size() == 2
-        assert definitions.RequestModel.properties.name.type == 'string'
-        assert definitions.RequestModel.properties.value.type == 'string'
+        assert definitions.RequestModel.properties.name.type == type
+        assert definitions.RequestModel.properties.value.type == type
         assert definitions.ResponseModel.type == 'object'
         assert definitions.ResponseModel.properties.size() == 1
-        assert definitions.ResponseModel.properties.name.type == 'string'
+        assert definitions.ResponseModel.properties.name.type == type
         assert definitions.SubResponseModel.type == 'object'
         assert definitions.SubResponseModel.properties.size() == 2
-        assert definitions.SubResponseModel.properties.name.type == 'string'
-        assert definitions.SubResponseModel.properties.value.type == 'string'
+        assert definitions.SubResponseModel.properties.name.type == type
+        assert definitions.SubResponseModel.properties.value.type == type
     }
 }

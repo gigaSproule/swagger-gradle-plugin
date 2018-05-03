@@ -36,8 +36,16 @@ class ClassFinder {
             return classCache.get(clazz)
         }
 
+        println "Looking for Annotation ${clazz} in packages ${packages}"
+
         Set<Class<?>> classes = new HashSet<Class<?>>()
         ClassLoader classLoader = prepareClassLoader()
+
+        try {
+            Class cls = Class.forName("com.benjaminsproule.swagger.gradleplugin.test.kotlin.jaxrs.TestResourceWithClassAnnotation", false, classLoader)
+            println "Kotlin class: ${cls}"
+        } catch (ClassNotFoundException ignored) {
+        }
 
         if (packages) {
             packages.each { location ->
@@ -58,7 +66,6 @@ class ClassFinder {
         def urls = []
         project.configurations.runtime.resolve().each {
             urls.add(it.toURI().toURL())
-//            println it
         }
 
         if (project.sourceSets.main.output.getProperties()['classesDirs']) {

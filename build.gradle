@@ -3,10 +3,12 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
     id 'net.researchgate.release' version '2.6.0'
     id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.41'
 }
 
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'jacoco' //Currently this does not exclude methods generated via Annotations (toString in this plugin)
@@ -32,6 +34,10 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
+    def jacksonVersion = '2.9.2'
+    def springVersion = '5.0.1.RELEASE'
+    def kotlinVersion = '1.2.41'
+
     compile gradleApi()
     compile localGroovy()
 
@@ -39,8 +45,8 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.6'
     compile 'org.apache.commons:commons-text:1.1'
     compile 'com.github.jknack:handlebars:4.0.6'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.2'
-    compile 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.2'
+    compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    compile "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}"
     compile 'javax.xml.bind:jaxb-api:2.2.4'
 
     //These should be pinned here until reflections/reflections#194 has been resolved
@@ -48,11 +54,11 @@ dependencies {
 
     compile 'javax.ws.rs:javax.ws.rs-api:2.1'
     compile 'com.sun.jersey:jersey-server:1.19.4'
-    compile 'org.springframework:spring-context:5.0.1.RELEASE'
-    compile 'org.springframework:spring-web:5.0.1.RELEASE'
+    compile "org.springframework:spring-context:${springVersion}"
+    compile "org.springframework:spring-web:${springVersion}"
 
-    testCompile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.41'
-    testCompile 'org.jetbrains.kotlin:kotlin-reflect:1.2.41'
+    testCompile "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     testCompile 'junit:junit:4.12'
     testCompile 'cglib:cglib-nodep:3.2.5'
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
@@ -69,6 +75,14 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 artifacts {
     archives sourcesJar
 }
+
+compileTestJava.dependsOn compileTestGroovy
+compileTestJava.classpath += files(compileTestGroovy.destinationDir)
+
+compileTestGroovy.dependsOn = compileTestGroovy.taskDependencies.values - 'compileTestJava'
+compileTestKotlin.dependsOn compileTestGroovy
+compileTestKotlin.classpath += files(compileTestGroovy.destinationDir)
+testClasses.dependsOn compileTestKotlin
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {

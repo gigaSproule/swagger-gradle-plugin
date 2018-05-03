@@ -6,7 +6,7 @@ import org.gradle.api.internal.ClosureBackedAction
 class JaxrsPluginOutputTest extends AbstractPluginOutputTest {
 
     @Override
-    protected ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure(String expectedSwaggerDirectory) {
+    ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure(String expectedSwaggerDirectory) {
         new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
@@ -35,7 +35,7 @@ class JaxrsPluginOutputTest extends AbstractPluginOutputTest {
     }
 
     @Override
-    protected ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure(String expectedSwaggerDirectory) {
+    ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure(String expectedSwaggerDirectory) {
         new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {
@@ -64,7 +64,7 @@ class JaxrsPluginOutputTest extends AbstractPluginOutputTest {
     }
 
     @Override
-    protected ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure(String expectedSwaggerDirectory) {
+    ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure(String expectedSwaggerDirectory) {
         new ClosureBackedAction<SwaggerExtension>(
             {
                 apiSource {

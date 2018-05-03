@@ -78,7 +78,7 @@ artifacts {
 
 test {
     testLogging {
-        events "passed", "skipped", "failed"
+        events "failed"
         exceptionFormat "full"
     }
 }

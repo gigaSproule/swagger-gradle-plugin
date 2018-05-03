@@ -22,7 +22,7 @@ class ResourceFinder {
     InputStream getResourceAsStream(String resourceName) {
         return new URLClassLoader(
             [project.sourceSets.main.output.resourcesDir.toURI().toURL()] as URL[],
-            getClass().getClassLoader()
+            ClassFinder.instance().classLoader
         ).getResourceAsStream(resourceName)
     }
 }

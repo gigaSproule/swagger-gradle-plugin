@@ -76,6 +76,13 @@ artifacts {
     archives sourcesJar
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
 compileTestJava.dependsOn compileTestGroovy
 compileTestJava.classpath += files(compileTestGroovy.destinationDir)
 

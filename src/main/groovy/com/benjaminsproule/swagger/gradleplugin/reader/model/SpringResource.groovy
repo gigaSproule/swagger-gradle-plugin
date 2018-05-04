@@ -8,7 +8,7 @@ import java.lang.reflect.Method
 class SpringResource {
     Class<?> controllerClass
     List<Method> methods
-    String controllerMapping //FIXME should be an array
+    List<String> controllerMapping
     String description
 
     /**
@@ -21,7 +21,10 @@ class SpringResource {
 
         String[] controllerRequestMappingValues = Utils.getControllerRequestMapping(controllerClass)
 
-        this.controllerMapping = StringUtils.removeEnd(controllerRequestMappingValues[0], "/")
+        def formattedControllerRequestMappings = controllerRequestMappingValues.each {
+            StringUtils.remove(it, '/')
+        }
+        this.controllerMapping = formattedControllerRequestMappings
     }
 
     void addMethod(Method m) {

@@ -1,8 +1,8 @@
-package com.benjaminsproule.swagger.gradleplugin.docgen
+package com.benjaminsproule.swagger.gradleplugin.misc
 
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
-import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
-import com.benjaminsproule.swagger.gradleplugin.misc.EnhancedSwaggerModule
+import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.resolver.ModelModifier
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,9 +19,13 @@ import org.slf4j.LoggerFactory
 class EnvironmentConfigurer {
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentConfigurer)
     ApiSourceExtension apiSource
+    private ClassFinder classFinder
+    private ResourceFinder resourceFinder
 
-    EnvironmentConfigurer(ApiSourceExtension apiSourceExtension) {
+    EnvironmentConfigurer(ApiSourceExtension apiSourceExtension, ClassFinder classFinder, ResourceFinder resourceFinder) {
         this.apiSource = apiSourceExtension
+        this.classFinder = classFinder
+        this.resourceFinder = resourceFinder
     }
 
     EnvironmentConfigurer initOutputDirectory() {
@@ -79,13 +83,13 @@ class EnvironmentConfigurer {
 
         optionallyRegisterJaxbModule(objectMapper)
 
-        ModelModifier modelModifier = new ModelModifier(objectMapper)
+        ModelModifier modelModifier = new ModelModifier(objectMapper, classFinder)
         if (apiSource.apiModelPropertyAccessExclusions) {
             modelModifier.setApiModelPropertyAccessExclusions(apiSource.apiModelPropertyAccessExclusions)
         }
 
         if (apiSource.modelSubstitute) {
-            ResourceFinder.instance().getResourceAsStream(apiSource.modelSubstitute).eachLine { line ->
+            resourceFinder.getResourceAsStream(apiSource.modelSubstitute).eachLine { line ->
                 def classes = line.split(":")
                 if (classes.length != 2) {
                     throw new GenerateException('Bad format of override model file, it should be ${actualClassName}:${expectClassName}')

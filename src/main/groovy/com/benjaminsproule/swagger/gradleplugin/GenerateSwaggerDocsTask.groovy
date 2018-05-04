@@ -2,11 +2,14 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
-import com.benjaminsproule.swagger.gradleplugin.docgen.LoaderFactory
-import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
+import com.benjaminsproule.swagger.gradleplugin.misc.EnvironmentConfigurer
+import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
+import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
+import io.swagger.config.FilterFactory
+import io.swagger.core.filter.SpecFilter
 import io.swagger.models.Swagger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -30,6 +33,9 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     String group = 'swagger'
 
+    private ClassFinder classFinder
+    private ResourceFinder resourceFinder
+
     @Override
     Spec<? super TaskInternal> getOnlyIf() {
         return new AndSpec<Task>(new Spec<Task>() {
@@ -42,8 +48,8 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     @TaskAction
     generateSwaggerDocuments() {
         def swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME)
-        ClassFinder.createInstance(project)
-        ResourceFinder.createInstance(project)
+        classFinder = ClassFinder.getInstance(project)
+        resourceFinder = ResourceFinder.getInstance(project)
 
         ensureCompatibleSwaggerSpec()
 
@@ -67,10 +73,16 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             throw new InvalidUserDataException(errors.join(","))
         }
 
-        def documentSource = LoaderFactory.loader(apiSourceExtension)
+        // TODO: Replace below
+        new EnvironmentConfigurer(apiSourceExtension, classFinder, resourceFinder)
+            .configureModelModifiers()
+            .configureModelConverters()
+            .configureSwaggerFilter()
+            .initOutputDirectory()
 
-        Swagger swagger = apiSourceExtension.asSwaggerType()
-        swagger = documentSource.loadDocuments(swagger)
+        def reader = new ReaderFactory(classFinder, apiSourceExtension).reader()
+        Swagger swagger = reader.read()
+        swagger = applySwaggerFilter(swagger)
 
         def generator = GeneratorFactory.generator(apiSourceExtension)
         generator.generate(swagger)
@@ -90,5 +102,13 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
             project.tasks.createSwaggerArtifact.execute()
         }
+    }
+
+    private static Swagger applySwaggerFilter(Swagger swagger) {
+        if (FilterFactory.getFilter()) {
+            return new SpecFilter().filter(swagger, FilterFactory.getFilter(), new HashMap<String, List<String>>(), new HashMap<String, String>(),
+                new HashMap<String, List<String>>())
+        }
+        swagger
     }
 }

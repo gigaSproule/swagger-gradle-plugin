@@ -1,16 +1,18 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
+import com.benjaminsproule.swagger.gradleplugin.AbstractPluginITest
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import io.swagger.models.auth.In
 import io.swagger.models.auth.SecuritySchemeDefinition
 import org.junit.Before
 import org.junit.Test
 
-class SecurityDefinitionExtensionTest {
+class SecurityDefinitionExtensionITest extends AbstractPluginITest {
     SecurityDefinitionExtension securityDefinitionExtension
 
     @Before
     void setup() {
-        securityDefinitionExtension = new SecurityDefinitionExtension()
+        securityDefinitionExtension = new SecurityDefinitionExtension(ResourceFinder.getInstance(project))
     }
 
     @Test

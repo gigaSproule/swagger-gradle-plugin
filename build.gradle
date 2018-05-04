@@ -61,6 +61,7 @@ dependencies {
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     testCompile 'junit:junit:4.12'
     testCompile 'cglib:cglib-nodep:3.2.5'
+    testCompile 'org.objenesis:objenesis:1.2'
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
         //We want to depend on the gradle version of groovy since this is a plugin
         exclude module: 'groovy-all'

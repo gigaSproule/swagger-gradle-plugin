@@ -10,27 +10,26 @@ import java.lang.annotation.Annotation
 class ClassFinder {
     private static final Logger LOG = LoggerFactory.getLogger(ClassFinder)
     static instance
-    Map<Class<? extends Annotation>, Set<Class<?>>> classCache
-    Project project
+    private Map<Class<? extends Annotation>, Set<Class<?>>> classCache
+    private Project project
     private ClassLoader classLoader
 
-    private ClassFinder(Project project) {
+    ClassFinder(Project project) {
         this.project = project
         this.classCache = new HashMap<>()
         this.classLoader = prepareClassLoader()
     }
 
     //FIXME hack until we have some DI working
-    static void createInstance(Project project) {
-        instance = new ClassFinder(project)
+    static ClassFinder getInstance(Project project) {
+        if (!instance) {
+            instance = new ClassFinder(project)
+        }
+        instance
     }
 
-    static ClassFinder instance() {
-        return instance
-    }
-
-    static Class<?> loadClass(String name) {
-        return instance.classLoader.loadClass(name)
+    Class<?> loadClass(String name) {
+        return classLoader.loadClass(name)
     }
 
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {

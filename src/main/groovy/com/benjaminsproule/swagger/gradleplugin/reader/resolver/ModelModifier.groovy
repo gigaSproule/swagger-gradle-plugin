@@ -1,7 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.reader.resolver
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
+import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.annotations.ApiModelProperty
@@ -23,23 +23,25 @@ import java.lang.reflect.Type
 class ModelModifier extends ModelResolver {
     private Map<JavaType, JavaType> modelSubtitutes = new HashMap<JavaType, JavaType>()
     List<String> apiModelPropertyAccessExclusions = new ArrayList<String>()
+    private ClassFinder classFinder
 
     private static Logger LOG = LoggerFactory.getLogger(ModelModifier)
 
-    ModelModifier(ObjectMapper mapper) {
+    ModelModifier(ObjectMapper mapper, ClassFinder classFinder) {
         super(mapper)
+        this.classFinder = classFinder
     }
 
     void addModelSubstitute(String fromClass, String toClass) throws GenerateException {
         JavaType type = null
         JavaType toType = null
         try {
-            type = _mapper.constructType(ClassFinder.loadClass(fromClass))
+            type = _mapper.constructType(classFinder.loadClass(fromClass))
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${fromClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }
         try {
-            toType = _mapper.constructType(ClassFinder.loadClass(toClass))
+            toType = _mapper.constructType(classFinder.loadClass(toClass))
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
         }

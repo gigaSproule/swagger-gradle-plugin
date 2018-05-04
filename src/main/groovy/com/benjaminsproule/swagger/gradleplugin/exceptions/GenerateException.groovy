@@ -1,4 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin.except
+package com.benjaminsproule.swagger.gradleplugin.exceptions
 
 class GenerateException extends Exception {
     GenerateException(String errorMessage, Throwable cause) {

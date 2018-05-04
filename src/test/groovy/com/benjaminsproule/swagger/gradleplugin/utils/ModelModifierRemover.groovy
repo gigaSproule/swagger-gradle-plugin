@@ -1,4 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin
+package com.benjaminsproule.swagger.gradleplugin.utils
 
 import com.benjaminsproule.swagger.gradleplugin.reader.resolver.ModelModifier
 import io.swagger.converter.ModelConverters

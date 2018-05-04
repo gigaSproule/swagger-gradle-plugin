@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import groovy.transform.ToString
 import io.swagger.annotations.Contact
 import io.swagger.annotations.Info
@@ -42,7 +43,10 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     List<String> modelConverters
     List<String> apiModelPropertyAccessExclusionsList
 
-    ApiSourceExtension(Project project) {
+    private ClassFinder classFinder
+    private ResourceFinder resourceFinder
+
+    ApiSourceExtension(Project project, ClassFinder classFinder, ResourceFinder resourceFinder) {
         this.project = project
 
         if (this.apiModelPropertyAccessExclusionsList != null) {
@@ -52,6 +56,9 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         if (this.typesToSkipList != null) {
             this.typesToSkip.addAll(this.typesToSkipList)
         }
+
+        this.classFinder = classFinder
+        this.resourceFinder = resourceFinder
     }
 
     void info(Closure closure) {
@@ -59,7 +66,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     void securityDefinition(Closure closure) {
-        securityDefinition = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
+        securityDefinition = project.configure(new SecurityDefinitionExtension(resourceFinder), closure) as SecurityDefinitionExtension
     }
 
     @Override
@@ -117,7 +124,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     private String setHostFromAnnotation() {
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations)) {
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             return swaggerDefinition.host()
         }
@@ -126,7 +133,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     private String setBasePathFromAnnotation() {
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations)) {
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             return swaggerDefinition.basePath()
         }
@@ -136,7 +143,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
 
     private InfoExtension setInfoFromAnnotation() {
         def resultInfo = new InfoExtension(project)
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition, locations)) {
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             Info infoAnnotation = swaggerDefinition.info()
             def info = new InfoExtension(project)

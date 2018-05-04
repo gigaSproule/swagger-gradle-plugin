@@ -4,14 +4,13 @@ import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
 import org.gradle.api.internal.ClosureBackedAction
 import org.junit.Test
-import org.yaml.snakeyaml.Yaml
 
 import java.nio.file.Files
 
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class GradleSwaggerPluginTest extends AbstractPluginTest {
+class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     @Test
     void pluginAddsGenerateSwaggerTask() {

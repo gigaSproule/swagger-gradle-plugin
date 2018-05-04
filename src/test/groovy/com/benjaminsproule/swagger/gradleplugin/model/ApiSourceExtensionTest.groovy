@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import io.swagger.models.Info
 import io.swagger.models.Scheme
 import io.swagger.models.auth.BasicAuthDefinition
@@ -14,8 +15,10 @@ class ApiSourceExtensionTest extends Specification {
     ApiSourceExtension apiSourceExtension
 
     def setup() {
-        project = ProjectBuilder.builder().build()
-        apiSourceExtension = new ApiSourceExtension(project)
+        project = Mock(Project)
+        def classFinder = Mock(ClassFinder)
+        def resourceFinder = Mock(ResourceFinder)
+        apiSourceExtension = new ApiSourceExtension(project, classFinder, resourceFinder)
     }
 
     def 'Valid api source validation returns no errors'() {
@@ -33,9 +36,6 @@ class ApiSourceExtensionTest extends Specification {
 
     def 'Api Source with missing info should provide missing info error'() {
         setup:
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-        ClassFinder.createInstance(project)
         apiSourceExtension.locations = ['com.github.junk'] //make sure we don't discover any annotations
 
         when:

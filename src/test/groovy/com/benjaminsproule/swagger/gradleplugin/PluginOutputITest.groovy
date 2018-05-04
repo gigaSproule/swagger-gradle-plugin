@@ -13,7 +13,7 @@ import java.nio.file.Files
 import static org.junit.Assert.fail
 
 @RunWith(Parameterized)
-class PluginOutputTest extends AbstractPluginTest {
+class PluginOutputITest extends AbstractPluginITest {
 
     @Parameterized.Parameters
     static Collection<ClosureBackedAction<SwaggerExtension>> data() {
@@ -26,7 +26,7 @@ class PluginOutputTest extends AbstractPluginTest {
 
     private ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure
 
-    PluginOutputTest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
+    PluginOutputITest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
         this.swaggerExtensionClosure = swaggerExtensionClosure
     }
 

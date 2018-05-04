@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.jackson.SwaggerAnnotationIntrospector
 
 /**
- * Extends SwaggerAnnotationIntrospector with {@link #findRootName(AnnotatedClass)} implementation. See
+ * Extends SwaggerAnnotationIntrospector with {@link EnhancedSwaggerAnnotationIntrospector#findRootName(AnnotatedClass)} implementation. See
  * https://github.com/swagger-api/swagger-core/issues/2104
  *
  * @author Tomasz Juchniewicz

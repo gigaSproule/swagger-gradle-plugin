@@ -55,6 +55,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         try {
             for (ApiSourceExtension apiSourceExtension : swaggerExtension.apiSourceExtensions) {
+                classFinder.clearClassCache() // TODO: Maybe do something better here?
                 processSwaggerPluginExtension(apiSourceExtension)
             }
         } catch (InvalidUserDataException iude) {

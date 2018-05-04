@@ -32,8 +32,8 @@ class ClassFinder {
         return classLoader.loadClass(name)
     }
 
-    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
-        return getValidClasses(clazz, [])
+    void clearClassCache() {
+        classCache.clear()
     }
 
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages) {

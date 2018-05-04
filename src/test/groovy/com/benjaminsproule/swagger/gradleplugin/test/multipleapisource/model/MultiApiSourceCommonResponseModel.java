@@ -1,4 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin.test.model;
+package com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.model;
 
 public class MultiApiSourceCommonResponseModel {
 

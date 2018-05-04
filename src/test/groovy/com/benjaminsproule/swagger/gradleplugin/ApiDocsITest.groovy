@@ -5,7 +5,7 @@ import org.apache.commons.text.RandomStringGenerator
 import org.gradle.api.internal.ClosureBackedAction
 import org.junit.Test
 
-class ApiDocsPluginITest extends AbstractPluginITest {
+class ApiDocsITest extends AbstractPluginITest {
 
     @Test
     void useSpecifiedTemplatesToGenerateSwaggerDocs() {

@@ -15,5 +15,5 @@ cache:
 matrix:
   allow_failures:
     - jdk:
-      - openjdk7
       - oraclejdk9
+      - openjdk7

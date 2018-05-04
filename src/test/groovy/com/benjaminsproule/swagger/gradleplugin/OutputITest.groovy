@@ -13,7 +13,7 @@ import java.nio.file.Files
 import static org.junit.Assert.fail
 
 @RunWith(Parameterized)
-class PluginOutputITest extends AbstractPluginITest {
+class OutputITest extends AbstractPluginITest {
 
     @Parameterized.Parameters
     static Collection<ClosureBackedAction<SwaggerExtension>> data() {
@@ -26,7 +26,7 @@ class PluginOutputITest extends AbstractPluginITest {
 
     private ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure
 
-    PluginOutputITest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
+    OutputITest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
         this.swaggerExtensionClosure = swaggerExtensionClosure
     }
 
@@ -173,20 +173,20 @@ class PluginOutputITest extends AbstractPluginITest {
         )
     }
 
-    private static Object assertSwaggerJson(String swaggerJsonFilePath) {
+    private static Object assertSwaggerJson(String swaggerJsonFilePath, String type = 'string') {
         def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
-        new JsonSlurper().parse(swaggerJsonFile, 'UTF-8')
+        assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), 'json', type)
     }
 
-    private static Object assertSwaggerYaml(String swaggerYamlFilePath) {
+    private static Object assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string') {
         def swaggerYamlFile = new File(swaggerYamlFilePath)
         assert Files.exists(swaggerYamlFile.toPath())
-        new Yaml().load(swaggerYamlFile.getText('UTF-8'))
+        assertSwaggerDocument(new Yaml().load(swaggerYamlFile.getText('UTF-8')), 'yaml', type)
     }
 
-    private static void assertSwaggerJson(String swaggerJsonFilePath, String type) {
-        Object producedSwaggerDocument = assertSwaggerJson(swaggerJsonFilePath)
+    private static void assertSwaggerDocument(def producedSwaggerDocument, String format, String type) {
+        def ok = format == 'json' ? '200' : 200
 
         assert producedSwaggerDocument.swagger == '2.0'
         assert producedSwaggerDocument.host == 'localhost:8080'
@@ -217,8 +217,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/basic'.get.description == 'Test resource'
         assert paths.'/root/withannotation/basic'.get.operationId == 'basic'
         assert paths.'/root/withannotation/basic'.get.produces == null
-        assert paths.'/root/withannotation/basic'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/basic'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/basic'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/basic'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/basic'.get.security.basic
 
         assert paths.'/root/withannotation/default'.get.tags == ['Test']
@@ -228,8 +228,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/default'.get.produces == null
         if (paths.'/root/withannotation/default'.get.responses.default) {
             assert paths.'/root/withannotation/default'.get.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withannotation/default'.get.responses.'200') {
-            assert paths.'/root/withannotation/default'.get.responses.'200'.description == 'successful operation'
+        } else if (paths.'/root/withannotation/default'.get.responses.get(ok)) {
+            assert paths.'/root/withannotation/default'.get.responses.get(ok).description == 'successful operation'
         } else {
             fail('No response found for /root/withannotation/default')
         }
@@ -240,9 +240,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/generics'.post.description == 'Test resource'
         assert paths.'/root/withannotation/generics'.post.operationId == 'generics'
         assert paths.'/root/withannotation/generics'.post.produces == null
-        assert paths.'/root/withannotation/generics'.post.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withannotation/generics'.post.responses.'200'.schema.items.type == type
+        assert paths.'/root/withannotation/generics'.post.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/generics'.post.responses.get(ok).schema.type == 'array'
+        assert paths.'/root/withannotation/generics'.post.responses.get(ok).schema.items.type == type
         assert paths.'/root/withannotation/generics'.post.security.basic
 
         assert paths.'/root/withannotation/datatype'.post.tags == ['Test']
@@ -252,8 +252,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/datatype'.post.produces == ['application/json']
         if (paths.'/root/withannotation/datatype'.post.responses.default) {
             assert paths.'/root/withannotation/datatype'.post.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withannotation/datatype'.post.responses.'200') {
-            assert paths.'/root/withannotation/datatype'.post.responses.'200'.description == 'successful operation'
+        } else if (paths.'/root/withannotation/datatype'.post.responses.get(ok)) {
+            assert paths.'/root/withannotation/datatype'.post.responses.get(ok).description == 'successful operation'
         } else {
             fail('No response found for /root/withannotation/datatype')
         }
@@ -264,9 +264,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/response'.post.description == 'Test resource'
         assert paths.'/root/withannotation/response'.post.operationId == 'response'
         assert paths.'/root/withannotation/response'.post.produces == null
-        assert paths.'/root/withannotation/response'.post.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/response'.post.responses.'200'.schema.type == null
-        assert paths.'/root/withannotation/response'.post.responses.'200'.schema.'$ref' == '#/definitions/ResponseModel'
+        assert paths.'/root/withannotation/response'.post.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/response'.post.responses.get(ok).schema.type == null
+        assert paths.'/root/withannotation/response'.post.responses.get(ok).schema.'$ref' == '#/definitions/ResponseModel'
         assert paths.'/root/withannotation/response'.post.security.basic
 
         assert paths.'/root/withannotation/responseContainer'.post.tags == ['Test']
@@ -274,9 +274,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/responseContainer'.post.description == 'Test resource'
         assert paths.'/root/withannotation/responseContainer'.post.operationId == 'responseContainer'
         assert paths.'/root/withannotation/responseContainer'.post.produces == null
-        assert paths.'/root/withannotation/responseContainer'.post.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/responseContainer'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withannotation/responseContainer'.post.responses.'200'.schema.items.'$ref' == '#/definitions/ResponseModel'
+        assert paths.'/root/withannotation/responseContainer'.post.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/responseContainer'.post.responses.get(ok).schema.type == 'array'
+        assert paths.'/root/withannotation/responseContainer'.post.responses.get(ok).schema.items.'$ref' == '#/definitions/ResponseModel'
         assert paths.'/root/withannotation/responseContainer'.post.security.basic
 
         assert paths.'/root/withannotation/extended'.get.tags == ['Test']
@@ -284,9 +284,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/extended'.get.description == 'Test resource'
         assert paths.'/root/withannotation/extended'.get.operationId == 'extended'
         assert paths.'/root/withannotation/extended'.get.produces == null
-        assert paths.'/root/withannotation/extended'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/extended'.get.responses.'200'.schema.type == null
-        assert paths.'/root/withannotation/extended'.get.responses.'200'.schema.'$ref' == '#/definitions/SubResponseModel'
+        assert paths.'/root/withannotation/extended'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/extended'.get.responses.get(ok).schema.type == null
+        assert paths.'/root/withannotation/extended'.get.responses.get(ok).schema.'$ref' == '#/definitions/SubResponseModel'
         assert paths.'/root/withannotation/extended'.get.security.basic
 
         assert paths.'/root/withannotation/deprecated'.get.tags == ['Test']
@@ -294,8 +294,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/deprecated'.get.description == 'Test resource'
         assert paths.'/root/withannotation/deprecated'.get.operationId == 'deprecated'
         assert paths.'/root/withannotation/deprecated'.get.produces == null
-        assert paths.'/root/withannotation/deprecated'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/deprecated'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/deprecated'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/deprecated'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/deprecated'.get.security.basic
 
         assert paths.'/root/withannotation/auth'.get.tags == ['Test']
@@ -303,8 +303,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/auth'.get.description == 'Test resource'
         assert paths.'/root/withannotation/auth'.get.operationId == 'withAuth'
         assert paths.'/root/withannotation/auth'.get.produces == null
-        assert paths.'/root/withannotation/auth'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/auth'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/auth'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/auth'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/auth'.get.security.basic
 
         assert paths.'/root/withannotation/model'.get.tags == ['Test']
@@ -312,8 +312,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/model'.get.description == 'Test resource'
         assert paths.'/root/withannotation/model'.get.operationId == 'model'
         assert paths.'/root/withannotation/model'.get.produces == null
-        assert paths.'/root/withannotation/model'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/model'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/model'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/model'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/model'.get.security.basic
 
         assert paths.'/root/withannotation/overriden'.get.tags == ['Test']
@@ -321,8 +321,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/overriden'.get.description == 'Test resource'
         assert paths.'/root/withannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withannotation/overriden'.get.produces == null
-        assert paths.'/root/withannotation/overriden'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/overriden'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/overriden'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/overriden'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/overriden'.get.security.basic
 
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.tags == ['Test']
@@ -330,8 +330,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.description == 'Test resource'
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.produces == null
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/overridenWithoutDescription'.get.security.basic
 
         assert paths.'/root/withannotation/hidden' == null
@@ -341,8 +341,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withannotation/ignoredModel'.get.description == 'Test resource'
         assert paths.'/root/withannotation/ignoredModel'.get.operationId == 'ignoredModel'
         assert paths.'/root/withannotation/ignoredModel'.get.produces == null
-        assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withannotation/ignoredModel'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withannotation/ignoredModel'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withannotation/ignoredModel'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withannotation/ignoredModel'.get.security.basic
 
         assert paths.'/root/withoutannotation/basic'.get.tags == ['Test']
@@ -350,8 +350,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/basic'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/basic'.get.operationId == 'basic'
         assert paths.'/root/withoutannotation/basic'.get.produces == null
-        assert paths.'/root/withoutannotation/basic'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/basic'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/basic'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/basic'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/basic'.get.security.basic
 
         assert paths.'/root/withoutannotation/default'.get.tags == ['Test']
@@ -361,8 +361,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/default'.get.produces == null
         if (paths.'/root/withoutannotation/default'.get.responses.default) {
             assert paths.'/root/withoutannotation/default'.get.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withoutannotation/default'.get.responses.'200') {
-            assert paths.'/root/withoutannotation/default'.get.responses.'200'.description == 'successful operation'
+        } else if (paths.'/root/withoutannotation/default'.get.responses.get(ok)) {
+            assert paths.'/root/withoutannotation/default'.get.responses.get(ok).description == 'successful operation'
         } else {
             fail('No response found for /root/withoutannotation/default')
         }
@@ -373,9 +373,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/generics'.post.description == 'Test resource'
         assert paths.'/root/withoutannotation/generics'.post.operationId == 'generics'
         assert paths.'/root/withoutannotation/generics'.post.produces == null
-        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withoutannotation/generics'.post.responses.'200'.schema.items.type == type
+        assert paths.'/root/withoutannotation/generics'.post.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/generics'.post.responses.get(ok).schema.type == 'array'
+        assert paths.'/root/withoutannotation/generics'.post.responses.get(ok).schema.items.type == type
         assert paths.'/root/withoutannotation/generics'.post.security.basic
 
         assert paths.'/root/withoutannotation/datatype'.post.tags == ['Test']
@@ -385,8 +385,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/datatype'.post.produces == ['application/json']
         if (paths.'/root/withoutannotation/datatype'.post.responses.default) {
             assert paths.'/root/withoutannotation/datatype'.post.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withoutannotation/datatype'.post.responses.'200') {
-            assert paths.'/root/withoutannotation/datatype'.post.responses.'200'.description == 'successful operation'
+        } else if (paths.'/root/withoutannotation/datatype'.post.responses.get(ok)) {
+            assert paths.'/root/withoutannotation/datatype'.post.responses.get(ok).description == 'successful operation'
         } else {
             fail('No response found for /root/withoutannotation/datatype')
         }
@@ -397,9 +397,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/response'.post.description == 'Test resource'
         assert paths.'/root/withoutannotation/response'.post.operationId == 'response'
         assert paths.'/root/withoutannotation/response'.post.produces == null
-        assert paths.'/root/withoutannotation/response'.post.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/response'.post.responses.'200'.schema.type == null
-        assert paths.'/root/withoutannotation/response'.post.responses.'200'.schema.'$ref' == '#/definitions/ResponseModel'
+        assert paths.'/root/withoutannotation/response'.post.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/response'.post.responses.get(ok).schema.type == null
+        assert paths.'/root/withoutannotation/response'.post.responses.get(ok).schema.'$ref' == '#/definitions/ResponseModel'
         assert paths.'/root/withoutannotation/response'.post.security.basic
 
         assert paths.'/root/withoutannotation/responseContainer'.post.tags == ['Test']
@@ -407,9 +407,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/responseContainer'.post.description == 'Test resource'
         assert paths.'/root/withoutannotation/responseContainer'.post.operationId == 'responseContainer'
         assert paths.'/root/withoutannotation/responseContainer'.post.produces == null
-        assert paths.'/root/withoutannotation/responseContainer'.post.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/responseContainer'.post.responses.'200'.schema.type == 'array'
-        assert paths.'/root/withoutannotation/responseContainer'.post.responses.'200'.schema.items.'$ref' == '#/definitions/ResponseModel'
+        assert paths.'/root/withoutannotation/responseContainer'.post.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/responseContainer'.post.responses.get(ok).schema.type == 'array'
+        assert paths.'/root/withoutannotation/responseContainer'.post.responses.get(ok).schema.items.'$ref' == '#/definitions/ResponseModel'
         assert paths.'/root/withoutannotation/responseContainer'.post.security.basic
 
         assert paths.'/root/withoutannotation/extended'.get.tags == ['Test']
@@ -417,9 +417,9 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/extended'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/extended'.get.operationId == 'extended'
         assert paths.'/root/withoutannotation/extended'.get.produces == null
-        assert paths.'/root/withoutannotation/extended'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/extended'.get.responses.'200'.schema.type == null
-        assert paths.'/root/withoutannotation/extended'.get.responses.'200'.schema.'$ref' == '#/definitions/SubResponseModel'
+        assert paths.'/root/withoutannotation/extended'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/extended'.get.responses.get(ok).schema.type == null
+        assert paths.'/root/withoutannotation/extended'.get.responses.get(ok).schema.'$ref' == '#/definitions/SubResponseModel'
         assert paths.'/root/withoutannotation/extended'.get.security.basic
 
         assert paths.'/root/withoutannotation/deprecated'.get.tags == ['Test']
@@ -427,8 +427,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/deprecated'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/deprecated'.get.operationId == 'deprecated'
         assert paths.'/root/withoutannotation/deprecated'.get.produces == null
-        assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/deprecated'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/deprecated'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/deprecated'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/deprecated'.get.security.basic
 
         assert paths.'/root/withoutannotation/auth'.get.tags == ['Test']
@@ -436,8 +436,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/auth'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/auth'.get.operationId == 'withAuth'
         assert paths.'/root/withoutannotation/auth'.get.produces == null
-        assert paths.'/root/withoutannotation/auth'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/auth'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/auth'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/auth'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/auth'.get.security.basic
 
         assert paths.'/root/withoutannotation/model'.get.tags == ['Test']
@@ -445,8 +445,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/model'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/model'.get.operationId == 'model'
         assert paths.'/root/withoutannotation/model'.get.produces == null
-        assert paths.'/root/withoutannotation/model'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/model'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/model'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/model'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/model'.get.security.basic
 
         assert paths.'/root/withoutannotation/overriden'.get.tags == ['Test']
@@ -454,8 +454,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/overriden'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/overriden'.get.operationId == 'overriden'
         assert paths.'/root/withoutannotation/overriden'.get.produces == null
-        assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/overriden'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/overriden'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/overriden'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/overriden'.get.security.basic
 
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.tags == ['Test']
@@ -463,8 +463,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.produces == null
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.security.basic
 
         assert paths.'/root/withoutannotation/hidden' == null
@@ -474,8 +474,8 @@ class PluginOutputITest extends AbstractPluginITest {
         assert paths.'/root/withoutannotation/ignoredModel'.get.description == 'Test resource'
         assert paths.'/root/withoutannotation/ignoredModel'.get.operationId == 'ignoredModel'
         assert paths.'/root/withoutannotation/ignoredModel'.get.produces == null
-        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.description == 'successful operation'
-        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.'200'.schema.type == type
+        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.get(ok).description == 'successful operation'
+        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.get(ok).schema.type == type
         assert paths.'/root/withoutannotation/ignoredModel'.get.security.basic
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions

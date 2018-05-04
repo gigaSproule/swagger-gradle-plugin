@@ -47,7 +47,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
         def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
         project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
             apiSource {
-                locations = ['com.benjaminsproule']
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.Definitions']
                 schemes = ['http']
                 swaggerDirectory = expectedSwaggerDirectory
                 securityDefinition {
@@ -63,9 +63,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
         def swaggerFile = new File("${expectedSwaggerDirectory}/swagger.json")
         assert Files.exists(swaggerFile.toPath())
 
-        JsonSlurper jsonSlurper = new JsonSlurper()
-
-        def producedSwaggerDocument = jsonSlurper.parse(swaggerFile)
+        def producedSwaggerDocument = new JsonSlurper().parse(swaggerFile)
 
         assert producedSwaggerDocument.host == 'http://annotated'
         assert producedSwaggerDocument.basePath == '/annotated'

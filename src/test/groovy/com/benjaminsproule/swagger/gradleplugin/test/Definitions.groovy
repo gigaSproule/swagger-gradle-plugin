@@ -4,9 +4,9 @@ import io.swagger.annotations.*
 
 @SwaggerDefinition(host = "http://annotated",
     basePath = "/annotated",
-    tags =
+    tags = [
         @Tag(name = "Test", description = "Test tag description")
-    ,
+    ],
     info = @Info(title = "annotated",
         version = "annotated",
         description = "annotated description",

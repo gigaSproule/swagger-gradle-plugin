@@ -72,14 +72,15 @@ class ReaderFactory {
         return resolved
     }
 
+    // TODO: Create tests for custom API reader
     private ClassSwaggerReader getCustomApiReader() throws GenerateException {
         String customReaderClassName = apiSourceExtension.getSwaggerApiReader()
         try {
             LOG.info("Reading custom API reader: " + customReaderClassName)
             Class<?> clazz = classFinder.loadClass(customReaderClassName)
             if (AbstractReader.class.isAssignableFrom(clazz)) {
-                Constructor<?> constructor = clazz.getConstructor(ApiSourceExtension, Set, List)
-                return (ClassSwaggerReader) constructor.newInstance(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions())
+                Constructor<?> constructor = clazz.getConstructor(ApiSourceExtension, Set, List, ClassFinder)
+                return (ClassSwaggerReader) constructor.newInstance(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions(), ClassFinder)
             } else {
                 return (ClassSwaggerReader) clazz.newInstance()
             }

@@ -1,6 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin.test.model;
-
-import com.benjaminsproule.swagger.gradleplugin.test.model.MultiApiSourceCommonResponseModel;
+package com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.model;
 
 public class MultiApiSourceParentTwoResponseModel {
 

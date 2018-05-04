@@ -7,8 +7,10 @@ import io.swagger.annotations.Contact
 import io.swagger.annotations.Info
 import io.swagger.annotations.License
 import io.swagger.annotations.SwaggerDefinition
+import io.swagger.models.ExternalDocs
 import io.swagger.models.Scheme
 import io.swagger.models.Swagger
+import io.swagger.models.Tag
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.springframework.core.annotation.AnnotationUtils
@@ -84,7 +86,6 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
             }
         }
 
-
         def errors = info.isValid()
 
         if (securityDefinition) {
@@ -100,6 +101,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         swagger.setHost(host ?: setHostFromAnnotation())
         swagger.setBasePath(basePath ?: setBasePathFromAnnotation())
         swagger.setInfo(info.asSwaggerType())
+        swagger.setTags(setTagsFromAnnotation())
 
         if (schemes) {
             for (String scheme : schemes) {
@@ -139,6 +141,26 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         }
 
         return null
+    }
+
+    private List<Tag> setTagsFromAnnotation() {
+        def tags = []
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
+            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
+            def tagAnnotations = swaggerDefinition.tags()
+            tags.addAll(tagAnnotations.collect {
+                Tag tag = new Tag()
+                    .name(it.name())
+                    .description(it.description())
+                tag.externalDocs(new ExternalDocs()
+                    .description(it.externalDocs().value())
+                    .url(it.externalDocs().url()))
+            })
+        }
+        if (!tags) {
+            return null
+        }
+        return tags as List<Tag>
     }
 
     private InfoExtension setInfoFromAnnotation() {

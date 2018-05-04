@@ -29,12 +29,12 @@ class ClassFinder {
         return instance
     }
 
-    static Class<?> loadClass(String name) {
-        return instance.classLoader.loadClass(name)
+    void clearClassCache() {
+        this.classCache.clear()
     }
 
-    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz) {
-        return getValidClasses(clazz, [])
+    static Class<?> loadClass(String name) {
+        return instance.classLoader.loadClass(name)
     }
 
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages) {

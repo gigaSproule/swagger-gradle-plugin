@@ -13,5 +13,4 @@ cache:
     - $HOME/.gradle/wrapper/
 matrix:
   allow_failures:
-    - jdk:
-      - oraclejdk9
+    - jdk: oraclejdk9

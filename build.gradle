@@ -87,10 +87,10 @@ test {
 compileTestJava.dependsOn compileTestGroovy
 compileTestJava.classpath += files(compileTestGroovy.destinationDir)
 
-compileTestGroovy.dependsOn = compileTestGroovy.taskDependencies.values - 'compileTestJava'
+compileTestGroovy.dependsOn = compileTestGroovy.taskDependencies.getDependencies(compileTestGroovy) - compileTestJava
 compileTestKotlin.dependsOn compileTestGroovy
 compileTestKotlin.classpath += files(compileTestGroovy.destinationDir)
-testClasses.dependsOn compileTestKotlin
+testClasses.dependsOn project.tasks.compileTestKotlin
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {

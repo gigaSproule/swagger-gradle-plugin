@@ -60,7 +60,7 @@ class ClassFinder {
 
     private ClassLoader prepareClassLoader() {
         def urls = []
-        project.configurations.runtime.resolve().each {
+        (project.configurations.compile.resolve() + project.configurations.runtime.resolve()).each {
             urls.add(it.toURI().toURL())
         }
 

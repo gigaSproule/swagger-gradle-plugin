@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  build-openjdk-8:
     docker:
       - image: circleci/openjdk:8-jdk
 
@@ -24,3 +24,34 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       - run: ./gradlew test
+  build-openjdk-9:
+    docker:
+      - image: circleci/openjdk:9-jdk
+
+    working_directory: ~/repo
+
+    environment:
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "build.gradle" }}
+          - v1-dependencies-
+
+      - run: ./gradlew dependencies
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
+      - run: ./gradlew test
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-openjdk-8
+      - build-openjdk-9

@@ -1,29 +1,34 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import org.apache.commons.text.RandomStringGenerator
-import org.gradle.api.internal.ClosureBackedAction
-import org.junit.Test
+
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class ApiDocsITest extends AbstractPluginITest {
 
-    @Test
-    void useSpecifiedTemplatesToGenerateSwaggerDocs() {
+    def 'Use specified templates to generate Swagger docs'() {
+        given:
         def randomizer = new RandomStringGenerator.Builder().build().generate(5)
-        //Template path is not actually a template path but a template file and it propbably has to be the root
-        def expectedSwaggerDocsDirectory = "${project.buildDir}/swaggerdocs-${randomizer}"
+        def expectedSwaggerDocsDirectory = "${testProjectDir}/swaggerdocs-${randomizer}"
         def expectedSwaggerApiDocsFile = "${expectedSwaggerDocsDirectory}/api.html"
+        //Template path is not actually a template path but a template file and it probably has to be the root
         def templatePathValue = "classpath:/api-doc-template/strapdown.html.hbs"
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>(
-            {
+
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
                 apiSource {
                     locations = ['com.benjaminsproule']
                     schemes = ['http']
                     info {
-                        title = project.name
+                        title = 'Project Name'
                         version = '1'
                         termsOfService = 'http://localhost/tos'
-                        description = 'The Api description'
+                        description = 'The Api Description'
                         license {
                             name = 'Apache 2.0'
                             url = 'http://localhost/license'
@@ -39,13 +44,17 @@ class ApiDocsITest extends AbstractPluginITest {
                         name = 'MyBasicAuth'
                         type = 'basic'
                     }
-                    templatePath = templatePathValue
-                    outputPath = expectedSwaggerApiDocsFile
+                    templatePath = '${templatePathValue}'
+                    outputPath = '${expectedSwaggerApiDocsFile}'
                 }
             }
-        ))
+        """
 
-        project.tasks.generateSwaggerDocumentation.execute()
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
         def swaggerDir = new File(expectedSwaggerApiDocsFile)
         assert swaggerDir

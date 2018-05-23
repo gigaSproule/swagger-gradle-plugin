@@ -12,6 +12,7 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'jacoco' //Currently this does not exclude methods generated via Annotations (toString in this plugin)
+apply plugin: 'java-gradle-plugin'
 
 repositories {
     mavenLocal()
@@ -57,9 +58,10 @@ dependencies {
     compile "org.springframework:spring-context:${springVersion}"
     compile "org.springframework:spring-web:${springVersion}"
 
+    testCompile gradleTestKit()
+
     testCompile "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
-    testCompile 'junit:junit:4.12'
     testCompile 'cglib:cglib-nodep:3.2.5'
     testCompile 'org.objenesis:objenesis:1.2'
     testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
@@ -90,7 +92,13 @@ compileTestJava.classpath += files(compileTestGroovy.destinationDir)
 compileTestGroovy.dependsOn = compileTestGroovy.taskDependencies.getDependencies(compileTestGroovy) - compileTestJava
 compileTestKotlin.dependsOn compileTestGroovy
 compileTestKotlin.classpath += files(compileTestGroovy.destinationDir)
-testClasses.dependsOn project.tasks.compileTestKotlin
+testClasses.dependsOn tasks.compileTestKotlin
+
+pluginUnderTestMetadata {
+    pluginClasspath = files("${projectDir}/out/test/classes") + pluginUnderTestMetadata.pluginClasspath
+}
+
+test.dependsOn tasks.pluginUnderTestMetadata
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {

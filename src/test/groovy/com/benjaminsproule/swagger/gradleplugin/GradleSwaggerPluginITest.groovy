@@ -1,64 +1,74 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
-import org.gradle.api.internal.ClosureBackedAction
-import org.junit.Test
 
 import java.nio.file.Files
 
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertTrue
+import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class GradleSwaggerPluginITest extends AbstractPluginITest {
 
-    @Test
-    void pluginAddsGenerateSwaggerTask() {
-        assertTrue(project.tasks.generateSwaggerDocumentation instanceof GenerateSwaggerDocsTask)
-    }
-
-    @Test
-    void shouldSkipSwaggerGenerationWhenSkipSwaggerPropertySet() {
-        project.extensions.extraProperties.set('swagger.skip', true)
-
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
-            apiSource {
-                locations = ['com.benjaminsproule']
-                info {
-                    title = project.name
-                    version = '1'
-                }
-                swaggerDirectory = expectedSwaggerDirectory
-                host = 'localhost:8080'
-                basePath = '/'
+    def 'Should skip swagger generation when swagger.skip property set'() {
+        given:
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
             }
-        }
-        ))
-
-        project.tasks.generateSwaggerDocumentation.execute()
-
-        def swaggerFile = new File("${expectedSwaggerDirectory}/swagger.json")
-        assertFalse(Files.exists(swaggerFile.toPath()))
-    }
-
-    @Test
-    void shouldReadMissingConfigFromAnnotations() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
-            apiSource {
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.Definitions']
-                schemes = ['http']
-                swaggerDirectory = expectedSwaggerDirectory
-                securityDefinition {
-                    name = 'MyBasicAuth'
-                    type = 'basic'
+            swagger {
+                apiSource {
+                    locations = ['com.benjaminsproule']
+                    info {
+                        title = project.name
+                        version = '1'
+                    }
+                    swaggerDirectory = '${testProjectOutputDir}'
+                    host = 'localhost:8080'
+                    basePath = '/'
                 }
             }
-        }
-        ))
+        """
 
-        project.tasks.generateSwaggerDocumentation.execute()
+        when:
+        def result = pluginTaskRunnerBuilder()
+            .withArguments('generateSwaggerDocumentation', '-Pswagger.skip=true')
+            .build()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SKIPPED
+
+        assert !new File(testProjectOutputDir, '/swagger.json').exists()
+    }
+
+    def 'Should read missing config from annotations'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.Definitions']
+                    schemes = ['http']
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+            """
+
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
         def swaggerFile = new File("${expectedSwaggerDirectory}/swagger.json")
         assert Files.exists(swaggerFile.toPath())
@@ -80,35 +90,45 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
         assert tags.get(0).description == 'Test tag description'
     }
 
-    @Test
-    void generateSwaggerArtifactWhenFlagIsSet() {
+    def 'Generate Swagger artifact when flag is set'() {
+        given:
         def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
-        def expectedSwaggerDirectory = "${project.buildDir}/${swaggerRelativeDirectory}"
-        project.extensions.configure(SwaggerExtension, new ClosureBackedAction<SwaggerExtension>({
-            apiSource {
-                attachSwaggerArtifact = true
-                locations = ['com.benjaminsproule']
-                schemes = ['http']
-                info {
-                    title = project.name
-                    version = '1'
-                    license { name = 'Apache 2.0' }
-                    contact { name = 'Joe Blogs' }
-                }
-                swaggerDirectory = expectedSwaggerDirectory
-                host = 'localhost:8080'
-                basePath = '/'
-                securityDefinition {
-                    name = 'MyBasicAuth'
-                    type = 'basic'
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/${swaggerRelativeDirectory}"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    attachSwaggerArtifact = true
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    info {
+                        title = project.name
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
                 }
             }
-        }
-        ))
+        """
 
-        project.tasks.generateSwaggerDocumentation.execute()
+        when:
+        def result = runPluginTask()
 
-        def swaggerFile = new File("${project.buildDir}/libs/${project.archivesBaseName}-${swaggerRelativeDirectory}.jar")
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        def swaggerFile = new File("${buildFile.getParentFile()}/build/libs/${buildFile.getParentFile().getName()}-${swaggerRelativeDirectory}.jar")
         assert swaggerFile.exists()
     }
 }

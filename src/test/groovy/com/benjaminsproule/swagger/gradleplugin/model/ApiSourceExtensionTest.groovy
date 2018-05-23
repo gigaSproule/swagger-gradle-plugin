@@ -6,8 +6,6 @@ import io.swagger.models.Info
 import io.swagger.models.Scheme
 import io.swagger.models.auth.BasicAuthDefinition
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 
 class ApiSourceExtensionTest extends Specification {
@@ -22,7 +20,7 @@ class ApiSourceExtensionTest extends Specification {
     }
 
     def 'Valid api source validation returns no errors'() {
-        setup:
+        given:
         apiSourceExtension.locations = ['com.github']
         apiSourceExtension.info = Mock(InfoExtension)
         apiSourceExtension.info.isValid() >> []
@@ -35,7 +33,7 @@ class ApiSourceExtensionTest extends Specification {
     }
 
     def 'Api Source with missing info should provide missing info error'() {
-        setup:
+        given:
         apiSourceExtension.locations = ['com.github.junk'] //make sure we don't discover any annotations
 
         when:
@@ -48,7 +46,7 @@ class ApiSourceExtensionTest extends Specification {
     }
 
     def 'Api Source with no locations should provide missing locations error'() {
-        setup:
+        given:
         apiSourceExtension.info = new InfoExtension(null)
 
         when:
@@ -60,7 +58,7 @@ class ApiSourceExtensionTest extends Specification {
     }
 
     def 'Errors from nested objects should be returned'() {
-        setup:
+        given:
         apiSourceExtension.locations = ['com.github']
         apiSourceExtension.info = Mock(InfoExtension)
         apiSourceExtension.info.isValid() >> ['nested error']
@@ -74,7 +72,7 @@ class ApiSourceExtensionTest extends Specification {
     }
 
     def 'Should generate swagger type from contents'() {
-        setup:
+        given:
         apiSourceExtension.host = "http://localhost"
         apiSourceExtension.basePath = '/'
         apiSourceExtension.locations = ['com.benjaminsproule']

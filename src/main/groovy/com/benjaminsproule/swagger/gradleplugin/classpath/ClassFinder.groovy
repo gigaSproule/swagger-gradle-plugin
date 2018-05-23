@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation
 
 class ClassFinder {
     private static final Logger LOG = LoggerFactory.getLogger(ClassFinder)
-    static instance
+    static ClassFinder instance
     private Map<Class<? extends Annotation>, Set<Class<?>>> classCache
     private Project project
     private ClassLoader classLoader
@@ -66,7 +66,9 @@ class ClassFinder {
 
         if (project.sourceSets.main.output.getProperties()['classesDirs']) {
             project.sourceSets.main.output.classesDirs.each {
-                urls.add(it.toURI().toURL())
+                if (it.exists()) {
+                    urls.add(it.toURI().toURL())
+                }
             }
         } else {
             urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())

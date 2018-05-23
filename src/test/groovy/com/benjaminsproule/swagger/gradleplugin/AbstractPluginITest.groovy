@@ -1,20 +1,32 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.utils.ModelModifierRemover
-import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
+import spock.lang.Specification
 
-abstract class AbstractPluginITest {
-    Project project
+abstract class AbstractPluginITest extends Specification {
+    File testProjectDir
+    File buildFile
+    File testProjectOutputDir
 
-    @Before
-    void setUp() {
-        project = ProjectBuilder.builder().build()
-        project.configurations.create('runtime')
-        project.plugins.apply JavaPlugin
-        project.pluginManager.apply 'com.benjaminsproule.swagger'
-        ModelModifierRemover.removeAllModelModifiers()
+    def setup() {
+        testProjectDir = File.createTempDir()
+        buildFile = new File(testProjectDir, 'build.gradle')
+        buildFile.createNewFile()
+        testProjectOutputDir = new File(testProjectDir, 'build/swagger')
+    }
+
+    BuildResult runPluginTask() {
+        pluginTaskRunnerBuilder()
+            .build()
+    }
+
+    GradleRunner pluginTaskRunnerBuilder() {
+        GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME)
+            .withPluginClasspath()
+            .withTestKitDir(File.createTempDir())
+            .withDebug(true)
     }
 }

@@ -2,9 +2,8 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
-import com.benjaminsproule.swagger.gradleplugin.misc.EnvironmentConfigurer
-import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
+import com.benjaminsproule.swagger.gradleplugin.misc.EnvironmentConfigurer
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
@@ -47,7 +46,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     @TaskAction
     generateSwaggerDocuments() {
-        def swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME)
+        SwaggerExtension swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME) as SwaggerExtension
         classFinder = ClassFinder.getInstance(project)
         resourceFinder = ResourceFinder.getInstance(project)
 
@@ -60,8 +59,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
             }
         } catch (InvalidUserDataException iude) {
             throw iude
-        } catch (GenerateException e) {
-            throw new GradleException(e.getMessage(), e)
         } catch (Exception e) {
             throw new GradleException(e.getMessage(), e)
         }

@@ -1,185 +1,213 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
-import org.gradle.api.internal.ClosureBackedAction
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.yaml.snakeyaml.Yaml
 
 import java.nio.file.Files
 
-import static org.junit.Assert.fail
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
-@RunWith(Parameterized)
 class OutputITest extends AbstractPluginITest {
 
-    @Parameterized.Parameters
-    static Collection<ClosureBackedAction<SwaggerExtension>> data() {
-        [
-            getGroovySwaggerExtensionClosure(),
-            getJavaSwaggerExtensionClosure(),
-            getKotlinSwaggerExtensionClosure()
+    def 'Produces Swagger documentation with JAX-RS'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    ${basicApiSourceClosure()}
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    ${testSpecificConfig}
+                }
+            }
+        """
+
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+
+        where:
+        testSpecificConfig << [
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+            """
         ]
     }
 
-    private ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure
+    void 'Produces Swagger documentation with Spring MVC'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    ${basicApiSourceClosure()}
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    ${testSpecificConfig}
+                }
+            }
+        """
 
-    OutputITest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
-        this.swaggerExtensionClosure = swaggerExtensionClosure
-    }
+        when:
+        def result = runPluginTask()
 
-    @Test
-    void producesSwaggerDocumentationWithJaxRs() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
-            it.swaggerDirectory = expectedSwaggerDirectory
-        }
-
-        project.tasks.generateSwaggerDocumentation.execute()
-
-        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
-    }
-
-    @Test
-    void producesSwaggerDocumentationWithSpringMvc() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
-            it.swaggerDirectory = expectedSwaggerDirectory
-            it.springmvc = true
-        }
-
-        project.tasks.generateSwaggerDocumentation.execute()
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+
+        where:
+        testSpecificConfig << [
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+                springmvc = true
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
+                springmvc = true
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+                springmvc = true
+            """
+        ]
     }
 
-    @Test
-    void producesSwaggerDocumentationWithModelSubstitution() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
-            it.swaggerDirectory = expectedSwaggerDirectory
-            it.modelSubstitute = 'model-substitution'
-        }
+    def 'Produces Swagger documentation with model substitution'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    ${basicApiSourceClosure()}
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    ${testSpecificConfig}
+                }
+            }
+        """
 
-        project.tasks.generateSwaggerDocumentation.execute()
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'integer')
+
+        where:
+        testSpecificConfig << [
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+                modelSubstitute = 'model-substitution'
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
+                modelSubstitute = 'model-substitution'
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+                modelSubstitute = 'model-substitution'
+            """
+        ]
     }
 
-    @Test
-    void produceSwaggerDocumentationInMultipleFormats() {
-        def expectedSwaggerDirectory = "${project.buildDir}/swaggerui-" + UUID.randomUUID()
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.each {
-            it.swaggerDirectory = expectedSwaggerDirectory
-            it.outputFormats = ['json', 'yaml']
-        }
+    def 'Produce Swagger documentation in multiple formats'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    ${basicApiSourceClosure()}
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    ${testSpecificConfig}
+                }
+            }
+        """
 
-        project.tasks.generateSwaggerDocumentation.execute()
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
         assertSwaggerYaml("${expectedSwaggerDirectory}/swagger.yaml")
+
+        where:
+        testSpecificConfig << [
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+                outputFormats = ['json', 'yaml']
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
+                outputFormats = ['json', 'yaml']
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+                outputFormats = ['json', 'yaml']
+            """
+        ]
     }
 
-    static ClosureBackedAction<SwaggerExtension> getGroovySwaggerExtensionClosure() {
-        new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
-                    springmvc = true
-                    schemes = ['http']
-                    modelSubstitute = ''
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                        contact {
-                            name = 'Joe Blogs'
-                        }
-                    }
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
-                }
+    private static String basicApiSourceClosure() {
+        """
+        schemes = ['http']
+        info {
+            title = 'test'
+            version = '1'
+            license {
+                name = 'Apache 2.0'
             }
-        )
-    }
-
-    static ClosureBackedAction<SwaggerExtension> getJavaSwaggerExtensionClosure() {
-        new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
-                    springmvc = true
-                    schemes = ['http']
-                    modelSubstitute = ''
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                        contact {
-                            name = 'Joe Blogs'
-                        }
-                    }
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
-                }
+            contact {
+                name = 'Joe Blogs'
             }
-        )
+        }
+        host = 'localhost:8080'
+        basePath = '/'
+        securityDefinition {
+            name = 'MyBasicAuth'
+            type = 'basic'
+        }
+    """
     }
 
-    static ClosureBackedAction<SwaggerExtension> getKotlinSwaggerExtensionClosure() {
-        new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
-                    springmvc = true
-                    schemes = ['http']
-                    modelSubstitute = ''
-                    info {
-                        title = project.name
-                        version = '1'
-                        license {
-                            name = 'Apache 2.0'
-                        }
-                        contact {
-                            name = 'Joe Blogs'
-                        }
-                    }
-                    host = 'localhost:8080'
-                    basePath = '/'
-                    securityDefinition {
-                        name = 'MyBasicAuth'
-                        type = 'basic'
-                    }
-                }
-            }
-        )
-    }
-
-    private static Object assertSwaggerJson(String swaggerJsonFilePath, String type = 'string') {
+    private static void assertSwaggerJson(String swaggerJsonFilePath, String type = 'string') {
         def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
         assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), 'json', type)
     }
 
-    private static Object assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string') {
+    private static void assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string') {
         def swaggerYamlFile = new File(swaggerYamlFilePath)
         assert Files.exists(swaggerYamlFile.toPath())
         assertSwaggerDocument(new Yaml().load(swaggerYamlFile.getText('UTF-8')), 'yaml', type)
@@ -231,7 +259,7 @@ class OutputITest extends AbstractPluginITest {
         } else if (paths.'/root/withannotation/default'.get.responses.get(ok)) {
             assert paths.'/root/withannotation/default'.get.responses.get(ok).description == 'successful operation'
         } else {
-            fail('No response found for /root/withannotation/default')
+            assert false: 'No response found for /root/withannotation/default'
         }
         assert paths.'/root/withannotation/default'.get.security.basic
 
@@ -255,7 +283,7 @@ class OutputITest extends AbstractPluginITest {
         } else if (paths.'/root/withannotation/datatype'.post.responses.get(ok)) {
             assert paths.'/root/withannotation/datatype'.post.responses.get(ok).description == 'successful operation'
         } else {
-            fail('No response found for /root/withannotation/datatype')
+            assert false: 'No response found for /root/withannotation/datatype'
         }
         assert paths.'/root/withannotation/datatype'.post.security.basic
 
@@ -364,7 +392,7 @@ class OutputITest extends AbstractPluginITest {
         } else if (paths.'/root/withoutannotation/default'.get.responses.get(ok)) {
             assert paths.'/root/withoutannotation/default'.get.responses.get(ok).description == 'successful operation'
         } else {
-            fail('No response found for /root/withoutannotation/default')
+            assert false: 'No response found for /root/withoutannotation/default'
         }
         assert paths.'/root/withoutannotation/default'.get.security.basic
 
@@ -388,7 +416,7 @@ class OutputITest extends AbstractPluginITest {
         } else if (paths.'/root/withoutannotation/datatype'.post.responses.get(ok)) {
             assert paths.'/root/withoutannotation/datatype'.post.responses.get(ok).description == 'successful operation'
         } else {
-            fail('No response found for /root/withoutannotation/datatype')
+            assert false: 'No response found for /root/withoutannotation/datatype'
         }
         assert paths.'/root/withoutannotation/datatype'.post.security.basic
 

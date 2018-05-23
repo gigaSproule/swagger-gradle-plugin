@@ -1,48 +1,66 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import groovy.json.JsonSlurper
-import org.gradle.api.internal.ClosureBackedAction
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
-@RunWith(Parameterized)
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+
 class MultipleApiSourceITest extends AbstractPluginITest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder()
+    def 'Produces Swagger Documentation'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    schemes = ['http']
+                    basePath = 'One'
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    swaggerFileName = 'swagger-one'
+                    ${testSpecificConfigOne}
+                }
+                apiSource {
+                    schemes = ['http']
+                    basePath = 'Two'
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    swaggerFileName = 'swagger-two'
+                    ${testSpecificConfigTwo}
+                }
+            }
+        """
 
-    @Parameterized.Parameters
-    static Collection<ClosureBackedAction<SwaggerExtension>> data() {
-        [
-            getSpringMvcSwaggerExtensionClosure(),
-            getJaxRsSwaggerExtensionClosure()
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger-one.json", 'One')
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger-two.json", 'Two')
+
+        where:
+        testSpecificConfigOne << [
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.springmvc.TestResourceForMultiApiSource_One']
+                springmvc = true
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.jaxrs.TestResourceForMultiApiSource_One']
+            """
         ]
-    }
-
-    private ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure
-
-    MultipleApiSourceITest(ClosureBackedAction<SwaggerExtension> swaggerExtensionClosure) {
-        this.swaggerExtensionClosure = swaggerExtensionClosure
-    }
-
-    @Test
-    void producesSwaggerDocumentation() {
-        def expectedSwaggerDirectory = temporaryFolder.newFolder()
-        def expectedSwaggerFiles = ["swagger-one", "swagger-two"]
-        project.extensions.configure(SwaggerExtension, swaggerExtensionClosure)
-        project.extensions.getByType(SwaggerExtension).apiSourceExtensions.eachWithIndex { apiSourceExtension, i ->
-            apiSourceExtension.swaggerDirectory = expectedSwaggerDirectory
-            apiSourceExtension.swaggerFileName = expectedSwaggerFiles[i]
-        }
-
-        project.tasks.generateSwaggerDocumentation.execute()
-
-        assertSwaggerJson("${expectedSwaggerDirectory}/${expectedSwaggerFiles[0]}.json", 'One')
-        assertSwaggerJson("${expectedSwaggerDirectory}/${expectedSwaggerFiles[1]}.json", 'Two')
+        testSpecificConfigTwo << [
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.springmvc.TestResourceForMultiApiSource_Two']
+                springmvc = true
+            """,
+            """
+                locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.jaxrs.TestResourceForMultiApiSource_Two']
+            """
+        ]
     }
 
     private static void assertSwaggerJson(String swaggerJsonFile, String prefix) {
@@ -61,41 +79,5 @@ class MultipleApiSourceITest extends AbstractPluginITest {
         assert paths.size() == 1
 
         assert paths."/${prefix}Api".get.responses.'200'.schema.'$ref' == "#/definitions/MultiApiSourceParent${prefix}ResponseModel"
-    }
-
-    private static ClosureBackedAction<SwaggerExtension> getSpringMvcSwaggerExtensionClosure() {
-        return new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.springmvc.TestResourceForMultiApiSource_One']
-                    springmvc = true
-                    schemes = ['http']
-                    basePath = 'One'
-                }
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.springmvc.TestResourceForMultiApiSource_Two']
-                    springmvc = true
-                    schemes = ['http']
-                    basePath = 'Two'
-                }
-            }
-        )
-    }
-
-    private static ClosureBackedAction<SwaggerExtension> getJaxRsSwaggerExtensionClosure() {
-        return new ClosureBackedAction<SwaggerExtension>(
-            {
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.jaxrs.TestResourceForMultiApiSource_One']
-                    schemes = ['http']
-                    basePath = 'One'
-                }
-                apiSource {
-                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.multipleapisource.jaxrs.TestResourceForMultiApiSource_Two']
-                    schemes = ['http']
-                    basePath = 'Two'
-                }
-            }
-        )
     }
 }

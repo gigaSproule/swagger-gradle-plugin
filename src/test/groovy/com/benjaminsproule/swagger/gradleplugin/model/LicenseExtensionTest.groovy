@@ -1,28 +1,30 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
-import org.junit.Before
-import org.junit.Test
+import spock.lang.Specification
 
-class LicenseExtensionTest {
+class LicenseExtensionTest extends Specification {
     LicenseExtension licenseExtension
 
-    @Before
-    void setup() {
+    def setup() {
         licenseExtension = new LicenseExtension()
     }
 
-    @Test
-    void 'Valid licence validation returns no errors'() {
+    def 'Valid licence validation returns no errors'() {
+        given:
         licenseExtension.name = 'name'
+
+        when:
         def result = licenseExtension.isValid()
 
+        then:
         assert !result
     }
 
-    @Test
-    void 'Swagger extension with missing name should provide missing name error'() {
+    def 'Swagger extension with missing name should provide missing name error'() {
+        when:
         def result = licenseExtension.isValid()
 
+        then:
         assert result
         assert result.contains('info.licence.name is required by the swagger spec')
     }

@@ -8,7 +8,7 @@ import spock.lang.Specification
 
 class ClassFinderTest extends Specification {
 
-    def 'ClassFinder gets scans both compile and runtime dependencies'() {
+    def 'ClassFinder scans both compile and runtime dependencies'() {
         setup:
         def compile = Mock(Configuration)
         def runtime = Mock(Configuration)

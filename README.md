@@ -376,6 +376,12 @@ swagger {
 }
 ```
 
+# To run integration tests
+This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the pluginUnderTestMetadata task to be run before hand
+```bash
+./gradlew pluginUnderTestMetadata
+```
+
 # To release
 This plugin uses the [gradle-release](https://github.com/researchgate/gradle-release) plugin, so to release the plugin.
 

@@ -23,7 +23,7 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: ./gradlew test --no-daemon
+      - run: ./gradlew test
   build-openjdk-9:
     docker:
       - image: circleci/openjdk:9-jdk
@@ -47,7 +47,7 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: ./gradlew test --no-daemon
+      - run: ./gradlew test
 
 workflows:
   version: 2

@@ -44,6 +44,17 @@ One `apiSource` can be considered as a version of APIs of your service.
 
 You can specify several `apiSource`s. Generally, one is enough.
 
+```groovy
+swagger {
+    apiSource {
+        ...
+    }
+    apiSource {
+        ...
+    }
+}
+```
+
 # Configuration for `swagger`
 
 | **name** | **description** |

@@ -1,0 +1,65 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.4.RELEASE'
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'groovy'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.benjaminsproule.swagger'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+group = 'com.benjaminsproule'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    compile localGroovy()
+    compile 'org.springframework.boot:spring-boot-starter-jersey'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'io.swagger:swagger-annotations:1.5.15'
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+}
+
+swagger {
+    apiSource {
+        springmvc = false
+        locations = ['com.benjaminsproule.sample']
+        schemes = ['http', 'https']
+        host = 'www.example.com:8080'
+        basePath = '/sample'
+        info {
+            title = 'Swagger Gradle Plugin Sample'
+            version = 'v1'
+            description = 'This is a sample.'
+            termsOfService = 'http://www.example.com/termsOfService'
+            contact {
+                email = 'email@email.com'
+                name = 'Name'
+                url = 'http://www.example.com'
+            }
+            license {
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.html'
+                name = 'Apache 2.0'
+            }
+        }
+        swaggerDirectory = "${project.buildDir}/swagger-ui"
+        securityDefinition {
+            json = 'securityDefinition.json'
+        }
+    }
+}

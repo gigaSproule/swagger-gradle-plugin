@@ -1,4 +1,4 @@
-# Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin)  [![CircleCI](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin.svg?style=svg)](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin)  [ ![Download](https://api.bintray.com/packages/gigasproule/maven/swagger-gradle-plugin/images/download.svg) ](https://bintray.com/gigasproule/maven/swagger-gradle-plugin/_latestVersion)
+# Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png?branch=master)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin?branch=master)  [![CircleCI](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin.svg?style=svg)](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin)  [ ![Download](https://api.bintray.com/packages/gigasproule/maven/swagger-gradle-plugin/images/download.svg) ](https://bintray.com/gigasproule/maven/swagger-gradle-plugin/_latestVersion)
 
 This plugin was based on [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)
 
@@ -43,6 +43,17 @@ swagger {
 One `apiSource` can be considered as a version of APIs of your service.
 
 You can specify several `apiSource`s. Generally, one is enough.
+
+```groovy
+swagger {
+    apiSource {
+        ...
+    }
+    apiSource {
+        ...
+    }
+}
+```
 
 # Configuration for `swagger`
 
@@ -363,6 +374,12 @@ swagger {
         // attachSwaggerArtifact = true - WILL BE ADDED IN THE FUTURE
     }
 }
+```
+
+# To run integration tests
+This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the pluginUnderTestMetadata task to be run before hand
+```bash
+./gradlew pluginUnderTestMetadata
 ```
 
 # To release

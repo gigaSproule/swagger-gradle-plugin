@@ -9,32 +9,31 @@ import java.lang.annotation.Annotation
 
 class ClassFinder {
     private static final Logger LOG = LoggerFactory.getLogger(ClassFinder)
-    static instance
-    Map<Class<? extends Annotation>, Set<Class<?>>> classCache
-    Project project
+    static ClassFinder instance
+    private Map<Class<? extends Annotation>, Set<Class<?>>> classCache
+    private Project project
     private ClassLoader classLoader
 
-    private ClassFinder(Project project) {
+    ClassFinder(Project project) {
         this.project = project
         this.classCache = new HashMap<>()
         this.classLoader = prepareClassLoader()
     }
 
     //FIXME hack until we have some DI working
-    static void createInstance(Project project) {
-        instance = new ClassFinder(project)
+    static ClassFinder getInstance(Project project) {
+        if (!instance) {
+            instance = new ClassFinder(project)
+        }
+        instance
     }
 
-    static ClassFinder instance() {
-        return instance
+    Class<?> loadClass(String name) {
+        return classLoader.loadClass(name)
     }
 
     void clearClassCache() {
-        this.classCache.clear()
-    }
-
-    static Class<?> loadClass(String name) {
-        return instance.classLoader.loadClass(name)
+        classCache.clear()
     }
 
     Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages) {
@@ -61,13 +60,15 @@ class ClassFinder {
 
     private ClassLoader prepareClassLoader() {
         def urls = []
-        project.configurations.runtime.resolve().each {
+        (project.configurations.compile.resolve() + project.configurations.runtime.resolve()).each {
             urls.add(it.toURI().toURL())
         }
 
         if (project.sourceSets.main.output.getProperties()['classesDirs']) {
             project.sourceSets.main.output.classesDirs.each {
-                urls.add(it.toURI().toURL())
+                if (it.exists()) {
+                    urls.add(it.toURI().toURL())
+                }
             }
         } else {
             urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())

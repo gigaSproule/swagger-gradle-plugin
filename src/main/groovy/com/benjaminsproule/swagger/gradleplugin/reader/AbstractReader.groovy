@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiImplicitParam
@@ -40,20 +41,23 @@ import org.apache.commons.lang3.reflect.TypeUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.AnnotationUtils
+
 import java.lang.annotation.Annotation
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
-abstract class AbstractReader {
+abstract class AbstractReader implements ClassSwaggerReader {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractReader)
     ApiSourceExtension apiSource
     protected Swagger swagger
-    private Set<Type> typesToSkip
+    protected Set<Type> typesToSkip
+    protected ClassFinder classFinder
 
-    AbstractReader(ApiSourceExtension apiSource, Swagger swagger, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions) {
+    AbstractReader(ApiSourceExtension apiSource, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions, ClassFinder classFinder) {
         this.apiSource = apiSource
-        this.swagger = swagger ?: new Swagger()
+        this.swagger = apiSource.asSwaggerType()
         this.typesToSkip = typesToSkip == null ? new HashSet<Type>() : typesToSkip
+        this.classFinder = classFinder
         updateExtensionChain(swaggerExtensions)
     }
 
@@ -89,7 +93,8 @@ abstract class AbstractReader {
         return PathUtils.parsePath(operationPath, regexMap)
     }
 
-    protected static void updateOperationParameters(List<Parameter> parentParameters, Map<String, String> regexMap, Operation operation) {
+    protected
+    static void updateOperationParameters(List<Parameter> parentParameters, Map<String, String> regexMap, Operation operation) {
         if (parentParameters != null) {
             for (Parameter param : parentParameters) {
                 operation.parameter(param)
@@ -408,7 +413,8 @@ abstract class AbstractReader {
         }
     }
 
-    protected static String[] updateOperationProduces(String[] parentProduces, String[] apiProduces, Operation operation) {
+    protected
+    static String[] updateOperationProduces(String[] parentProduces, String[] apiProduces, Operation operation) {
         if (parentProduces != null) {
             Set<String> both = new LinkedHashSet<String>(Arrays.asList(apiProduces))
             both.addAll(Arrays.asList(parentProduces))
@@ -420,7 +426,8 @@ abstract class AbstractReader {
         return apiProduces
     }
 
-    protected static String[] updateOperationConsumes(String[] parentConsumes, String[] apiConsumes, Operation operation) {
+    protected
+    static String[] updateOperationConsumes(String[] parentConsumes, String[] apiConsumes, Operation operation) {
         if (parentConsumes != null) {
             Set<String> both = new LinkedHashSet<String>(Arrays.asList(apiConsumes))
             both.addAll(Arrays.asList(parentConsumes))

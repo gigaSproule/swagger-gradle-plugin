@@ -1,6 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
+import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import io.swagger.models.Model
 import io.swagger.models.Operation
 import io.swagger.models.Path

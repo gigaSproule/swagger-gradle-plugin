@@ -1,13 +1,16 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import groovy.transform.ToString
 import io.swagger.annotations.Contact
 import io.swagger.annotations.Info
 import io.swagger.annotations.License
 import io.swagger.annotations.SwaggerDefinition
+import io.swagger.models.ExternalDocs
 import io.swagger.models.Scheme
 import io.swagger.models.Swagger
+import io.swagger.models.Tag
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.springframework.core.annotation.AnnotationUtils
@@ -42,7 +45,10 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     List<String> modelConverters
     List<String> apiModelPropertyAccessExclusionsList
 
-    ApiSourceExtension(Project project) {
+    private ClassFinder classFinder
+    private ResourceFinder resourceFinder
+
+    ApiSourceExtension(Project project, ClassFinder classFinder, ResourceFinder resourceFinder) {
         this.project = project
 
         if (this.apiModelPropertyAccessExclusionsList != null) {
@@ -52,6 +58,9 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         if (this.typesToSkipList != null) {
             this.typesToSkip.addAll(this.typesToSkipList)
         }
+
+        this.classFinder = classFinder
+        this.resourceFinder = resourceFinder
     }
 
     void info(Closure closure) {
@@ -59,7 +68,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     void securityDefinition(Closure closure) {
-        securityDefinition = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
+        securityDefinition = project.configure(new SecurityDefinitionExtension(resourceFinder), closure) as SecurityDefinitionExtension
     }
 
     @Override
@@ -77,7 +86,6 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
             }
         }
 
-
         def errors = info.isValid()
 
         if (securityDefinition) {
@@ -93,6 +101,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         swagger.setHost(host ?: setHostFromAnnotation())
         swagger.setBasePath(basePath ?: setBasePathFromAnnotation())
         swagger.setInfo(info.asSwaggerType())
+        swagger.setTags(setTagsFromAnnotation())
 
         if (schemes) {
             for (String scheme : schemes) {
@@ -117,7 +126,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     private String setHostFromAnnotation() {
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations)) {
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             return swaggerDefinition.host()
         }
@@ -126,7 +135,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     private String setBasePathFromAnnotation() {
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition.class, locations)) {
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             return swaggerDefinition.basePath()
         }
@@ -134,9 +143,29 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         return null
     }
 
+    private List<Tag> setTagsFromAnnotation() {
+        def tags = []
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
+            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
+            def tagAnnotations = swaggerDefinition.tags()
+            tags.addAll(tagAnnotations.collect {
+                Tag tag = new Tag()
+                    .name(it.name())
+                    .description(it.description())
+                tag.externalDocs(new ExternalDocs()
+                    .description(it.externalDocs().value())
+                    .url(it.externalDocs().url()))
+            })
+        }
+        if (!tags) {
+            return null
+        }
+        return tags as List<Tag>
+    }
+
     private InfoExtension setInfoFromAnnotation() {
         def resultInfo = new InfoExtension(project)
-        for (Class<?> aClass : ClassFinder.instance().getValidClasses(SwaggerDefinition, locations)) {
+        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition, locations)) {
             SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
             Info infoAnnotation = swaggerDefinition.info()
             def info = new InfoExtension(project)

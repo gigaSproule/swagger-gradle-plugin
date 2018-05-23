@@ -1,21 +1,25 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
-import org.gradle.testfixtures.ProjectBuilder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
+import org.gradle.api.Project
 import spock.lang.Specification
 
 class SwaggerExtensionTest extends Specification {
     SwaggerExtension swaggerExtension
 
     def setup() {
-        def project = ProjectBuilder.builder().build()
-        swaggerExtension = new SwaggerExtension(project)
+        def mockProject = Mock(Project)
+        def mockClassFinder = Mock(ClassFinder)
+        def mockResourceFinder = Mock(ResourceFinder)
+        swaggerExtension = new SwaggerExtension(mockProject, mockClassFinder, mockResourceFinder)
     }
 
     def 'Valid swagger extension validation returns no errors'() {
         setup:
         def mock = Mock(ApiSourceExtension)
         mock.isValid() >> []
-        swaggerExtension.apiSourceExtensions.push(mock)
+        swaggerExtension.apiSourceExtensions.add(mock)
 
         when:
         def result = swaggerExtension.isValid()
@@ -49,7 +53,7 @@ class SwaggerExtensionTest extends Specification {
         setup:
         def mock = Mock(ApiSourceExtension)
         mock.isValid() >> ['nested error']
-        swaggerExtension.apiSourceExtensions.push(mock)
+        swaggerExtension.apiSourceExtensions.add(mock)
 
         when:
         def result = swaggerExtension.isValid()

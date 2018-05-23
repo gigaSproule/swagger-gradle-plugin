@@ -1,7 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.generator
 
 import com.benjaminsproule.swagger.gradleplugin.Utils
-import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
+import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.github.jknack.handlebars.Handlebars
 import com.github.jknack.handlebars.Helper

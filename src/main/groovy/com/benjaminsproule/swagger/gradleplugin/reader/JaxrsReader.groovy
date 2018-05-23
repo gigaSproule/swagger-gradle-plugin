@@ -4,6 +4,7 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.jaxrs.BeanParamInjectionParamExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.jaxrs.JaxrsParameterExtension
+import com.google.common.collect.Sets
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponses
@@ -14,7 +15,7 @@ import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.PATCH
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
-import io.swagger.jersey.SwaggerJerseyJaxrs
+import io.swagger.jersey.SwaggerJersey2Jaxrs
 import io.swagger.models.Model
 import io.swagger.models.Operation
 import io.swagger.models.Response
@@ -43,24 +44,25 @@ import java.lang.annotation.Annotation
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
-class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
+class JaxrsReader extends AbstractReader {
     private static final Logger LOG = LoggerFactory.getLogger(JaxrsReader.class)
 
-    JaxrsReader(ApiSourceExtension apiSourceExtension, Swagger swagger, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions) {
-        super(apiSourceExtension, swagger, typesToSkip, swaggerExtensions)
+    JaxrsReader(ApiSourceExtension apiSourceExtension, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions, ClassFinder classFinder) {
+        super(apiSourceExtension, typesToSkip, swaggerExtensions, classFinder)
     }
 
     @Override
     void updateExtensionChain(List<SwaggerExtension> swaggerExtensions) {
         List<SwaggerExtension> extensions = swaggerExtensions ?: new ArrayList<SwaggerExtension>()
         extensions.add(new BeanParamInjectionParamExtension())
-        extensions.add(new SwaggerJerseyJaxrs())
+        extensions.add(new SwaggerJersey2Jaxrs())
         extensions.add(new JaxrsParameterExtension())
         SwaggerExtensions.setExtensions(extensions)
     }
 
     @Override
-    Swagger read(Set<Class<?>> classes) {
+    Swagger read() {
+        Set<Class<?>> classes = getValidClasses()
         for (Class<?> cls : classes) {
             read(cls)
         }
@@ -69,6 +71,19 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
 
     Swagger read(Class<?> cls) {
         return read(cls, "", null, false, new String[0], new String[0], new HashMap<String, Tag>(), new ArrayList<Parameter>())
+    }
+
+    private Set<Class<?>> getValidClasses() {
+        Set<Class<?>> classes = Sets.union(classFinder.getValidClasses(Api, apiSource.locations), classFinder.getValidClasses(Path, apiSource.locations))
+        Set<Class<?>> copied = new HashSet<>(classes)
+        for (Class<?> clazz : classes) {
+            for (Class<?> aClazz : classes) {
+                if (clazz != aClazz && clazz.isAssignableFrom(aClazz)) {
+                    copied.remove(clazz)
+                }
+            }
+        }
+        copied
     }
 
     protected Swagger read(Class<?> cls, String parentPath, String parentMethod, boolean readHidden, String[] parentConsumes, String[] parentProduces, Map<String, Tag> parentTags, List<Parameter> parentParameters) {
@@ -100,6 +115,12 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
             if (apiOperation != null && apiOperation.hidden()) {
                 continue //Skip processing for hidden operation
             }
+
+            if (!AnnotationUtils.findAnnotation(method, GET) && !AnnotationUtils.findAnnotation(method, POST)
+                && !AnnotationUtils.findAnnotation(method, PUT) && !AnnotationUtils.findAnnotation(method, DELETE)) {
+                continue // Skip processing for non-API methods
+            }
+
             Path methodPath = AnnotationUtils.findAnnotation(method, Path)
 
             String operationPath = getPath(apiPath, methodPath, parentPath)
@@ -159,7 +180,7 @@ class JaxrsReader extends AbstractReader implements ClassSwaggerReader {
     private Map<String, Tag> scanClasspathForTags() {
         def tags = new HashMap<>()
 
-        ClassFinder.instance()
+        classFinder
             .getValidClasses(SwaggerDefinition, apiSource.locations)
             .each {
             def swaggerDefinition = AnnotationUtils.findAnnotation(it, SwaggerDefinition)

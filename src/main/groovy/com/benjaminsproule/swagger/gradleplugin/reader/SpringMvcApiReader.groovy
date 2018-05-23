@@ -1,15 +1,17 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
 import com.benjaminsproule.swagger.gradleplugin.Utils
-import com.benjaminsproule.swagger.gradleplugin.except.GenerateException
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.spring.SpringSwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.model.SpringResource
+import com.google.common.collect.Sets
+import io.swagger.models.*
 import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
-import io.swagger.models.*
 import io.swagger.models.parameters.Parameter
 import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
@@ -23,18 +25,19 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 
 import java.lang.annotation.Annotation
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
+class SpringMvcApiReader extends AbstractReader {
     private static final Logger LOG = LoggerFactory.getLogger(SpringMvcApiReader.class)
     private String resourcePath
 
-    SpringMvcApiReader(ApiSourceExtension apiSourceExtension, Swagger swagger, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions) {
-        super(apiSourceExtension, swagger, typesToSkip, swaggerExtensions)
+    SpringMvcApiReader(ApiSourceExtension apiSourceExtension, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions, ClassFinder classFinder) {
+        super(apiSourceExtension, typesToSkip, swaggerExtensions, classFinder)
     }
 
     @Override
@@ -45,11 +48,11 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
     }
 
     @Override
-    Swagger read(Set<Class<?>> classes) throws GenerateException {
+    Swagger read() throws GenerateException {
         //relate all methods to one base request mapping if multiple controllers exist for that mapping
         //get all methods from each controller & find their request mapping
         //create map - resource string (after first slash) as key, new SpringResource as value
-        Map<String, SpringResource> resourceMap = generateResourceMap(classes)
+        Map<String, SpringResource> resourceMap = generateResourceMap(getValidClasses())
         for (String str : resourceMap.keySet()) {
             SpringResource resource = resourceMap.get(str)
             read(resource)
@@ -58,7 +61,21 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         return swagger
     }
 
-    protected static Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
+    Set<Class<?>> getValidClasses() {
+        Set<Class<?>> classes = Sets.union(classFinder.getValidClasses(Api, apiSource.locations), classFinder.getValidClasses(RestController, apiSource.locations))
+        Set<Class<?>> copied = new HashSet<>(classes)
+        for (Class<?> clazz : classes) {
+            for (Class<?> aClazz : classes) {
+                if (clazz != aClazz && clazz.isAssignableFrom(aClazz)) {
+                    copied.remove(clazz)
+                }
+            }
+        }
+        copied
+    }
+
+    protected
+    static Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
         Map<String, SpringResource> resourceMap = new HashMap<String, SpringResource>()
         for (Class<?> aClass : validClasses) {
             //This try/catch block is to stop a bamboo build from failing due to NoClassDefFoundError
@@ -104,7 +121,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         }
 
         if (resource.controllerClass.isAnnotationPresent(RequestMapping)) {
-            resourcePath = resource.controllerMapping
+            resourcePath = resource.controllerMapping[0]
         } else if (controllerRM != null) {
             resourcePath = controllerRM.path()[0]
         } else {
@@ -320,7 +337,7 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         String[] parameterNames = parameterNameDiscoverer.getParameterNames(method)
         // paramTypes = method.getParameterTypes
         // genericParamTypes = method.getGenericParameterTypes
-        for (int i = 0; i < parameterTypes.length; i++) {
+        parameterTypes.eachWithIndex { parameterType, i ->
             Type type = genericParameterTypes[i]
             List<Annotation> annotations = Arrays.asList(paramAnnotations[i])
             List<Parameter> parameters = getParameters(type, annotations)
@@ -375,23 +392,6 @@ class SpringMvcApiReader extends AbstractReader implements ClassSwaggerReader {
         } else {
             return this.resourcePath
         }
-    }
-
-    @Deprecated
-    // TODO: Delete method never used
-    private static Class<?> getGenericSubtype(Class<?> clazz, Type type) {
-        if (!(clazz.getName() == "void" || type.toString() == "void")) {
-            try {
-                ParameterizedType paramType = (ParameterizedType) type
-                Type[] argTypes = paramType.getActualTypeArguments()
-                if (argTypes.length > 0) {
-                    return (Class<?>) argTypes[0]
-                }
-            } catch (ClassCastException ignore) {
-                //FIXME: find out why this happens to only certain types
-            }
-        }
-        return clazz
     }
 
     //Helper method for loadDocuments()

@@ -1,4 +1,4 @@
-# Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png?branch=master)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin?branch=master)  [![CircleCI](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin/tree/master.svg?style=svg)](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin/tree/master)  [ ![Download](https://api.bintray.com/packages/gigasproule/maven/swagger-gradle-plugin/images/download.svg) ](https://bintray.com/gigasproule/maven/swagger-gradle-plugin/_latestVersion)
+# Swagger Gradle Plugin [![Build Status](https://travis-ci.org/gigaSproule/swagger-gradle-plugin.png?branch=master)](https://travis-ci.org/gigaSproule/swagger-gradle-plugin?branch=master)   [ ![Download](https://api.bintray.com/packages/gigasproule/maven/swagger-gradle-plugin/images/download.svg) ](https://bintray.com/gigasproule/maven/swagger-gradle-plugin/_latestVersion)
 
 This plugin was based on [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)
 

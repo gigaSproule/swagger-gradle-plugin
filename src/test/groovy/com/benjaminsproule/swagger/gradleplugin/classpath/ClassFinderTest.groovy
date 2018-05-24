@@ -10,14 +10,14 @@ class ClassFinderTest extends Specification {
 
     def 'ClassFinder scans both compile and runtime dependencies'() {
         setup:
-        def compile = Mock(Configuration)
-        def runtime = Mock(Configuration)
-        compile.resolve() >> [new File('externaltestdata/compile')]
-        runtime.resolve() >> [new File('externaltestdata/runtime')]
+        def compileClasspath = Mock(Configuration)
+        def runtimeClasspath = Mock(Configuration)
+        compileClasspath.resolve() >> [new File('externaltestdata/compile')]
+        runtimeClasspath.resolve() >> [new File('externaltestdata/runtime')]
 
         def configurations = Mock(ConfigurationContainer)
-        configurations.metaClass.compile = compile
-        configurations.metaClass.runtime = runtime
+        configurations.metaClass.compileClasspath = compileClasspath
+        configurations.metaClass.runtimeClasspath = runtimeClasspath
 
         def project = ProjectBuilder.builder().build()
         project.plugins.apply JavaPlugin

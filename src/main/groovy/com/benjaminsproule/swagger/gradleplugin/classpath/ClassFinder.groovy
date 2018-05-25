@@ -17,7 +17,6 @@ class ClassFinder {
     ClassFinder(Project project) {
         this.project = project
         this.classCache = new HashMap<>()
-        this.classLoader = prepareClassLoader()
     }
 
     //FIXME hack until we have some DI working
@@ -29,7 +28,7 @@ class ClassFinder {
     }
 
     Class<?> loadClass(String name) {
-        return classLoader.loadClass(name)
+        return getClassLoader().loadClass(name)
     }
 
     void clearClassCache() {
@@ -45,12 +44,12 @@ class ClassFinder {
 
         if (packages) {
             packages.each { location ->
-                Set<Class<?>> c = new Reflections(classLoader, location).getTypesAnnotatedWith(clazz)
+                Set<Class<?>> c = new Reflections(getClassLoader(), location).getTypesAnnotatedWith(clazz)
                 classes.addAll(c)
             }
         } else {
             LOG.warn("Scanning the the entire classpath (${clazz}), you should avoid this by specifying package locations")
-            Set<Class<?>> c = new Reflections(classLoader, '').getTypesAnnotatedWith(clazz)
+            Set<Class<?>> c = new Reflections(getClassLoader(), '').getTypesAnnotatedWith(clazz)
             classes.addAll(c)
         }
 
@@ -58,7 +57,11 @@ class ClassFinder {
         return classes
     }
 
-    private ClassLoader prepareClassLoader() {
+    private ClassLoader getClassLoader() {
+        if (classLoader) {
+            return classLoader
+        }
+
         def urls = []
         (project.configurations.compileClasspath.resolve() + project.configurations.runtimeClasspath.resolve()).each {
             urls.add(it.toURI().toURL())

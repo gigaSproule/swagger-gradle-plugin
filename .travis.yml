@@ -5,6 +5,15 @@ jdk:
   - oraclejdk9
   - oraclejdk8
   - openjdk8
+script:
+    - ./gradlew clean check
+    - ./gradlew install
+    - ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+    - ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+    - ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+    - ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+    - ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+    - ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

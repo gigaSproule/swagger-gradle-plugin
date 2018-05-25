@@ -21,8 +21,6 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             GenerateSwaggerDocsTask.TASK_NAME) as GenerateSwaggerDocsTask
 
         project.afterEvaluate {
-            generateSwaggerDocsTask.classFinder = classFinder
-            generateSwaggerDocsTask.resourceFinder = resourceFinder
             generateSwaggerDocsTask.outputDirectories = swaggerExtension.apiSourceExtensions.collect {
                 def directory = it.getSwaggerDirectory()
                 if (!directory) {

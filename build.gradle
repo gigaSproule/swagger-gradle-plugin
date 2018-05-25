@@ -103,7 +103,7 @@ test.dependsOn tasks.pluginUnderTestMetadata
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {
-        user = 'bintray_user'
+        user = bintray_user
         key = bintray_apiKey
 
         configurations = ['archives']

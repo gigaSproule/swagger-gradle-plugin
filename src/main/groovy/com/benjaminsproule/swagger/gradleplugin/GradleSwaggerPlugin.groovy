@@ -5,6 +5,7 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.internal.classloader.VisitableURLClassLoader
 
 class GradleSwaggerPlugin implements Plugin<Project> {
 
@@ -12,10 +13,26 @@ class GradleSwaggerPlugin implements Plugin<Project> {
     void apply(Project project) {
         ClassFinder classFinder = ClassFinder.getInstance(project)
         ResourceFinder resourceFinder = ResourceFinder.getInstance(project)
-        project.extensions.create('swagger', SwaggerExtension, project, classFinder, resourceFinder)
+        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, classFinder, resourceFinder)
 
-        project.task(GenerateSwaggerDocsTask.TASK_NAME,
-            type: GenerateSwaggerDocsTask,
-            dependsOn: 'classes')
+        def generateSwaggerDocsTask = project.task(type: GenerateSwaggerDocsTask,
+            dependsOn: 'classes',
+            constructorArgs: [classFinder, resourceFinder],
+            GenerateSwaggerDocsTask.TASK_NAME) as GenerateSwaggerDocsTask
+
+        project.afterEvaluate {
+            generateSwaggerDocsTask.classFinder = classFinder
+            generateSwaggerDocsTask.resourceFinder = resourceFinder
+            generateSwaggerDocsTask.outputDirectories = swaggerExtension.apiSourceExtensions.collect {
+                def directory = it.getSwaggerDirectory()
+                if (!directory) {
+                    directory = it.getOutputPath()
+                }
+                new File(directory)
+            }
+            generateSwaggerDocsTask.inputFiles = ((classFinder.classLoader as URLClassLoader).parent as VisitableURLClassLoader).URLs.collect {
+                new File(it.toURI())
+            }
+        }
     }
 }

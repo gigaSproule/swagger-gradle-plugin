@@ -103,7 +103,7 @@ test.dependsOn tasks.pluginUnderTestMetadata
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {
-        user = bintray_user
+        user = 'bintray_user'
         key = bintray_apiKey
 
         configurations = ['archives']
@@ -152,6 +152,6 @@ publishing {
 }
 
 tasks.jacocoTestReport.dependsOn('test')
-tasks.build.dependsOn('jacocoTestReport')
+tasks.check.dependsOn('jacocoTestReport')
 
 afterReleaseBuild.dependsOn publishPlugins

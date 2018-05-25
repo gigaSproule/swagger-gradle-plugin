@@ -17,8 +17,12 @@ import org.gradle.api.Task
 import org.gradle.api.internal.TaskInternal
 import org.gradle.api.specs.AndSpec
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
+
+import javax.inject.Inject
 
 import static com.benjaminsproule.swagger.gradleplugin.VersionUtils.ensureCompatibleSwaggerSpec
 
@@ -32,8 +36,20 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     String group = 'swagger'
 
-    private ClassFinder classFinder
-    private ResourceFinder resourceFinder
+    ClassFinder classFinder
+    ResourceFinder resourceFinder
+
+    @OutputDirectories
+    Iterable<File> outputDirectories
+
+    @InputFiles
+    Iterable<File> inputFiles
+
+    @Inject
+    GenerateSwaggerDocsTask(ClassFinder classFinder, ResourceFinder resourceFinder) {
+        this.classFinder = classFinder
+        this.resourceFinder = resourceFinder
+    }
 
     @Override
     Spec<? super TaskInternal> getOnlyIf() {
@@ -47,8 +63,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     @TaskAction
     generateSwaggerDocuments() {
         SwaggerExtension swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME) as SwaggerExtension
-        classFinder = ClassFinder.getInstance(project)
-        resourceFinder = ResourceFinder.getInstance(project)
 
         ensureCompatibleSwaggerSpec()
 

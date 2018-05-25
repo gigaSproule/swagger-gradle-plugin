@@ -1,12 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
-import io.swagger.models.Model
-import io.swagger.models.Operation
-import io.swagger.models.Path
-import io.swagger.models.Response
-import io.swagger.models.Swagger
-import io.swagger.models.Tag
+import io.swagger.models.*
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.web.bind.annotation.RequestMapping
 

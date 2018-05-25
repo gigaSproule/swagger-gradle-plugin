@@ -1,15 +1,12 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import org.apache.commons.text.RandomStringGenerator
-
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class ApiDocsITest extends AbstractPluginITest {
 
     def 'Use specified templates to generate Swagger docs'() {
         given:
-        def randomizer = new RandomStringGenerator.Builder().build().generate(5)
-        def expectedSwaggerDocsDirectory = "${testProjectDir}/swaggerdocs-${randomizer}"
+        def expectedSwaggerDocsDirectory = "${testProjectOutputDir}/swaggerdocs-${UUID.randomUUID()}"
         def expectedSwaggerApiDocsFile = "${expectedSwaggerDocsDirectory}/api.html"
         //Template path is not actually a template path but a template file and it probably has to be the root
         def templatePathValue = "classpath:/api-doc-template/strapdown.html.hbs"

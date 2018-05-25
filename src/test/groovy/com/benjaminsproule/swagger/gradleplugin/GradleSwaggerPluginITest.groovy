@@ -4,8 +4,7 @@ import groovy.json.JsonSlurper
 
 import java.nio.file.Files
 
-import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.*
 
 class GradleSwaggerPluginITest extends AbstractPluginITest {
 
@@ -21,7 +20,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                 apiSource {
                     locations = ['com.benjaminsproule']
                     info {
-                        title = project.name
+                        title = 'test'
                         version = '1'
                     }
                     swaggerDirectory = '${testProjectOutputDir}'
@@ -106,7 +105,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                     locations = ['com.benjaminsproule']
                     schemes = ['http']
                     info {
-                        title = project.name
+                        title = 'test'
                         version = '1'
                         license { name = 'Apache 2.0' }
                         contact { name = 'Joe Blogs' }
@@ -130,5 +129,132 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
         def swaggerFile = new File("${buildFile.getParentFile()}/build/libs/${buildFile.getParentFile().getName()}-${swaggerRelativeDirectory}.jar")
         assert swaggerFile.exists()
+    }
+
+    def 'Skips task if nothing has changed'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    attachSwaggerArtifact = true
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        """
+
+        when:
+        def firstRunResult = runPluginTask()
+        def secondRunResult = pluginTaskRunnerBuilder().withArguments(GenerateSwaggerDocsTask.TASK_NAME).build()
+
+        then:
+        firstRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+        secondRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == UP_TO_DATE
+    }
+
+    def 'Runs task if output directory changed'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    attachSwaggerArtifact = true
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        """
+
+        when:
+        def firstRunResult = runPluginTask()
+        def secondRunResult = pluginTaskRunnerBuilder().withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME).build()
+
+        then:
+        firstRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+        secondRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+    }
+
+    def 'Runs task if input directory changed'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    attachSwaggerArtifact = true
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        """
+
+        when:
+        def firstRunResult = runPluginTask()
+        def newClassFile = new File('build/classes/groovy/test/com/benjaminsproule/swagger/gradleplugin/NewGradleSwaggerPluginITest.class')
+        new File('build/classes/groovy/test/com/benjaminsproule/swagger/gradleplugin/GradleSwaggerPluginITest.class').readLines().each {
+            newClassFile.write(it.replace('GradleSwaggerPluginITest', 'NewGradleSwaggerPluginITest'))
+        }
+        def secondRunResult = pluginTaskRunnerBuilder().withArguments(GenerateSwaggerDocsTask.TASK_NAME).build()
+
+        then:
+        firstRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+        secondRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        cleanup:
+        newClassFile.delete()
     }
 }

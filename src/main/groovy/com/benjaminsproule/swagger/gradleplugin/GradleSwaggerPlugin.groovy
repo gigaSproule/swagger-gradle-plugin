@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,23 +11,31 @@ class GradleSwaggerPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         ClassFinder classFinder = ClassFinder.getInstance(project)
-        ResourceFinder resourceFinder = ResourceFinder.getInstance(project)
-        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, classFinder, resourceFinder)
+        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, classFinder)
 
         def generateSwaggerDocsTask = project.task(type: GenerateSwaggerDocsTask,
             dependsOn: 'classes',
-            constructorArgs: [classFinder, resourceFinder],
+            constructorArgs: [classFinder],
             GenerateSwaggerDocsTask.TASK_NAME) as GenerateSwaggerDocsTask
 
         project.afterEvaluate {
             generateSwaggerDocsTask.outputDirectories = swaggerExtension.apiSourceExtensions.collect {
-                def directory = it.getSwaggerDirectory()
-                if (!directory) {
-                    directory = it.getOutputPath()
+                if (it.swaggerDirectory) {
+                    return new File(it.swaggerDirectory)
                 }
-                new File(directory)
+                return null as File
+            }.findAll {
+                it != null
             }
-            generateSwaggerDocsTask.inputFiles = ((classFinder.classLoader as URLClassLoader).parent as VisitableURLClassLoader).URLs.collect {
+            generateSwaggerDocsTask.outputFile = swaggerExtension.apiSourceExtensions.collect {
+                if (it.outputPath) {
+                    return new File(it.outputPath)
+                }
+                return null as File
+            }.findAll {
+                it != null
+            }
+            generateSwaggerDocsTask.inputFiles = ((classFinder.getClassLoader() as URLClassLoader).parent as VisitableURLClassLoader).URLs.collect {
                 new File(it.toURI())
             }
         }

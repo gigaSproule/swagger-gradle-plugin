@@ -57,7 +57,7 @@ class ClassFinder {
         return classes
     }
 
-    private ClassLoader getClassLoader() {
+    ClassLoader getClassLoader() {
         if (classLoader) {
             return classLoader
         }
@@ -76,6 +76,8 @@ class ClassFinder {
         } else {
             urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
         }
+
+        urls.add(project.sourceSets.main.output.resourcesDir.toURI().toURL())
 
         return new URLClassLoader(urls as URL[], getClass().getClassLoader())
     }

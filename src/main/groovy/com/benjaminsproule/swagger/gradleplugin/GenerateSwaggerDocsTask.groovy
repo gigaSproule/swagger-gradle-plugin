@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
 import com.benjaminsproule.swagger.gradleplugin.misc.EnvironmentConfigurer
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
@@ -19,6 +18,7 @@ import org.gradle.api.specs.AndSpec
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectories
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 
@@ -36,19 +36,24 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     String group = 'swagger'
 
-    ClassFinder classFinder
-    ResourceFinder resourceFinder
-
     @OutputDirectories
     Iterable<File> outputDirectories
+
+    @OutputFiles
+    Iterable<File> outputFile
 
     @InputFiles
     Iterable<File> inputFiles
 
+    private ClassFinder classFinder
+    private ReaderFactory readerFactory
+    private GeneratorFactory generatorFactory
+
     @Inject
-    GenerateSwaggerDocsTask(ClassFinder classFinder, ResourceFinder resourceFinder) {
+    GenerateSwaggerDocsTask(ClassFinder classFinder) {
         this.classFinder = classFinder
-        this.resourceFinder = resourceFinder
+        this.readerFactory = new ReaderFactory(classFinder)
+        this.generatorFactory = new GeneratorFactory(classFinder)
     }
 
     @Override
@@ -86,17 +91,17 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
 
         // TODO: Replace below
-        new EnvironmentConfigurer(apiSourceExtension, classFinder, resourceFinder)
+        new EnvironmentConfigurer(apiSourceExtension, classFinder)
             .configureModelModifiers()
             .configureModelConverters()
             .configureSwaggerFilter()
             .initOutputDirectory()
 
-        def reader = new ReaderFactory(classFinder, apiSourceExtension).reader()
+        def reader = readerFactory.reader(apiSourceExtension)
         Swagger swagger = reader.read()
         swagger = applySwaggerFilter(swagger)
 
-        def generator = GeneratorFactory.generator(apiSourceExtension)
+        def generator = generatorFactory.generator(apiSourceExtension)
         generator.generate(swagger)
 
         if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory && this.project) {

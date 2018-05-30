@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.generator
 
 import com.benjaminsproule.swagger.gradleplugin.Utils
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.github.jknack.handlebars.Handlebars
@@ -8,7 +9,6 @@ import com.github.jknack.handlebars.Helper
 import com.github.jknack.handlebars.Options
 import com.github.jknack.handlebars.Template
 import com.github.jknack.handlebars.helper.StringHelpers
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader
 import com.github.jknack.handlebars.io.FileTemplateLoader
 import com.github.jknack.handlebars.io.TemplateLoader
 import groovy.transform.ToString
@@ -20,8 +20,14 @@ import java.nio.charset.Charset
 
 class ApiDocGenerator implements Generator {
     private static final Logger LOG = LoggerFactory.getLogger(ApiDocGenerator)
-    ApiSourceExtension apiSource
-    boolean isSorted = false
+    private ApiSourceExtension apiSourceExtension
+    private ClassFinder classFinder
+    private boolean isSorted = false
+
+    ApiDocGenerator(ApiSourceExtension apiSourceExtension, ClassFinder classFinder) {
+        this.apiSourceExtension = apiSourceExtension
+        this.classFinder = classFinder
+    }
 
     @Override
     void generate(Swagger source) {
@@ -29,13 +35,13 @@ class ApiDocGenerator implements Generator {
             Utils.sortSwagger(source)
             isSorted = true
         }
-        LOG.info("Writing swagger doc to ${apiSource.outputPath}")
+        LOG.info("Writing swagger doc to ${apiSourceExtension.outputPath}")
 
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(apiSource.outputPath)
+            FileOutputStream fileOutputStream = new FileOutputStream(apiSourceExtension.outputPath)
             OutputStreamWriter writer = new OutputStreamWriter(fileOutputStream, Charset.forName("UTF-8"))
 
-            TemplatePath tp = parseTemplateUrl(apiSource.templatePath)
+            TemplatePath tp = parseTemplateUrl(apiSourceExtension.templatePath)
 
             Handlebars handlebars = new Handlebars(tp.loader)
             initHandlebars(handlebars)
@@ -85,15 +91,18 @@ class ApiDocGenerator implements Generator {
         handlebars.registerHelper(StringHelpers.lower.name(), StringHelpers.lower)
     }
 
-    private static TemplatePath parseTemplateUrl(String templatePath) throws GenerateException {
+    private TemplatePath parseTemplateUrl(String templatePath) throws GenerateException {
         if (templatePath == null) {
             return null
         }
         TemplatePath tp
         if (templatePath.startsWith(Utils.CLASSPATH)) {
             String resPath = templatePath.substring(Utils.CLASSPATH.length())
+            if (resPath.startsWith('/')) {
+                resPath = resPath.substring(1, resPath.length())
+            }
             tp = extractTemplateObject(resPath)
-            tp.loader = new ClassPathTemplateLoader(tp.prefix, tp.suffix)
+            tp.loader = new ClassPathTemplateLoaderImpl(tp.prefix, tp.suffix, classFinder)
         } else {
             tp = extractTemplateObject(templatePath)
             tp.loader = new FileTemplateLoader(tp.prefix, tp.suffix)

@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.misc
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.resolver.ModelModifier
@@ -18,22 +17,20 @@ import org.slf4j.LoggerFactory
 
 class EnvironmentConfigurer {
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentConfigurer)
-    ApiSourceExtension apiSource
+    ApiSourceExtension apiSourceExtension
     private ClassFinder classFinder
-    private ResourceFinder resourceFinder
 
-    EnvironmentConfigurer(ApiSourceExtension apiSourceExtension, ClassFinder classFinder, ResourceFinder resourceFinder) {
-        this.apiSource = apiSourceExtension
+    EnvironmentConfigurer(ApiSourceExtension apiSourceExtension, ClassFinder classFinder) {
+        this.apiSourceExtension = apiSourceExtension
         this.classFinder = classFinder
-        this.resourceFinder = resourceFinder
     }
 
     EnvironmentConfigurer initOutputDirectory() {
-        if (apiSource.outputPath) {
-            def outputDirectory = new File(apiSource.outputPath).getParentFile()
+        if (apiSourceExtension.outputPath) {
+            def outputDirectory = new File(apiSourceExtension.outputPath).getParentFile()
             if (outputDirectory && !outputDirectory.exists()) {
                 if (!outputDirectory.mkdirs()) {
-                    throw new GradleException("Create directory[${apiSource.getOutputPath()}] for output failed.")
+                    throw new GradleException("Create directory[${apiSourceExtension.getOutputPath()}] for output failed.")
                 }
             }
         }
@@ -42,12 +39,12 @@ class EnvironmentConfigurer {
     }
 
     EnvironmentConfigurer configureSwaggerFilter() {
-        if (apiSource.getSwaggerInternalFilter() != null) {
+        if (apiSourceExtension.getSwaggerInternalFilter() != null) {
             try {
-                LOG.info("Setting filter configuration: " + apiSource.getSwaggerInternalFilter())
-                FilterFactory.setFilter((SwaggerSpecFilter) Class.forName(apiSource.getSwaggerInternalFilter()).newInstance())
+                LOG.info("Setting filter configuration: " + apiSourceExtension.getSwaggerInternalFilter())
+                FilterFactory.setFilter((SwaggerSpecFilter) Class.forName(apiSourceExtension.getSwaggerInternalFilter()).newInstance())
             } catch (Exception e) {
-                throw new GenerateException("Cannot load: " + apiSource.getSwaggerInternalFilter(), e)
+                throw new GenerateException("Cannot load: " + apiSourceExtension.getSwaggerInternalFilter(), e)
             }
         }
 
@@ -55,8 +52,8 @@ class EnvironmentConfigurer {
     }
 
     EnvironmentConfigurer configureModelConverters() {
-        if (apiSource.getModelConverters()) {
-            apiSource.getModelConverters().each { String modelConverter ->
+        if (apiSourceExtension.getModelConverters()) {
+            apiSourceExtension.getModelConverters().each { String modelConverter ->
                 try {
                     def modelConverterClass = Class.forName(modelConverter)
                     if (ModelConverter.class.isAssignableFrom(modelConverterClass)) {
@@ -84,12 +81,12 @@ class EnvironmentConfigurer {
         optionallyRegisterJaxbModule(objectMapper)
 
         ModelModifier modelModifier = new ModelModifier(objectMapper, classFinder)
-        if (apiSource.apiModelPropertyAccessExclusions) {
-            modelModifier.setApiModelPropertyAccessExclusions(apiSource.apiModelPropertyAccessExclusions)
+        if (apiSourceExtension.apiModelPropertyAccessExclusions) {
+            modelModifier.setApiModelPropertyAccessExclusions(apiSourceExtension.apiModelPropertyAccessExclusions)
         }
 
-        if (apiSource.modelSubstitute) {
-            resourceFinder.getResourceAsStream(apiSource.modelSubstitute).eachLine { line ->
+        if (apiSourceExtension.modelSubstitute) {
+            classFinder.getClassLoader().getResourceAsStream(apiSourceExtension.modelSubstitute).eachLine { line ->
                 def classes = line.split(":")
                 if (classes.length != 2) {
                     throw new GenerateException('Bad format of override model file, it should be ${actualClassName}:${expectClassName}')
@@ -103,9 +100,9 @@ class EnvironmentConfigurer {
     }
 
     private void optionallyRegisterJaxbModule(ObjectMapper objectMapper) {
-        if (apiSource.isUseJAXBAnnotationProcessor()) {
+        if (apiSourceExtension.isUseJAXBAnnotationProcessor()) {
             JaxbAnnotationModule jaxbAnnotationModule = new JaxbAnnotationModule()
-            if (apiSource.isUseJAXBAnnotationProcessorAsPrimary()) {
+            if (apiSourceExtension.isUseJAXBAnnotationProcessorAsPrimary()) {
                 jaxbAnnotationModule.setPriority(JaxbAnnotationModule.Priority.PRIMARY)
             } else {
                 jaxbAnnotationModule.setPriority(JaxbAnnotationModule.Priority.SECONDARY)

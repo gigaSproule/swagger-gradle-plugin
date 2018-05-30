@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import groovy.transform.ToString
 import org.gradle.api.Project
 
@@ -11,14 +10,12 @@ class SwaggerExtension implements ModelValidator {
 
     private Project project
     private ClassFinder classFinder
-    private ResourceFinder resourceFinder
 
     Collection<ApiSourceExtension> apiSourceExtensions = new ArrayList<>()
 
-    SwaggerExtension(Project project, ClassFinder classFinder, ResourceFinder resourceFinder) {
+    SwaggerExtension(Project project, ClassFinder classFinder) {
         this.project = project
         this.classFinder = classFinder
-        this.resourceFinder = resourceFinder
         this.apiSourceExtensions = new ArrayList<>()
     }
 
@@ -27,7 +24,7 @@ class SwaggerExtension implements ModelValidator {
      * @param closure InfoExtension closure
      */
     void apiSource(Closure closure) {
-        ApiSourceExtension apiSourceExtension = project.configure(new ApiSourceExtension(project, classFinder, resourceFinder), closure) as ApiSourceExtension
+        ApiSourceExtension apiSourceExtension = project.configure(new ApiSourceExtension(project, classFinder), closure) as ApiSourceExtension
         apiSourceExtensions.add(apiSourceExtension)
     }
 

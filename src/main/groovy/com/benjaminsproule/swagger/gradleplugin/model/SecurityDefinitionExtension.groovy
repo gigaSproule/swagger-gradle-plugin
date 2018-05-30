@@ -1,6 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -24,10 +24,10 @@ class SecurityDefinitionExtension implements ModelValidator, Swagerable<Map<Stri
     String description
     String json
     String jsonPath
-    private ResourceFinder resourceFinder
+    private ClassFinder classFinder
 
-    SecurityDefinitionExtension(ResourceFinder resourceFinder) {
-        this.resourceFinder = resourceFinder
+    SecurityDefinitionExtension(ClassFinder classFinder) {
+        this.classFinder = classFinder
     }
 
     @Override
@@ -82,7 +82,7 @@ class SecurityDefinitionExtension implements ModelValidator, Swagerable<Map<Stri
 
         try {
             InputStream jsonStream = json != null ?
-                resourceFinder.getResourceAsStream(json)
+                classFinder.getClassLoader().getResourceAsStream(json)
                 : new FileInputStream(jsonPath)
 
             JsonNode tree = new ObjectMapper().readTree(jsonStream)

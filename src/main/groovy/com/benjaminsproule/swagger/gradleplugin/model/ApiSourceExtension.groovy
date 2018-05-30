@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import groovy.transform.ToString
 import io.swagger.annotations.Contact
 import io.swagger.annotations.Info
@@ -46,9 +45,8 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     List<String> apiModelPropertyAccessExclusionsList
 
     private ClassFinder classFinder
-    private ResourceFinder resourceFinder
 
-    ApiSourceExtension(Project project, ClassFinder classFinder, ResourceFinder resourceFinder) {
+    ApiSourceExtension(Project project, ClassFinder classFinder) {
         this.project = project
 
         if (this.apiModelPropertyAccessExclusionsList != null) {
@@ -60,7 +58,6 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
         }
 
         this.classFinder = classFinder
-        this.resourceFinder = resourceFinder
     }
 
     void info(Closure closure) {
@@ -68,7 +65,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     }
 
     void securityDefinition(Closure closure) {
-        securityDefinition = project.configure(new SecurityDefinitionExtension(resourceFinder), closure) as SecurityDefinitionExtension
+        securityDefinition = project.configure(new SecurityDefinitionExtension(classFinder), closure) as SecurityDefinitionExtension
     }
 
     @Override

@@ -13,24 +13,22 @@ import java.lang.reflect.Type
 class ReaderFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ReaderFactory)
     private ClassFinder classFinder
-    ApiSourceExtension apiSourceExtension
 
-    ReaderFactory(ClassFinder classFinder, ApiSourceExtension apiSourceExtension) {
+    ReaderFactory(ClassFinder classFinder) {
         this.classFinder = classFinder
-        this.apiSourceExtension = apiSourceExtension
     }
 
-    ClassSwaggerReader reader() {
+    ClassSwaggerReader reader(ApiSourceExtension apiSourceExtension) {
         if (apiSourceExtension.springmvc) {
-            return new SpringMvcApiReader(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions(), classFinder)
+            return new SpringMvcApiReader(apiSourceExtension, loadTypesToSkip(apiSourceExtension), resolveSwaggerExtensions(apiSourceExtension), classFinder)
         } else if (apiSourceExtension.getSwaggerApiReader()) {
-            return getCustomApiReader()
+            return getCustomApiReader(apiSourceExtension)
         } else {
-            return new JaxrsReader(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions(), classFinder)
+            return new JaxrsReader(apiSourceExtension, loadTypesToSkip(apiSourceExtension), resolveSwaggerExtensions(apiSourceExtension), classFinder)
         }
     }
 
-    private Set<Type> loadTypesToSkip() throws GenerateException {
+    private Set<Type> loadTypesToSkip(ApiSourceExtension apiSourceExtension) throws GenerateException {
         def typesToSkip = []
 
         if (!apiSourceExtension.getTypesToSkip()) {
@@ -55,14 +53,14 @@ class ReaderFactory {
      * @return Collection < SwaggerExtension >  which should be added to the swagger configuration
      * @throws GenerateException if the swagger extensions could not be created / resolved
      */
-    private List<SwaggerExtension> resolveSwaggerExtensions() throws GenerateException {
+    private List<SwaggerExtension> resolveSwaggerExtensions(ApiSourceExtension apiSourceExtension) throws GenerateException {
         List<String> clazzes = apiSourceExtension.getSwaggerExtensions()
         List<SwaggerExtension> resolved = new ArrayList<SwaggerExtension>()
         if (clazzes != null) {
             for (String clazz : clazzes) {
                 SwaggerExtension extension
                 try {
-                    extension = (SwaggerExtension) Class.forName(clazz).newInstance([])
+                    extension = (SwaggerExtension) classFinder.loadClass(clazz).newInstance([])
                 } catch (Exception e) {
                     throw new GenerateException("Cannot load Swagger extension: " + clazz, e)
                 }
@@ -73,7 +71,7 @@ class ReaderFactory {
     }
 
     // TODO: Create tests for custom API reader
-    private ClassSwaggerReader getCustomApiReader() throws GenerateException {
+    private ClassSwaggerReader getCustomApiReader(ApiSourceExtension apiSourceExtension) throws GenerateException {
         String customReaderClassName = apiSourceExtension.getSwaggerApiReader()
         try {
             LOG.info("Reading custom API reader: " + customReaderClassName)

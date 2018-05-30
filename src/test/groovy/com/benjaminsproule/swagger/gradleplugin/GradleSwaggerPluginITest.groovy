@@ -3,6 +3,7 @@ package com.benjaminsproule.swagger.gradleplugin
 import groovy.json.JsonSlurper
 
 import java.nio.file.Files
+import java.nio.file.Paths
 
 import static org.gradle.testkit.runner.TaskOutcome.*
 
@@ -204,7 +205,8 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
         when:
         def firstRunResult = runPluginTask()
-        def secondRunResult = pluginTaskRunnerBuilder().withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME).build()
+        Files.delete(Paths.get("${expectedSwaggerDirectory}/swagger.json"))
+        def secondRunResult = pluginTaskRunnerBuilder().withArguments(GenerateSwaggerDocsTask.TASK_NAME).build()
 
         then:
         firstRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
@@ -256,5 +258,48 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
         cleanup:
         newClassFile.delete()
+    }
+
+    def 'Can apply plugin before declaring dependencies'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+
+            repositories {
+                mavenLocal()
+                mavenCentral()
+            }
+
+            dependencies {
+                compile 'io.swagger:swagger-jersey2-jaxrs:+'
+            }
+
+            swagger {
+                apiSource {
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                }
+            }
+        """
+
+        when:
+        def runResult = runPluginTask()
+
+        then:
+        runResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
     }
 }

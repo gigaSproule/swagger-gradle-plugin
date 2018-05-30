@@ -1,7 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
 import io.swagger.models.Info
 import io.swagger.models.Scheme
 import io.swagger.models.auth.BasicAuthDefinition
@@ -15,8 +14,7 @@ class ApiSourceExtensionTest extends Specification {
     def setup() {
         project = Mock(Project)
         def classFinder = Mock(ClassFinder)
-        def resourceFinder = Mock(ResourceFinder)
-        apiSourceExtension = new ApiSourceExtension(project, classFinder, resourceFinder)
+        apiSourceExtension = new ApiSourceExtension(project, classFinder)
     }
 
     def 'Valid api source validation returns no errors'() {

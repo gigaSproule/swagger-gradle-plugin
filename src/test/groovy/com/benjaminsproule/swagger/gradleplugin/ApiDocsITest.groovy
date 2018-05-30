@@ -40,7 +40,7 @@ class ApiDocsITest extends AbstractPluginITest {
                     securityDefinition {
                         name = 'MyBasicAuth'
                         type = 'basic'
-                    }
+                    } 
                     templatePath = '${templatePathValue}'
                     outputPath = '${expectedSwaggerApiDocsFile}'
                 }
@@ -53,7 +53,6 @@ class ApiDocsITest extends AbstractPluginITest {
         then:
         result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
-        def swaggerDir = new File(expectedSwaggerApiDocsFile)
-        assert swaggerDir
+        assert new File(expectedSwaggerApiDocsFile).exists()
     }
 }

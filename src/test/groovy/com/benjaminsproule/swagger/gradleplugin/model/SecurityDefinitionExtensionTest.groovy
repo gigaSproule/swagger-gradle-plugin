@@ -1,17 +1,17 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
-import com.benjaminsproule.swagger.gradleplugin.classpath.ResourceFinder
+import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import io.swagger.models.auth.In
 import io.swagger.models.auth.SecuritySchemeDefinition
 import spock.lang.Specification
 
 class SecurityDefinitionExtensionTest extends Specification {
     SecurityDefinitionExtension securityDefinitionExtension
-    private resourceFinder
+    private ClassFinder classFinder
 
     def setup() {
-        resourceFinder = Mock(ResourceFinder)
-        securityDefinitionExtension = new SecurityDefinitionExtension(resourceFinder)
+        classFinder = Mock(ClassFinder)
+        securityDefinitionExtension = new SecurityDefinitionExtension(classFinder)
     }
 
     def 'Valid security definition of type basic returns no errors'() {
@@ -120,7 +120,9 @@ class SecurityDefinitionExtensionTest extends Specification {
     def 'Load Security Definitions from file'() {
         given:
         securityDefinitionExtension.json = 'security-definition/securityDefinitionExtensionTest.json'
-        resourceFinder.getResourceAsStream(securityDefinitionExtension.json) >> getClass().getClassLoader().getResourceAsStream(securityDefinitionExtension.json)
+        def classLoader = Mock(ClassLoader)
+        classFinder.getClassLoader() >> classLoader
+        classLoader.getResourceAsStream(securityDefinitionExtension.json) >> getClass().getClassLoader().getResourceAsStream(securityDefinitionExtension.json)
 
         when:
         def result = securityDefinitionExtension.asSwaggerType()

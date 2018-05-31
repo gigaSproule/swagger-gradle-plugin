@@ -1,6 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.test.kotlin.springmvc
 
-import com.benjaminsproule.swagger.gradleplugin.ignore.IgnoredModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel
 import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel
 import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel
 import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel

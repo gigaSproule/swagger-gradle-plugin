@@ -23,8 +23,9 @@ class ClassFinderTest extends Specification {
         project.plugins.apply JavaPlugin
         project.metaClass.configurations = configurations
 
+        def classFinder = new ClassFinder(project)
+
         when:
-        def classFinder = ClassFinder.getInstance(project)
         def compileClass = classFinder.loadClass('TestCompileClass')
         def runtimeClass = classFinder.loadClass('TestRuntimeClass')
 

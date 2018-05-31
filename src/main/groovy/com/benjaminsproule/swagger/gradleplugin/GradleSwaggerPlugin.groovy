@@ -10,13 +10,19 @@ class GradleSwaggerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        ClassFinder classFinder = ClassFinder.getInstance(project)
+        def classFinder = new ClassFinder(project)
         SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, classFinder)
 
         def generateSwaggerDocsTask = project.task(type: GenerateSwaggerDocsTask,
             dependsOn: 'classes',
             constructorArgs: [classFinder],
+            group: 'swagger',
+            description: 'Generates swagger documentation',
             GenerateSwaggerDocsTask.TASK_NAME) as GenerateSwaggerDocsTask
+
+        if (project.hasProperty('swagger.skip')) {
+            generateSwaggerDocsTask.enabled = false
+        }
 
         project.afterEvaluate {
             generateSwaggerDocsTask.outputDirectories = swaggerExtension.apiSourceExtensions.collect {

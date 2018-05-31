@@ -19,14 +19,6 @@ class ClassFinder {
         this.classCache = new HashMap<>()
     }
 
-    //FIXME hack until we have some DI working
-    static ClassFinder getInstance(Project project) {
-        if (!instance) {
-            instance = new ClassFinder(project)
-        }
-        instance
-    }
-
     Class<?> loadClass(String name) {
         return getClassLoader().loadClass(name)
     }

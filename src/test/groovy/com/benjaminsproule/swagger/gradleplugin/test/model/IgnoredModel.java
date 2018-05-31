@@ -1,4 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin.ignore;
+package com.benjaminsproule.swagger.gradleplugin.test.model;
 
 public class IgnoredModel {
     private String name;

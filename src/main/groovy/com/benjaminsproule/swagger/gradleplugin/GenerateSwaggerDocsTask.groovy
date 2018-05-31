@@ -12,10 +12,6 @@ import io.swagger.models.Swagger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
-import org.gradle.api.Task
-import org.gradle.api.internal.TaskInternal
-import org.gradle.api.specs.AndSpec
-import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.OutputFiles
@@ -31,10 +27,6 @@ import static com.benjaminsproule.swagger.gradleplugin.VersionUtils.ensureCompat
  */
 class GenerateSwaggerDocsTask extends DefaultTask {
     public static final String TASK_NAME = 'generateSwaggerDocumentation'
-
-    String description = 'Generates swagger documentation'
-
-    String group = 'swagger'
 
     @OutputDirectories
     Iterable<File> outputDirectories
@@ -54,15 +46,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         this.classFinder = classFinder
         this.readerFactory = new ReaderFactory(classFinder)
         this.generatorFactory = new GeneratorFactory(classFinder)
-    }
-
-    @Override
-    Spec<? super TaskInternal> getOnlyIf() {
-        return new AndSpec<Task>(new Spec<Task>() {
-            boolean isSatisfiedBy(Task element) {
-                return element == GenerateSwaggerDocsTask.this && enabled && !(project.findProperty('swagger.skip') ?: false)
-            }
-        })
     }
 
     @TaskAction

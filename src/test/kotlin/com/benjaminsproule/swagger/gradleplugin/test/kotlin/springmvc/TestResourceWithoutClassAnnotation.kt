@@ -8,6 +8,7 @@ import io.swagger.annotations.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 
 import java.util.Collections.singletonList
 
@@ -20,13 +21,13 @@ open class TestResourceWithoutClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "A default operation")
+    @ApiOperation("A default operation")
     @RequestMapping(path = ["/root/withoutannotation/default"], method = [(RequestMethod.GET)])
     fun defaultResponse(): ResponseEntity<Any> {
         return ResponseEntity.ok().build()
     }
 
-    @ApiOperation(value = "A generics operation")
+    @ApiOperation("A generics operation")
     @RequestMapping(path = ["/root/withoutannotation/generics"], method = [(RequestMethod.POST)])
     fun generics(@ApiParam body: List<RequestModel>): List<String> {
         return singletonList("")
@@ -38,13 +39,13 @@ open class TestResourceWithoutClassAnnotation {
         return ResponseEntity.ok().build()
     }
 
-    @ApiOperation(value = "A response operation", response = ResponseModel::class)
+    @ApiOperation("A response operation", response = ResponseModel::class)
     @RequestMapping(path = ["/root/withoutannotation/response"], method = [(RequestMethod.POST)])
     fun response(@ApiParam body: List<RequestModel>): ResponseModel {
         return ResponseModel()
     }
 
-    @ApiOperation(value = "A response container operation", response = ResponseModel::class, responseContainer = "List")
+    @ApiOperation("A response container operation", response = ResponseModel::class, responseContainer = "List")
     @RequestMapping(path = ["/root/withoutannotation/responseContainer"], method = [(RequestMethod.POST)])
     fun responseContainer(@ApiParam body: List<RequestModel>): List<ResponseModel> {
         return singletonList(ResponseModel())
@@ -63,7 +64,7 @@ open class TestResourceWithoutClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "An auth operation", authorizations = [
+    @ApiOperation("An auth operation", authorizations = [
         Authorization(value = "oauth2", scopes = [
             AuthorizationScope(scope = "scope", description = "scope description")
         ])
@@ -73,7 +74,7 @@ open class TestResourceWithoutClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "A model operation")
+    @ApiOperation("A model operation")
     @RequestMapping(path = ["/root/withoutannotation/model"], method = [(RequestMethod.GET)])
     fun model(): String {
         return ""
@@ -91,14 +92,18 @@ open class TestResourceWithoutClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "A hidden operation", hidden = true)
+    @ApiOperation("A hidden operation", hidden = true)
     @RequestMapping(path = ["/root/withoutannotation/hidden"], method = [(RequestMethod.GET)])
     fun hidden(): String {
         return ""
     }
 
-    @ApiOperation(value = "An ignored model")
-    @RequestMapping(value = ["/root/withoutannotation/ignoredModel"], method = [(RequestMethod.GET)])
+    @ApiOperation("A multiple parameters operation")
+    @RequestMapping(path = ["/root/withoutannotation/multipleParameters/{parameter1}"], method = [(RequestMethod.GET)])
+    fun multipleParameters(@RequestParam("parameter1") parameterDouble: Double, @RequestParam(name = "parameter2", required = false) parameterBool: Boolean): String {
+        return ""
+    }
+
     fun ignoredModel(ignoredModel: IgnoredModel): String {
         return ""
     }

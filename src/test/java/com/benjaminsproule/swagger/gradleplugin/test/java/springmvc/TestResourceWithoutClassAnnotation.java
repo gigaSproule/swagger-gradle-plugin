@@ -8,6 +8,7 @@ import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,13 +23,13 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "A default operation")
+    @ApiOperation("A default operation")
     @RequestMapping(path = "/root/withoutannotation/default", method = RequestMethod.GET)
     public ResponseEntity<?> defaultResponse() {
         return ResponseEntity.ok().build();
     }
 
-    @ApiOperation(value = "A generics operation")
+    @ApiOperation("A generics operation")
     @RequestMapping(path = "/root/withoutannotation/generics", method = RequestMethod.POST)
     public List<String> generics(@ApiParam List<RequestModel> body) {
         return singletonList("");
@@ -75,7 +76,7 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "A model operation")
+    @ApiOperation("A model operation")
     @RequestMapping(path = "/root/withoutannotation/model", method = RequestMethod.GET)
     public String model() {
         return "";
@@ -99,9 +100,15 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "An ignored model")
-    @RequestMapping(value = "/root/withoutannotation/ignoredModel", method = RequestMethod.GET)
-    public String ignoredModel(IgnoredModel ignoredModel) {
+    @ApiOperation("A multiple parameters operation")
+    @RequestMapping(path = "/root/withoutannotation/multipleParameters/{parameter1}", method = RequestMethod.GET)
+    public String multipleParameters(
+        @RequestParam("parameter1") Double parameterDouble,
+        @RequestParam(name = "parameter2", required = false) Boolean parameterBool) {
+        return "";
+    }
+
+    String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
 }

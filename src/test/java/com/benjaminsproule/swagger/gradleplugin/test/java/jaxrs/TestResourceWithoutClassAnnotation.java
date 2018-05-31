@@ -22,14 +22,14 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "A default operation")
+    @ApiOperation("A default operation")
     @Path("/root/withoutannotation/default")
     @GET
     public Response defaultResponse() {
         return Response.ok().build();
     }
 
-    @ApiOperation(value = "A generics operation")
+    @ApiOperation("A generics operation")
     @Path("/root/withoutannotation/generics")
     @POST
     public List<String> generics(@ApiParam List<RequestModel> body) {
@@ -48,14 +48,14 @@ public class TestResourceWithoutClassAnnotation {
     @ApiOperation(value = "A response operation", response = ResponseModel.class)
     @Path("/root/withoutannotation/response")
     @POST
-    public ResponseModel response(@ApiParam List<RequestModel> body) {
+    public ResponseModel response() {
         return new ResponseModel();
     }
 
     @ApiOperation(value = "A response container operation", response = ResponseModel.class, responseContainer = "List")
     @Path("/root/withoutannotation/responseContainer")
     @POST
-    public List<ResponseModel> responseContainer(@ApiParam List<RequestModel> body) {
+    public List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel());
     }
 
@@ -85,7 +85,7 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "A model operation")
+    @ApiOperation("A model operation")
     @Path("/root/withoutannotation/model")
     @GET
     public String model() {
@@ -113,10 +113,14 @@ public class TestResourceWithoutClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "An ignored model")
-    @Path("/root/withoutannotation/ignoredModel")
+    @ApiOperation("A multiple parameters operation")
+    @Path("/root/withoutannotation/multipleParameters/{parameter1}")
     @GET
-    public String ignoredModel(IgnoredModel ignoredModel) {
+    public String multipleParameters(@PathParam("parameter1") Double parameterDouble, @QueryParam("parameter2") Boolean parameterBool) {
+        return "";
+    }
+
+    String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
 }

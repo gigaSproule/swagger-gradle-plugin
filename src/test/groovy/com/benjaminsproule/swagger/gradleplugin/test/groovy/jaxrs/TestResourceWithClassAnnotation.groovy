@@ -22,14 +22,14 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'A default operation')
+    @ApiOperation('A default operation')
     @Path('/default')
     @GET
     Response defaultResponse() {
         return Response.ok().build()
     }
 
-    @ApiOperation(value = 'A generics operation')
+    @ApiOperation('A generics operation')
     @Path('/generics')
     @POST
     List<String> generics(@ApiParam List<RequestModel> body) {
@@ -48,14 +48,14 @@ class TestResourceWithClassAnnotation {
     @ApiOperation(value = 'A response operation', response = ResponseModel.class)
     @Path('/response')
     @POST
-    ResponseModel response(@ApiParam List<RequestModel> body) {
+    ResponseModel response() {
         return new ResponseModel()
     }
 
     @ApiOperation(value = 'A response container operation', response = ResponseModel.class, responseContainer = 'List')
     @Path('/responseContainer')
     @POST
-    List<ResponseModel> responseContainer(@ApiParam List<RequestModel> body) {
+    List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel())
     }
 
@@ -85,7 +85,7 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'A model operation')
+    @ApiOperation('A model operation')
     @Path('/model')
     @GET
     String model() {
@@ -113,9 +113,14 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'An ignored model')
-    @Path('/ignoredModel')
+    @ApiOperation('A multiple parameters operation')
+    @Path('/multipleParameters/{parameter1}')
     @GET
+    String multipleParameters(
+        @PathParam("parameter1") Double parameterDouble, @QueryParam("parameter2") Boolean parameterBool) {
+        return ''
+    }
+
     String ignoredModel(IgnoredModel ignoredModel) {
         return ''
     }

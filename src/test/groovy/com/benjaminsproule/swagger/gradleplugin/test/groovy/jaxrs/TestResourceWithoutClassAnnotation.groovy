@@ -21,14 +21,14 @@ class TestResourceWithoutClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'A default operation')
+    @ApiOperation('A default operation')
     @Path('/root/withoutannotation/default')
     @GET
     Response defaultResponse() {
         return Response.ok().build()
     }
 
-    @ApiOperation(value = 'A generics operation')
+    @ApiOperation('A generics operation')
     @Path('/root/withoutannotation/generics')
     @POST
     List<String> generics(@ApiParam List<RequestModel> body) {
@@ -47,14 +47,14 @@ class TestResourceWithoutClassAnnotation {
     @ApiOperation(value = 'A response operation', response = ResponseModel.class)
     @Path('/root/withoutannotation/response')
     @POST
-    ResponseModel response(@ApiParam List<RequestModel> body) {
+    ResponseModel response() {
         return new ResponseModel()
     }
 
     @ApiOperation(value = 'A response container operation', response = ResponseModel.class, responseContainer = 'List')
     @Path('/root/withoutannotation/responseContainer')
     @POST
-    List<ResponseModel> responseContainer(@ApiParam List<RequestModel> body) {
+    List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel())
     }
 
@@ -84,7 +84,7 @@ class TestResourceWithoutClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'A model operation')
+    @ApiOperation('A model operation')
     @Path('/root/withoutannotation/model')
     @GET
     String model() {
@@ -112,9 +112,13 @@ class TestResourceWithoutClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'An ignored model')
-    @Path('/root/withoutannotation/ignoredModel')
+    @ApiOperation('A multiple parameters operation')
+    @Path('/root/withoutannotation/multipleParameters/{parameter1}')
     @GET
+    String multipleParameters(@PathParam("parameter1") Double parameterDouble, @QueryParam("parameter2") Boolean parameterBool) {
+        return ''
+    }
+
     String ignoredModel(IgnoredModel ignoredModel) {
         return ''
     }

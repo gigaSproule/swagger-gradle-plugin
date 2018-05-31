@@ -214,8 +214,6 @@ class OutputITest extends AbstractPluginITest {
     }
 
     private static void assertSwaggerDocument(def producedSwaggerDocument, String format, String type) {
-        def ok = format == 'json' ? '200' : 200
-
         assert producedSwaggerDocument.swagger == '2.0'
         assert producedSwaggerDocument.host == 'localhost:8080'
         assert producedSwaggerDocument.basePath == '/'
@@ -240,271 +238,8 @@ class OutputITest extends AbstractPluginITest {
         def paths = producedSwaggerDocument.paths
         assert paths
         assert paths.size() == 26
-        assert paths.'/root/withannotation/basic'.get.tags == ['Test']
-        assert paths.'/root/withannotation/basic'.get.summary == 'A basic operation'
-        assert paths.'/root/withannotation/basic'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/basic'.get.operationId == 'basic'
-        assert paths.'/root/withannotation/basic'.get.produces == null
-        assert paths.'/root/withannotation/basic'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/basic'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/basic'.get.security.basic
-
-        assert paths.'/root/withannotation/default'.get.tags == ['Test']
-        assert paths.'/root/withannotation/default'.get.summary == 'A default operation'
-        assert paths.'/root/withannotation/default'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/default'.get.operationId == 'defaultResponse'
-        assert paths.'/root/withannotation/default'.get.produces == null
-        if (paths.'/root/withannotation/default'.get.responses.default) {
-            assert paths.'/root/withannotation/default'.get.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withannotation/default'.get.responses.get(ok)) {
-            assert paths.'/root/withannotation/default'.get.responses.get(ok).description == 'successful operation'
-        } else {
-            assert false: 'No response found for /root/withannotation/default'
-        }
-        assert paths.'/root/withannotation/default'.get.security.basic
-
-        assert paths.'/root/withannotation/generics'.post.tags == ['Test']
-        assert paths.'/root/withannotation/generics'.post.summary == 'A generics operation'
-        assert paths.'/root/withannotation/generics'.post.description == 'Test resource'
-        assert paths.'/root/withannotation/generics'.post.operationId == 'generics'
-        assert paths.'/root/withannotation/generics'.post.produces == null
-        assert paths.'/root/withannotation/generics'.post.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/generics'.post.responses.get(ok).schema.type == 'array'
-        assert paths.'/root/withannotation/generics'.post.responses.get(ok).schema.items.type == type
-        assert paths.'/root/withannotation/generics'.post.security.basic
-
-        assert paths.'/root/withannotation/datatype'.post.tags == ['Test']
-        assert paths.'/root/withannotation/datatype'.post.summary == 'Consumes and Produces operation'
-        assert paths.'/root/withannotation/datatype'.post.description == 'Test resource'
-        assert paths.'/root/withannotation/datatype'.post.operationId == 'dataType'
-        assert paths.'/root/withannotation/datatype'.post.produces == ['application/json']
-        if (paths.'/root/withannotation/datatype'.post.responses.default) {
-            assert paths.'/root/withannotation/datatype'.post.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withannotation/datatype'.post.responses.get(ok)) {
-            assert paths.'/root/withannotation/datatype'.post.responses.get(ok).description == 'successful operation'
-        } else {
-            assert false: 'No response found for /root/withannotation/datatype'
-        }
-        assert paths.'/root/withannotation/datatype'.post.security.basic
-
-        assert paths.'/root/withannotation/response'.post.tags == ['Test']
-        assert paths.'/root/withannotation/response'.post.summary == 'A response operation'
-        assert paths.'/root/withannotation/response'.post.description == 'Test resource'
-        assert paths.'/root/withannotation/response'.post.operationId == 'response'
-        assert paths.'/root/withannotation/response'.post.produces == null
-        assert paths.'/root/withannotation/response'.post.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/response'.post.responses.get(ok).schema.type == null
-        assert paths.'/root/withannotation/response'.post.responses.get(ok).schema.'$ref' == '#/definitions/ResponseModel'
-        assert paths.'/root/withannotation/response'.post.security.basic
-
-        assert paths.'/root/withannotation/responseContainer'.post.tags == ['Test']
-        assert paths.'/root/withannotation/responseContainer'.post.summary == 'A response container operation'
-        assert paths.'/root/withannotation/responseContainer'.post.description == 'Test resource'
-        assert paths.'/root/withannotation/responseContainer'.post.operationId == 'responseContainer'
-        assert paths.'/root/withannotation/responseContainer'.post.produces == null
-        assert paths.'/root/withannotation/responseContainer'.post.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/responseContainer'.post.responses.get(ok).schema.type == 'array'
-        assert paths.'/root/withannotation/responseContainer'.post.responses.get(ok).schema.items.'$ref' == '#/definitions/ResponseModel'
-        assert paths.'/root/withannotation/responseContainer'.post.security.basic
-
-        assert paths.'/root/withannotation/extended'.get.tags == ['Test']
-        assert paths.'/root/withannotation/extended'.get.summary == 'An extended operation'
-        assert paths.'/root/withannotation/extended'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/extended'.get.operationId == 'extended'
-        assert paths.'/root/withannotation/extended'.get.produces == null
-        assert paths.'/root/withannotation/extended'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/extended'.get.responses.get(ok).schema.type == null
-        assert paths.'/root/withannotation/extended'.get.responses.get(ok).schema.'$ref' == '#/definitions/SubResponseModel'
-        assert paths.'/root/withannotation/extended'.get.security.basic
-
-        assert paths.'/root/withannotation/deprecated'.get.tags == ['Test']
-        assert paths.'/root/withannotation/deprecated'.get.summary == 'A deprecated operation'
-        assert paths.'/root/withannotation/deprecated'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/deprecated'.get.operationId == 'deprecated'
-        assert paths.'/root/withannotation/deprecated'.get.produces == null
-        assert paths.'/root/withannotation/deprecated'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/deprecated'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/deprecated'.get.security.basic
-
-        assert paths.'/root/withannotation/auth'.get.tags == ['Test']
-        assert paths.'/root/withannotation/auth'.get.summary == 'An auth operation'
-        assert paths.'/root/withannotation/auth'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/auth'.get.operationId == 'withAuth'
-        assert paths.'/root/withannotation/auth'.get.produces == null
-        assert paths.'/root/withannotation/auth'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/auth'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/auth'.get.security.basic
-
-        assert paths.'/root/withannotation/model'.get.tags == ['Test']
-        assert paths.'/root/withannotation/model'.get.summary == 'A model operation'
-        assert paths.'/root/withannotation/model'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/model'.get.operationId == 'model'
-        assert paths.'/root/withannotation/model'.get.produces == null
-        assert paths.'/root/withannotation/model'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/model'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/model'.get.security.basic
-
-        assert paths.'/root/withannotation/overriden'.get.tags == ['Test']
-        assert paths.'/root/withannotation/overriden'.get.summary == 'An overriden operation description'
-        assert paths.'/root/withannotation/overriden'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/overriden'.get.operationId == 'overriden'
-        assert paths.'/root/withannotation/overriden'.get.produces == null
-        assert paths.'/root/withannotation/overriden'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/overriden'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/overriden'.get.security.basic
-
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.tags == ['Test']
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.summary == 'An overriden operation'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.produces == null
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/overridenWithoutDescription'.get.security.basic
-
-        assert paths.'/root/withannotation/hidden' == null
-
-        assert paths.'/root/withannotation/ignoredModel'.get.tags == ['Test']
-        assert paths.'/root/withannotation/ignoredModel'.get.summary == 'An ignored model'
-        assert paths.'/root/withannotation/ignoredModel'.get.description == 'Test resource'
-        assert paths.'/root/withannotation/ignoredModel'.get.operationId == 'ignoredModel'
-        assert paths.'/root/withannotation/ignoredModel'.get.produces == null
-        assert paths.'/root/withannotation/ignoredModel'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withannotation/ignoredModel'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withannotation/ignoredModel'.get.security.basic
-
-        assert paths.'/root/withoutannotation/basic'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/basic'.get.summary == 'A basic operation'
-        assert paths.'/root/withoutannotation/basic'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/basic'.get.operationId == 'basic'
-        assert paths.'/root/withoutannotation/basic'.get.produces == null
-        assert paths.'/root/withoutannotation/basic'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/basic'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/basic'.get.security.basic
-
-        assert paths.'/root/withoutannotation/default'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/default'.get.summary == 'A default operation'
-        assert paths.'/root/withoutannotation/default'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/default'.get.operationId == 'defaultResponse'
-        assert paths.'/root/withoutannotation/default'.get.produces == null
-        if (paths.'/root/withoutannotation/default'.get.responses.default) {
-            assert paths.'/root/withoutannotation/default'.get.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withoutannotation/default'.get.responses.get(ok)) {
-            assert paths.'/root/withoutannotation/default'.get.responses.get(ok).description == 'successful operation'
-        } else {
-            assert false: 'No response found for /root/withoutannotation/default'
-        }
-        assert paths.'/root/withoutannotation/default'.get.security.basic
-
-        assert paths.'/root/withoutannotation/generics'.post.tags == ['Test']
-        assert paths.'/root/withoutannotation/generics'.post.summary == 'A generics operation'
-        assert paths.'/root/withoutannotation/generics'.post.description == 'Test resource'
-        assert paths.'/root/withoutannotation/generics'.post.operationId == 'generics'
-        assert paths.'/root/withoutannotation/generics'.post.produces == null
-        assert paths.'/root/withoutannotation/generics'.post.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/generics'.post.responses.get(ok).schema.type == 'array'
-        assert paths.'/root/withoutannotation/generics'.post.responses.get(ok).schema.items.type == type
-        assert paths.'/root/withoutannotation/generics'.post.security.basic
-
-        assert paths.'/root/withoutannotation/datatype'.post.tags == ['Test']
-        assert paths.'/root/withoutannotation/datatype'.post.summary == 'Consumes and Produces operation'
-        assert paths.'/root/withoutannotation/datatype'.post.description == 'Test resource'
-        assert paths.'/root/withoutannotation/datatype'.post.operationId == 'dataType'
-        assert paths.'/root/withoutannotation/datatype'.post.produces == ['application/json']
-        if (paths.'/root/withoutannotation/datatype'.post.responses.default) {
-            assert paths.'/root/withoutannotation/datatype'.post.responses.default.description == 'successful operation'
-        } else if (paths.'/root/withoutannotation/datatype'.post.responses.get(ok)) {
-            assert paths.'/root/withoutannotation/datatype'.post.responses.get(ok).description == 'successful operation'
-        } else {
-            assert false: 'No response found for /root/withoutannotation/datatype'
-        }
-        assert paths.'/root/withoutannotation/datatype'.post.security.basic
-
-        assert paths.'/root/withoutannotation/response'.post.tags == ['Test']
-        assert paths.'/root/withoutannotation/response'.post.summary == 'A response operation'
-        assert paths.'/root/withoutannotation/response'.post.description == 'Test resource'
-        assert paths.'/root/withoutannotation/response'.post.operationId == 'response'
-        assert paths.'/root/withoutannotation/response'.post.produces == null
-        assert paths.'/root/withoutannotation/response'.post.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/response'.post.responses.get(ok).schema.type == null
-        assert paths.'/root/withoutannotation/response'.post.responses.get(ok).schema.'$ref' == '#/definitions/ResponseModel'
-        assert paths.'/root/withoutannotation/response'.post.security.basic
-
-        assert paths.'/root/withoutannotation/responseContainer'.post.tags == ['Test']
-        assert paths.'/root/withoutannotation/responseContainer'.post.summary == 'A response container operation'
-        assert paths.'/root/withoutannotation/responseContainer'.post.description == 'Test resource'
-        assert paths.'/root/withoutannotation/responseContainer'.post.operationId == 'responseContainer'
-        assert paths.'/root/withoutannotation/responseContainer'.post.produces == null
-        assert paths.'/root/withoutannotation/responseContainer'.post.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/responseContainer'.post.responses.get(ok).schema.type == 'array'
-        assert paths.'/root/withoutannotation/responseContainer'.post.responses.get(ok).schema.items.'$ref' == '#/definitions/ResponseModel'
-        assert paths.'/root/withoutannotation/responseContainer'.post.security.basic
-
-        assert paths.'/root/withoutannotation/extended'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/extended'.get.summary == 'An extended operation'
-        assert paths.'/root/withoutannotation/extended'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/extended'.get.operationId == 'extended'
-        assert paths.'/root/withoutannotation/extended'.get.produces == null
-        assert paths.'/root/withoutannotation/extended'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/extended'.get.responses.get(ok).schema.type == null
-        assert paths.'/root/withoutannotation/extended'.get.responses.get(ok).schema.'$ref' == '#/definitions/SubResponseModel'
-        assert paths.'/root/withoutannotation/extended'.get.security.basic
-
-        assert paths.'/root/withoutannotation/deprecated'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/deprecated'.get.summary == 'A deprecated operation'
-        assert paths.'/root/withoutannotation/deprecated'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/deprecated'.get.operationId == 'deprecated'
-        assert paths.'/root/withoutannotation/deprecated'.get.produces == null
-        assert paths.'/root/withoutannotation/deprecated'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/deprecated'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/deprecated'.get.security.basic
-
-        assert paths.'/root/withoutannotation/auth'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/auth'.get.summary == 'An auth operation'
-        assert paths.'/root/withoutannotation/auth'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/auth'.get.operationId == 'withAuth'
-        assert paths.'/root/withoutannotation/auth'.get.produces == null
-        assert paths.'/root/withoutannotation/auth'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/auth'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/auth'.get.security.basic
-
-        assert paths.'/root/withoutannotation/model'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/model'.get.summary == 'A model operation'
-        assert paths.'/root/withoutannotation/model'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/model'.get.operationId == 'model'
-        assert paths.'/root/withoutannotation/model'.get.produces == null
-        assert paths.'/root/withoutannotation/model'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/model'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/model'.get.security.basic
-
-        assert paths.'/root/withoutannotation/overriden'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/overriden'.get.summary == 'An overriden operation description'
-        assert paths.'/root/withoutannotation/overriden'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/overriden'.get.operationId == 'overriden'
-        assert paths.'/root/withoutannotation/overriden'.get.produces == null
-        assert paths.'/root/withoutannotation/overriden'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/overriden'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/overriden'.get.security.basic
-
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.summary == 'An overriden operation'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.operationId == 'overridenWithoutDescription'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.produces == null
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/overridenWithoutDescription'.get.security.basic
-
-        assert paths.'/root/withoutannotation/hidden' == null
-
-        assert paths.'/root/withoutannotation/ignoredModel'.get.tags == ['Test']
-        assert paths.'/root/withoutannotation/ignoredModel'.get.summary == 'An ignored model'
-        assert paths.'/root/withoutannotation/ignoredModel'.get.description == 'Test resource'
-        assert paths.'/root/withoutannotation/ignoredModel'.get.operationId == 'ignoredModel'
-        assert paths.'/root/withoutannotation/ignoredModel'.get.produces == null
-        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.get(ok).description == 'successful operation'
-        assert paths.'/root/withoutannotation/ignoredModel'.get.responses.get(ok).schema.type == type
-        assert paths.'/root/withoutannotation/ignoredModel'.get.security.basic
+        assertPaths(paths, format, type, 'withannotation')
+        assertPaths(paths, format, type, 'withoutannotation')
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -525,5 +260,150 @@ class OutputITest extends AbstractPluginITest {
         assert definitions.SubResponseModel.properties.size() == 2
         assert definitions.SubResponseModel.properties.name.type == type
         assert definitions.SubResponseModel.properties.value.type == type
+    }
+
+    private static void assertPaths(paths, String format, String type, String path) {
+        def ok = format == 'json' ? '200' : 200
+
+        assert paths."/root/${path}/basic".get.tags == ['Test']
+        assert paths."/root/${path}/basic".get.summary == 'A basic operation'
+        assert paths."/root/${path}/basic".get.description == 'Test resource'
+        assert paths."/root/${path}/basic".get.operationId == 'basic'
+        assert paths."/root/${path}/basic".get.produces == null
+        assert paths."/root/${path}/basic".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/basic".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/basic".get.security.basic
+
+        assert paths."/root/${path}/default".get.tags == ['Test']
+        assert paths."/root/${path}/default".get.summary == 'A default operation'
+        assert paths."/root/${path}/default".get.description == 'Test resource'
+        assert paths."/root/${path}/default".get.operationId == 'defaultResponse'
+        assert paths."/root/${path}/default".get.produces == null
+        if (paths."/root/${path}/default".get.responses.default) {
+            assert paths."/root/${path}/default".get.responses.default.description == 'successful operation'
+        } else if (paths."/root/${path}/default".get.responses.get(ok)) {
+            assert paths."/root/${path}/default".get.responses.get(ok).description == 'successful operation'
+        } else {
+            assert false: "No response found for /root/${path}/default"
+        }
+        assert paths."/root/${path}/default".get.security.basic
+
+        assert paths."/root/${path}/generics".post.tags == ['Test']
+        assert paths."/root/${path}/generics".post.summary == 'A generics operation'
+        assert paths."/root/${path}/generics".post.description == 'Test resource'
+        assert paths."/root/${path}/generics".post.operationId == 'generics'
+        assert paths."/root/${path}/generics".post.produces == null
+        assert paths."/root/${path}/generics".post.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/generics".post.responses.get(ok).schema.type == 'array'
+        assert paths."/root/${path}/generics".post.responses.get(ok).schema.items.type == type
+        assert paths."/root/${path}/generics".post.security.basic
+        assert paths."/root/${path}/generics".post.parameters[0].schema.type == 'array'
+        assert paths."/root/${path}/generics".post.parameters[0].schema.items.'$ref' == '#/definitions/RequestModel'
+
+        assert paths."/root/${path}/datatype".post.tags == ['Test']
+        assert paths."/root/${path}/datatype".post.summary == 'Consumes and Produces operation'
+        assert paths."/root/${path}/datatype".post.description == 'Test resource'
+        assert paths."/root/${path}/datatype".post.operationId == 'dataType'
+        assert paths."/root/${path}/datatype".post.produces == ['application/json']
+        if (paths."/root/${path}/datatype".post.responses.default) {
+            assert paths."/root/${path}/datatype".post.responses.default.description == 'successful operation'
+        } else if (paths."/root/${path}/datatype".post.responses.get(ok)) {
+            assert paths."/root/${path}/datatype".post.responses.get(ok).description == 'successful operation'
+        } else {
+            assert false: "No response found for /root/${path}/datatype"
+        }
+        assert paths."/root/${path}/datatype".post.security.basic
+        assert paths."/root/${path}/datatype".post.parameters[0].name == 'body'
+        assert paths."/root/${path}/datatype".post.parameters[0].schema.'$ref' == '#/definitions/RequestModel'
+
+        assert paths."/root/${path}/response".post.tags == ['Test']
+        assert paths."/root/${path}/response".post.summary == 'A response operation'
+        assert paths."/root/${path}/response".post.description == 'Test resource'
+        assert paths."/root/${path}/response".post.operationId == 'response'
+        assert paths."/root/${path}/response".post.produces == null
+        assert paths."/root/${path}/response".post.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/response".post.responses.get(ok).schema.type == null
+        assert paths."/root/${path}/response".post.responses.get(ok).schema.'$ref' == '#/definitions/ResponseModel'
+        assert paths."/root/${path}/response".post.security.basic
+
+        assert paths."/root/${path}/responseContainer".post.tags == ['Test']
+        assert paths."/root/${path}/responseContainer".post.summary == 'A response container operation'
+        assert paths."/root/${path}/responseContainer".post.description == 'Test resource'
+        assert paths."/root/${path}/responseContainer".post.operationId == 'responseContainer'
+        assert paths."/root/${path}/responseContainer".post.produces == null
+        assert paths."/root/${path}/responseContainer".post.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/responseContainer".post.responses.get(ok).schema.type == 'array'
+        assert paths."/root/${path}/responseContainer".post.responses.get(ok).schema.items.'$ref' == '#/definitions/ResponseModel'
+        assert paths."/root/${path}/responseContainer".post.security.basic
+
+        assert paths."/root/${path}/extended".get.tags == ['Test']
+        assert paths."/root/${path}/extended".get.summary == 'An extended operation'
+        assert paths."/root/${path}/extended".get.description == 'Test resource'
+        assert paths."/root/${path}/extended".get.operationId == 'extended'
+        assert paths."/root/${path}/extended".get.produces == null
+        assert paths."/root/${path}/extended".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/extended".get.responses.get(ok).schema.type == null
+        assert paths."/root/${path}/extended".get.responses.get(ok).schema.'$ref' == '#/definitions/SubResponseModel'
+        assert paths."/root/${path}/extended".get.security.basic
+
+        assert paths."/root/${path}/deprecated".get.tags == ['Test']
+        assert paths."/root/${path}/deprecated".get.summary == 'A deprecated operation'
+        assert paths."/root/${path}/deprecated".get.description == 'Test resource'
+        assert paths."/root/${path}/deprecated".get.operationId == 'deprecated'
+        assert paths."/root/${path}/deprecated".get.produces == null
+        assert paths."/root/${path}/deprecated".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/deprecated".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/deprecated".get.security.basic
+
+        assert paths."/root/${path}/auth".get.tags == ['Test']
+        assert paths."/root/${path}/auth".get.summary == 'An auth operation'
+        assert paths."/root/${path}/auth".get.description == 'Test resource'
+        assert paths."/root/${path}/auth".get.operationId == 'withAuth'
+        assert paths."/root/${path}/auth".get.produces == null
+        assert paths."/root/${path}/auth".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/auth".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/auth".get.security.basic
+
+        assert paths."/root/${path}/model".get.tags == ['Test']
+        assert paths."/root/${path}/model".get.summary == 'A model operation'
+        assert paths."/root/${path}/model".get.description == 'Test resource'
+        assert paths."/root/${path}/model".get.operationId == 'model'
+        assert paths."/root/${path}/model".get.produces == null
+        assert paths."/root/${path}/model".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/model".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/model".get.security.basic
+
+        assert paths."/root/${path}/overriden".get.tags == ['Test']
+        assert paths."/root/${path}/overriden".get.summary == 'An overriden operation description'
+        assert paths."/root/${path}/overriden".get.description == 'Test resource'
+        assert paths."/root/${path}/overriden".get.operationId == 'overriden'
+        assert paths."/root/${path}/overriden".get.produces == null
+        assert paths."/root/${path}/overriden".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/overriden".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/overriden".get.security.basic
+
+        assert paths."/root/${path}/overridenWithoutDescription".get.tags == ['Test']
+        assert paths."/root/${path}/overridenWithoutDescription".get.summary == 'An overriden operation'
+        assert paths."/root/${path}/overridenWithoutDescription".get.description == 'Test resource'
+        assert paths."/root/${path}/overridenWithoutDescription".get.operationId == 'overridenWithoutDescription'
+        assert paths."/root/${path}/overridenWithoutDescription".get.produces == null
+        assert paths."/root/${path}/overridenWithoutDescription".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/overridenWithoutDescription".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/overridenWithoutDescription".get.security.basic
+
+        assert paths."/root/${path}/hidden" == null
+
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.tags == ['Test']
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.summary == 'A multiple parameters operation'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.description == 'Test resource'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.operationId == 'multipleParameters'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.produces == null
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.security.basic
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].name == 'parameter1'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].type == 'number'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].name == 'parameter2'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].type == 'boolean'
     }
 }

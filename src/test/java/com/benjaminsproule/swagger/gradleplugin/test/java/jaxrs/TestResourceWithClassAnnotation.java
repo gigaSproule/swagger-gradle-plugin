@@ -23,14 +23,14 @@ public class TestResourceWithClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "A default operation")
+    @ApiOperation("A default operation")
     @Path("/default")
     @GET
     public Response defaultResponse() {
         return Response.ok().build();
     }
 
-    @ApiOperation(value = "A generics operation")
+    @ApiOperation("A generics operation")
     @Path("/generics")
     @POST
     public List<String> generics(@ApiParam List<RequestModel> body) {
@@ -49,14 +49,14 @@ public class TestResourceWithClassAnnotation {
     @ApiOperation(value = "A response operation", response = ResponseModel.class)
     @Path("/response")
     @POST
-    public ResponseModel response(@ApiParam List<RequestModel> body) {
+    public ResponseModel response() {
         return new ResponseModel();
     }
 
     @ApiOperation(value = "A response container operation", response = ResponseModel.class, responseContainer = "List")
     @Path("/responseContainer")
     @POST
-    public List<ResponseModel> responseContainer(@ApiParam List<RequestModel> body) {
+    public List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel());
     }
 
@@ -86,7 +86,7 @@ public class TestResourceWithClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "A model operation")
+    @ApiOperation("A model operation")
     @Path("/model")
     @GET
     public String model() {
@@ -114,10 +114,14 @@ public class TestResourceWithClassAnnotation {
         return "";
     }
 
-    @ApiOperation(value = "An ignored model")
-    @Path("/ignoredModel")
+    @ApiOperation("A multiple parameters operation")
+    @Path("/multipleParameters/{parameter1}")
     @GET
-    public String ignoredModel(IgnoredModel ignoredModel) {
+    public String multipleParameters(@PathParam("parameter1") Double parameterDouble, @QueryParam("parameter2") Boolean parameterBool) {
+        return "";
+    }
+
+    String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
 }

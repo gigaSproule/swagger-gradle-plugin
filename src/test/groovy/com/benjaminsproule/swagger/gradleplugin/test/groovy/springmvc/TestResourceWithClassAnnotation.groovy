@@ -8,11 +8,12 @@ import io.swagger.annotations.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 
 import static java.util.Collections.singletonList
 
 @Api(tags = 'Test', description = 'Test resource', authorizations = @Authorization('basic'))
-@RequestMapping(value = '/root/withannotation')
+@RequestMapping(path = '/root/withannotation')
 class TestResourceWithClassAnnotation {
 
     @ApiOperation('A basic operation')
@@ -21,13 +22,13 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'A default operation')
+    @ApiOperation('A default operation')
     @RequestMapping(path = '/default', method = RequestMethod.GET)
     ResponseEntity<?> defaultResponse() {
         return ResponseEntity.ok().build()
     }
 
-    @ApiOperation(value = 'A generics operation')
+    @ApiOperation('A generics operation')
     @RequestMapping(path = '/generics', method = RequestMethod.POST)
     List<String> generics(@ApiParam List<RequestModel> body) {
         return singletonList('')
@@ -41,13 +42,13 @@ class TestResourceWithClassAnnotation {
 
     @ApiOperation(value = 'A response operation', response = ResponseModel.class)
     @RequestMapping(path = '/response', method = RequestMethod.POST)
-    ResponseModel response(@ApiParam List<RequestModel> body) {
+    ResponseModel response() {
         return new ResponseModel()
     }
 
     @ApiOperation(value = 'A response container operation', response = ResponseModel.class, responseContainer = 'List')
     @RequestMapping(path = '/responseContainer', method = RequestMethod.POST)
-    List<ResponseModel> responseContainer(@ApiParam List<RequestModel> body) {
+    List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel())
     }
 
@@ -74,7 +75,7 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'A model operation')
+    @ApiOperation('A model operation')
     @RequestMapping(path = '/model', method = RequestMethod.GET)
     String model() {
         return ''
@@ -98,8 +99,14 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = 'An ignored model')
-    @RequestMapping(value = '/ignoredModel', method = RequestMethod.GET)
+    @ApiOperation('A multiple parameters operation')
+    @RequestMapping(path = '/multipleParameters/{parameter1}', method = RequestMethod.GET)
+    String multipleParameters(
+        @RequestParam("parameter1") Double parameterDouble,
+        @RequestParam(name = "parameter2", required = false) Boolean parameterBool) {
+        return ''
+    }
+
     String ignoredModel(IgnoredModel ignoredModel) {
         return ''
     }

@@ -20,14 +20,14 @@ open class TestResourceWithClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "A default operation")
+    @ApiOperation("A default operation")
     @Path("/default")
     @GET
     fun defaultResponse(): Response {
         return Response.ok().build()
     }
 
-    @ApiOperation(value = "A generics operation")
+    @ApiOperation("A generics operation")
     @Path("/generics")
     @POST
     fun generics(@ApiParam body: List<RequestModel>): List<String> {
@@ -43,17 +43,17 @@ open class TestResourceWithClassAnnotation {
         return Response.ok().build()
     }
 
-    @ApiOperation(value = "A response operation", response = ResponseModel::class)
+    @ApiOperation("A response operation", response = ResponseModel::class)
     @Path("/response")
     @POST
-    fun response(@ApiParam body: List<RequestModel>): ResponseModel {
+    fun response(): ResponseModel {
         return ResponseModel()
     }
 
-    @ApiOperation(value = "A response container operation", response = ResponseModel::class, responseContainer = "List")
+    @ApiOperation("A response container operation", response = ResponseModel::class, responseContainer = "List")
     @Path("/responseContainer")
     @POST
-    fun responseContainer(@ApiParam body: List<RequestModel>): List<ResponseModel> {
+    fun responseContainer(): List<ResponseModel> {
         return singletonList(ResponseModel())
     }
 
@@ -72,7 +72,7 @@ open class TestResourceWithClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "An auth operation", authorizations = [
+    @ApiOperation("An auth operation", authorizations = [
         Authorization(value = "oauth2", scopes = [
             AuthorizationScope(scope = "scope", description = "scope description")
         ])
@@ -83,7 +83,7 @@ open class TestResourceWithClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "A model operation")
+    @ApiOperation("A model operation")
     @Path("/model")
     @GET
     fun model(): String {
@@ -104,16 +104,20 @@ open class TestResourceWithClassAnnotation {
         return ""
     }
 
-    @ApiOperation(value = "A hidden operation", hidden = true)
+    @ApiOperation("A hidden operation", hidden = true)
     @Path("/hidden")
     @GET
     fun hidden(): String {
         return ""
     }
 
-    @ApiOperation(value = "An ignored model")
-    @Path("/ignoredModel")
+    @ApiOperation("A multiple parameters operation")
+    @Path("/multipleParameters/{parameter1}")
     @GET
+    fun multipleParameters(@PathParam("parameter1") parameterDouble: Double, @QueryParam("parameter2") parameterBool: Boolean): String {
+        return ""
+    }
+
     fun ignoredModel(ignoredModel: IgnoredModel): String {
         return ""
     }

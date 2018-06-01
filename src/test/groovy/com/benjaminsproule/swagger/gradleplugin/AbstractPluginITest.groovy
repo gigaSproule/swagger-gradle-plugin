@@ -5,9 +5,14 @@ import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
 
 abstract class AbstractPluginITest extends Specification {
+    static String gradleVersion
     File testProjectDir
     File buildFile
     File testProjectOutputDir
+
+    def setupSpec() {
+        gradleVersion = System.getProperty('tests.gradleVersion', '4.7')
+    }
 
     def setup() {
         testProjectDir = File.createTempDir()
@@ -27,6 +32,7 @@ abstract class AbstractPluginITest extends Specification {
             .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME)
             .withPluginClasspath()
             .withTestKitDir(File.createTempDir())
+            .withGradleVersion(gradleVersion)
             .withDebug(true)
     }
 }

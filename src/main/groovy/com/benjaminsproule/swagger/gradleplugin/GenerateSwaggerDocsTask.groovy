@@ -12,13 +12,8 @@ import io.swagger.models.Swagger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectories
-import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.jvm.tasks.Jar
-
-import javax.inject.Inject
 
 import static com.benjaminsproule.swagger.gradleplugin.VersionUtils.ensureCompatibleSwaggerSpec
 
@@ -37,16 +32,12 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     @InputFiles
     Iterable<File> inputFiles
 
-    private ClassFinder classFinder
-    private ReaderFactory readerFactory
-    private GeneratorFactory generatorFactory
-
-    @Inject
-    GenerateSwaggerDocsTask(ClassFinder classFinder) {
-        this.classFinder = classFinder
-        this.readerFactory = new ReaderFactory(classFinder)
-        this.generatorFactory = new GeneratorFactory(classFinder)
-    }
+    @Internal
+    ClassFinder classFinder
+    @Internal
+    ReaderFactory readerFactory
+    @Internal
+    GeneratorFactory generatorFactory
 
     @TaskAction
     generateSwaggerDocuments() {

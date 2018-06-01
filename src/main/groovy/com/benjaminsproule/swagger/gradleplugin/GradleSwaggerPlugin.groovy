@@ -1,7 +1,9 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
+import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.classloader.VisitableURLClassLoader
@@ -10,15 +12,19 @@ class GradleSwaggerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        def classFinder = new ClassFinder(project)
-        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, classFinder)
+        def createdClassFinder = new ClassFinder(project)
+        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, createdClassFinder)
 
         def generateSwaggerDocsTask = project.task(type: GenerateSwaggerDocsTask,
             dependsOn: 'classes',
-            constructorArgs: [classFinder],
             group: 'swagger',
             description: 'Generates swagger documentation',
-            GenerateSwaggerDocsTask.TASK_NAME) as GenerateSwaggerDocsTask
+            GenerateSwaggerDocsTask.TASK_NAME,
+            {
+                classFinder = createdClassFinder
+                readerFactory = new ReaderFactory(createdClassFinder)
+                generatorFactory = new GeneratorFactory(createdClassFinder)
+            }) as GenerateSwaggerDocsTask
 
         if (project.hasProperty('swagger.skip')) {
             generateSwaggerDocsTask.enabled = false
@@ -41,7 +47,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            generateSwaggerDocsTask.inputFiles = ((classFinder.getClassLoader() as URLClassLoader).parent as VisitableURLClassLoader).URLs.collect {
+            generateSwaggerDocsTask.inputFiles = ((createdClassFinder.getClassLoader() as URLClassLoader).parent as VisitableURLClassLoader).URLs.collect {
                 new File(it.toURI())
             }
         }

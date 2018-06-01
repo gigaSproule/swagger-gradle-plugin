@@ -84,6 +84,9 @@ test {
         events "failed"
         exceptionFormat "full"
     }
+    options {
+        systemProperties(System.getProperties())
+    }
 }
 
 compileTestJava.dependsOn compileTestGroovy

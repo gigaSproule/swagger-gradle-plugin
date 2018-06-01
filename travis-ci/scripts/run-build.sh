@@ -2,8 +2,10 @@
 set -ev
 ./gradlew clean check
 if [[ "${TRAVIS_JDK_VERSION}" == "openjdk8" || "${TRAVIS_JDK_VERSION}" == "oraclejdk8" || "${TRAVIS_JDK_VERSION}" == "oraclejdk9" ]]; then
-    ./gradlew clean check -Dtest.gradleVersion=4.0
-    ./gradlew clean check -Dtest.gradleVersion=3.0
+    older_gradle_versions=(3.2 3.5.1 4.0)
+    for gradle_version in ${older_gradle_versions[@]} ; do
+        ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
+    done
 fi
 ./gradlew clean install
 ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation

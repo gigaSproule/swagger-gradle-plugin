@@ -9,6 +9,19 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class OutputITest extends AbstractPluginITest {
 
+
+    public static final List<String> locations = [
+        """
+            locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+        """,
+        """
+            locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
+        """,
+        """
+            locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+        """
+    ]
+
     def 'Produces Swagger documentation with JAX-RS'() {
         given:
         def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
@@ -36,17 +49,7 @@ class OutputITest extends AbstractPluginITest {
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
 
         where:
-        testSpecificConfig << [
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
-            """
-        ]
+        testSpecificConfig << locations
     }
 
     void 'Produces Swagger documentation with Spring MVC'() {
@@ -62,6 +65,7 @@ class OutputITest extends AbstractPluginITest {
                 apiSource {
                     ${basicApiSourceClosure()}
                     swaggerDirectory = '${expectedSwaggerDirectory}'
+                    springmvc = true
                     ${testSpecificConfig}
                 }
             }
@@ -76,20 +80,7 @@ class OutputITest extends AbstractPluginITest {
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
 
         where:
-        testSpecificConfig << [
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
-                springmvc = true
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
-                springmvc = true
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
-                springmvc = true
-            """
-        ]
+        testSpecificConfig << locations
     }
 
     def 'Produces Swagger documentation with model substitution'() {
@@ -105,6 +96,7 @@ class OutputITest extends AbstractPluginITest {
                 apiSource {
                     ${basicApiSourceClosure()}
                     swaggerDirectory = '${expectedSwaggerDirectory}'
+                    modelSubstitute = 'model-substitution'
                     ${testSpecificConfig}
                 }
             }
@@ -119,20 +111,46 @@ class OutputITest extends AbstractPluginITest {
         assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'integer')
 
         where:
-        testSpecificConfig << [
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
-                modelSubstitute = 'model-substitution'
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
-                modelSubstitute = 'model-substitution'
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
-                modelSubstitute = 'model-substitution'
-            """
-        ]
+        testSpecificConfig << locations
+    }
+
+    def 'Produces Swagger documentation with model substitution on an apiSource level'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    ${basicApiSourceClosure()}
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    swaggerFileName = 'swagger-model-substitution'
+                    modelSubstitute = 'model-substitution'
+                    ${testSpecificConfig}
+                }
+                apiSource {
+                    ${basicApiSourceClosure()}
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    swaggerFileName = 'swagger'
+                    ${testSpecificConfig}
+                }
+            }
+        """
+
+        when:
+        def result = runPluginTask()
+
+        then:
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger-model-substitution.json", 'integer')
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
+
+        where:
+        testSpecificConfig << locations
     }
 
     def 'Produce Swagger documentation in multiple formats'() {
@@ -148,6 +166,7 @@ class OutputITest extends AbstractPluginITest {
                 apiSource {
                     ${basicApiSourceClosure()}
                     swaggerDirectory = '${expectedSwaggerDirectory}'
+                    outputFormats = ['json', 'yaml']
                     ${testSpecificConfig}
                 }
             }
@@ -163,20 +182,7 @@ class OutputITest extends AbstractPluginITest {
         assertSwaggerYaml("${expectedSwaggerDirectory}/swagger.yaml")
 
         where:
-        testSpecificConfig << [
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
-                outputFormats = ['json', 'yaml']
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
-                outputFormats = ['json', 'yaml']
-            """,
-            """
-                locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
-                outputFormats = ['json', 'yaml']
-            """
-        ]
+        testSpecificConfig << locations
     }
 
     private static String basicApiSourceClosure() {

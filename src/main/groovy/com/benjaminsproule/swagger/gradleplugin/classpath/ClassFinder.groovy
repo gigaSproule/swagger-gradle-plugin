@@ -55,7 +55,13 @@ class ClassFinder {
         }
 
         def urls = []
-        (project.configurations.compileClasspath.resolve() + project.configurations.runtimeClasspath.resolve()).each {
+        def classpaths = [project.configurations.compileClasspath.resolve()]
+        if (project.configurations.hasProperty('runtimeClasspath')) {
+            classpaths += project.configurations.runtimeClasspath.resolve()
+        } else {
+            classpaths += project.configurations.runtime.resolve()
+        }
+        classpaths.flatten().each {
             urls.add(it.toURI().toURL())
         }
 

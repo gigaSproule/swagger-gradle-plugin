@@ -47,8 +47,14 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         try {
             for (ApiSourceExtension apiSourceExtension : swaggerExtension.apiSourceExtensions) {
-                classFinder.clearClassCache() // TODO: Maybe do something better here?
+                // TODO: Replace below
+                def environmentConfigurer = new EnvironmentConfigurer(apiSourceExtension, classFinder)
+                    .configureModelModifiers()
+                    .configureModelConverters()
+                    .configureSwaggerFilter()
+                    .initOutputDirectory()
                 processSwaggerPluginExtension(apiSourceExtension)
+                environmentConfigurer.cleanUp()
             }
         } catch (InvalidUserDataException iude) {
             throw iude
@@ -63,13 +69,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         if (errors) {
             throw new InvalidUserDataException(errors.join(","))
         }
-
-        // TODO: Replace below
-        new EnvironmentConfigurer(apiSourceExtension, classFinder)
-            .configureModelModifiers()
-            .configureModelConverters()
-            .configureSwaggerFilter()
-            .initOutputDirectory()
 
         def reader = readerFactory.reader(apiSourceExtension)
         Swagger swagger = reader.read()

@@ -4,6 +4,8 @@ This plugin was based on [kongchen's swagger-maven-plugin](https://github.com/ko
 
 This enables your Swagger-annotated project to generate **Swagger specs** and **customizable, templated static documents** during the gradle build phase. Unlike swagger-core, swagger-gradle-plugin does not actively serve the spec with the rest of the application; it generates the spec as a build artifact to be used in downstream Swagger tooling.
 
+N.B This plugin is tested against the oldest and latest of each major Gradle version from 3.2 onwards. The reason for 3.2 is that it's the first that supports Kotlin therefore keeping tests simpler. This does _not_ mean that this plugin won't work with earlier versions, just your mileage may vary.
+
 # Features
 
 * Supports [Swagger Spec 2.0](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md)
@@ -377,9 +379,15 @@ swagger {
 ```
 
 # To run integration tests
-This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the pluginUnderTestMetadata task to be run before hand
+This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the pluginUnderTestMetadata task to be run before hand.
 ```bash
 ./gradlew pluginUnderTestMetadata
+```
+
+# To run tests against different versions of Gradle
+This plugin will by default run the tests against Gradle 4.7. To change which version it runs tests against, `test.gradleVersion` system property is required.
+```bash
+./gradlew /gradlew clean test -Dtest.gradleVersion=4.0
 ```
 
 # To release

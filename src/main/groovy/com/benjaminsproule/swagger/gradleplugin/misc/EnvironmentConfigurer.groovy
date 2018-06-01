@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory
 
 class EnvironmentConfigurer {
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentConfigurer)
-    ApiSourceExtension apiSourceExtension
+    private ApiSourceExtension apiSourceExtension
     private ClassFinder classFinder
+    private List<ModelConverter> modelConverters = new ArrayList<>()
+    private List<ModelModifier> modelModifiers = new ArrayList<>()
 
     EnvironmentConfigurer(ApiSourceExtension apiSourceExtension, ClassFinder classFinder) {
         this.apiSourceExtension = apiSourceExtension
@@ -58,6 +60,7 @@ class EnvironmentConfigurer {
                     def modelConverterClass = Class.forName(modelConverter)
                     if (ModelConverter.class.isAssignableFrom(modelConverterClass)) {
                         def modelConverterInstance = (ModelConverter) modelConverterClass.newInstance()
+                        modelConverters.add(modelConverterInstance)
                         ModelConverters.getInstance().addConverter(modelConverterInstance)
                     } else {
                         throw new GradleException(String.format("Class %s has to be a subclass of %s", modelConverterClass.getName(), ModelConverter.class))
@@ -95,6 +98,7 @@ class EnvironmentConfigurer {
             }
         }
 
+        modelModifiers.add(modelModifier)
         ModelConverters.getInstance().addConverter(modelModifier)
         return this
     }
@@ -113,6 +117,13 @@ class EnvironmentConfigurer {
             // must be registered only if we use JaxbAnnotationModule before. Why?
             // https://github.com/swagger-api/swagger-core/issues/2104
             objectMapper.registerModule(new EnhancedSwaggerModule())
+        }
+    }
+
+    void cleanUp() {
+        classFinder.clearClassCache() // TODO: Maybe do something better here?
+        (modelConverters + modelModifiers).each {
+            ModelConverters.instance.removeConverter(it)
         }
     }
 }

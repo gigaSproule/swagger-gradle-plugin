@@ -47,7 +47,8 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            generateSwaggerDocsTask.inputFiles = ((createdClassFinder.getClassLoader() as URLClassLoader).parent as VisitableURLClassLoader).URLs.collect {
+            def classLoader = createdClassFinder.getClassLoader() as URLClassLoader
+            generateSwaggerDocsTask.inputFiles = ((classLoader.getURLs() + (classLoader.parent as VisitableURLClassLoader).URLs) as Set).collect {
                 new File(it.toURI())
             }
         }

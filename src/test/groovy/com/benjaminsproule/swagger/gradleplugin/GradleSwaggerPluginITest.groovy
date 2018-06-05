@@ -260,6 +260,54 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
         newClassFile.delete()
     }
 
+    def 'Runs task if file in input directory changed'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+            swagger {
+                apiSource {
+                    attachSwaggerArtifact = true
+                    locations = ['com.benjaminsproule']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                }
+            }
+        """
+
+        when:
+        def newClassFile = new File('build/classes/groovy/test/com/benjaminsproule/swagger/gradleplugin/NewGradleSwaggerPluginITest.class')
+        new File('build/classes/groovy/test/com/benjaminsproule/swagger/gradleplugin/GradleSwaggerPluginITest.class').readLines().each {
+            newClassFile.write(it.replace('GradleSwaggerPluginITest', 'NewGradleSwaggerPluginITest'))
+        }
+        def firstRunResult = pluginTaskRunnerBuilder().withArguments(GenerateSwaggerDocsTask.TASK_NAME).build()
+        newClassFile.append("\n")
+        def secondRunResult = pluginTaskRunnerBuilder().withArguments(GenerateSwaggerDocsTask.TASK_NAME).build()
+
+        then:
+        firstRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+        secondRunResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        cleanup:
+        newClassFile.delete()
+    }
+
     def 'Can apply plugin before declaring dependencies'() {
         given:
         def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"

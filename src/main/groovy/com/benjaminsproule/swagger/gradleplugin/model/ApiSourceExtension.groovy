@@ -21,7 +21,7 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     SecurityDefinitionExtension securityDefinition
     List<String> locations
     List<String> schemes // Values MUST be from the list: "http", "https", "ws", "wss"
-    List<String> outputFormats
+    List<String> outputFormats = ['json']
     String basePath
     String host
     String templatePath

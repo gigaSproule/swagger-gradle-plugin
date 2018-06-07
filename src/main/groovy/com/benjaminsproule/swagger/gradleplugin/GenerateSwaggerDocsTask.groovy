@@ -76,22 +76,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         def generator = generatorFactory.generator(apiSourceExtension)
         generator.generate(swagger)
-
-        if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory && this.project) {
-            String classifierName = new File(apiSourceExtension.swaggerDirectory).getName()
-            File swaggerFile = new File(apiSourceExtension.swaggerDirectory)
-
-            project.task('createSwaggerArtifact', type: Jar, dependsOn: project.tasks.classes) {
-                classifier = classifierName
-                from swaggerFile
-            }
-
-            project.artifacts {
-                archives project.tasks.createSwaggerArtifact
-            }
-
-            project.tasks.createSwaggerArtifact.execute()
-        }
     }
 
     private static Swagger applySwaggerFilter(Swagger swagger) {

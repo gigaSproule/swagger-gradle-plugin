@@ -64,28 +64,19 @@ class SwaggerSpecGenerator implements Generator {
 
         def fileName = apiSource.swaggerFileName ?: 'swagger'
 
-        try {
-            if (apiSource.outputFormats) {
-                for (String format : apiSource.outputFormats) {
-                    try {
-                        switch (format.trim().toLowerCase()) {
-                            case 'json':
-                                writeAsJsonFormat(dir, fileName, source)
-                                break
-                            case 'yaml':
-                                FileUtils.write(new File(dir, fileName + ".yaml"), Yaml.pretty().writeValueAsString(source), encoding)
-                                break
-                        }
-                    } catch (Exception e) {
-                        throw new GenerateException(String.format("Declared output format [%s] is not supported.", format), e)
-                    }
+        for (String format : apiSource.outputFormats) {
+            try {
+                switch (format.trim().toLowerCase()) {
+                    case 'json':
+                        writeAsJsonFormat(dir, fileName, source)
+                        break
+                    case 'yaml':
+                        FileUtils.write(new File(dir, fileName + ".yaml"), Yaml.pretty().writeValueAsString(source), encoding)
+                        break
                 }
-            } else {
-                // Default to json
-                writeAsJsonFormat(dir, fileName, source)
+            } catch (Exception e) {
+                throw new GenerateException(String.format("Declared output format [%s] is not supported.", format), e)
             }
-        } catch (IOException e) {
-            throw new GenerateException(e)
         }
     }
 

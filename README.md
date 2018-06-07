@@ -396,5 +396,5 @@ This plugin uses the [gradle-release](https://github.com/researchgate/gradle-rel
 In `~/.gradle/gradle.properties`, `bintray_user` and `bintray_apiKey` need to be set for publishing to Bintray and `gradle.publish.key` and `gradle.publish.secret` for publishing to the central Gradle repository.
 
 ```bash
-./gradlew release
+./gradlew release -Prelease.useAutomaticVersion=true
 ```

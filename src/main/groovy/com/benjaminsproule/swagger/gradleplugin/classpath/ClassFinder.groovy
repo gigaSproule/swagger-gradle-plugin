@@ -9,14 +9,13 @@ import java.lang.annotation.Annotation
 
 class ClassFinder {
     private static final Logger LOG = LoggerFactory.getLogger(ClassFinder)
-    static ClassFinder instance
     private Map<Class<? extends Annotation>, Set<Class<?>>> classCache
     private Project project
     private ClassLoader classLoader
 
     ClassFinder(Project project) {
         this.project = project
-        this.classCache = new HashMap<>()
+        this.classCache = [:]
     }
 
     Class<?> loadClass(String name) {
@@ -62,21 +61,21 @@ class ClassFinder {
             classpaths += project.configurations.runtime.resolve()
         }
         classpaths.flatten().each {
-            urls.add(it.toURI().toURL())
+            urls += it.toURI().toURL()
         }
 
         if (project.sourceSets.main.output.getProperties()['classesDirs']) {
             project.sourceSets.main.output.classesDirs.each {
                 if (it.exists()) {
-                    urls.add(it.toURI().toURL())
+                    urls += it.toURI().toURL()
                 }
             }
         } else {
-            urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
+            urls += project.sourceSets.main.output.classesDir.toURI().toURL()
         }
 
-        urls.add(project.sourceSets.main.output.resourcesDir.toURI().toURL())
+        urls += project.sourceSets.main.output.resourcesDir.toURI().toURL()
 
-        return new URLClassLoader(urls as URL[], getClass().getClassLoader())
+        return new URLClassLoader(urls as URL[])
     }
 }

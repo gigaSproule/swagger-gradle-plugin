@@ -19,8 +19,8 @@ class EnvironmentConfigurer {
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentConfigurer)
     private ApiSourceExtension apiSourceExtension
     private ClassFinder classFinder
-    private List<ModelConverter> modelConverters = new ArrayList<>()
-    private List<ModelModifier> modelModifiers = new ArrayList<>()
+    private List<ModelConverter> modelConverters = []
+    private List<ModelModifier> modelModifiers = []
 
     EnvironmentConfigurer(ApiSourceExtension apiSourceExtension, ClassFinder classFinder) {
         this.apiSourceExtension = apiSourceExtension
@@ -58,12 +58,12 @@ class EnvironmentConfigurer {
             apiSourceExtension.getModelConverters().each { String modelConverter ->
                 try {
                     def modelConverterClass = Class.forName(modelConverter)
-                    if (ModelConverter.class.isAssignableFrom(modelConverterClass)) {
+                    if (ModelConverter.isAssignableFrom(modelConverterClass)) {
                         def modelConverterInstance = (ModelConverter) modelConverterClass.newInstance()
-                        modelConverters.add(modelConverterInstance)
+                        modelConverters += modelConverterInstance
                         ModelConverters.getInstance().addConverter(modelConverterInstance)
                     } else {
-                        throw new GradleException(String.format("Class %s has to be a subclass of %s", modelConverterClass.getName(), ModelConverter.class))
+                        throw new GradleException(String.format("Class %s has to be a subclass of %s", modelConverterClass.getName(), ModelConverter))
                     }
                 } catch (ClassNotFoundException e) {
                     throw new GradleException(String.format("Could not find custom model converter %s", modelConverter), e)
@@ -84,8 +84,8 @@ class EnvironmentConfigurer {
         optionallyRegisterJaxbModule(objectMapper)
 
         ModelModifier modelModifier = new ModelModifier(objectMapper, classFinder)
-        if (apiSourceExtension.apiModelPropertyAccessExclusions) {
-            modelModifier.setApiModelPropertyAccessExclusions(apiSourceExtension.apiModelPropertyAccessExclusions)
+        if (apiSourceExtension.apiModelPropertyAccessExclusionsList) {
+            modelModifier.setApiModelPropertyAccessExclusions(apiSourceExtension.apiModelPropertyAccessExclusionsList)
         }
 
         if (apiSourceExtension.modelSubstitute) {
@@ -98,7 +98,7 @@ class EnvironmentConfigurer {
             }
         }
 
-        modelModifiers.add(modelModifier)
+        modelModifiers += modelModifier
         ModelConverters.getInstance().addConverter(modelModifier)
         return this
     }

@@ -15,7 +15,7 @@ import io.swagger.jackson.SwaggerAnnotationIntrospector
 class EnhancedSwaggerAnnotationIntrospector extends SwaggerAnnotationIntrospector {
     @Override
     PropertyName findRootName(AnnotatedClass ac) {
-        ApiModel model = ac.getAnnotation(ApiModel.class)
+        ApiModel model = ac.getAnnotation(ApiModel)
         if (model != null) {
             return new PropertyName(model.value())
         } else {

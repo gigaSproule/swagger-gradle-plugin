@@ -1,36 +1,14 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
+import com.benjaminsproule.swagger.gradleplugin.factory.SwaggerFactory
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiImplicitParam
-import io.swagger.annotations.ApiImplicitParams
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
-import io.swagger.annotations.Authorization
-import io.swagger.annotations.AuthorizationScope
-import io.swagger.annotations.Extension
-import io.swagger.annotations.ExtensionProperty
-import io.swagger.annotations.ResponseHeader
+import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
-import io.swagger.models.Model
-import io.swagger.models.Operation
-import io.swagger.models.Path
-import io.swagger.models.Response
-import io.swagger.models.Scheme
-import io.swagger.models.SecurityRequirement
-import io.swagger.models.Swagger
-import io.swagger.models.Tag
-import io.swagger.models.parameters.BodyParameter
-import io.swagger.models.parameters.FormParameter
-import io.swagger.models.parameters.HeaderParameter
-import io.swagger.models.parameters.Parameter
-import io.swagger.models.parameters.PathParameter
-import io.swagger.models.parameters.QueryParameter
+import io.swagger.models.*
+import io.swagger.models.parameters.*
 import io.swagger.models.properties.ArrayProperty
 import io.swagger.models.properties.MapProperty
 import io.swagger.models.properties.Property
@@ -48,27 +26,29 @@ import java.lang.reflect.Type
 
 abstract class AbstractReader implements ClassSwaggerReader {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractReader)
-    ApiSourceExtension apiSource
-    protected Swagger swagger
+    protected ApiSourceExtension apiSource
     protected Set<Type> typesToSkip
     protected ClassFinder classFinder
+    protected Swagger swagger
 
     AbstractReader(ApiSourceExtension apiSource, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions, ClassFinder classFinder) {
         this.apiSource = apiSource
-        this.swagger = apiSource.asSwaggerType()
-        this.typesToSkip = typesToSkip == null ? new HashSet<Type>() : typesToSkip
+        this.typesToSkip = typesToSkip ?: []
         this.classFinder = classFinder
-        updateExtensionChain(swaggerExtensions)
+        this.swagger = new SwaggerFactory(classFinder).swagger(apiSource)
+
+        swaggerExtensions = swaggerExtensions ?: []
+        SwaggerExtensions.setExtensions(swaggerExtensions + customSwaggerExtensions())
     }
 
     /**
      * Method which allows sub-classes to modify the Swagger extension chain.
      * @param swaggerExtensions user provided swagger extensions
      */
-    abstract void updateExtensionChain(List<SwaggerExtension> swaggerExtensions)
+    abstract List<SwaggerExtension> customSwaggerExtensions()
 
     protected static List<SecurityRequirement> getSecurityRequirements(Api api) {
-        List<SecurityRequirement> securities = new ArrayList<SecurityRequirement>()
+        List<SecurityRequirement> securities = []
         if (api == null) {
             return securities
         }
@@ -84,7 +64,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
                     security.addScope(scope.scope())
                 }
             }
-            securities.add(security)
+            securities += security
         }
         return securities
     }
@@ -118,11 +98,11 @@ abstract class AbstractReader implements ClassSwaggerReader {
                 continue
             }
             if (responseHeaders == null) {
-                responseHeaders = new HashMap<String, Property>()
+                responseHeaders = [:]
             }
             Class<?> cls = header.response()
 
-            if (!cls.equals(Void.class) && !cls.equals(void.class)) {
+            if (cls != Void && cls != void) {
                 Property property = ModelConverters.getInstance().readAsProperty(cls)
                 if (property != null) {
                     Property responseProperty
@@ -151,7 +131,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
             if (extension == null) {
                 continue
             }
-            Map<String, Object> extensionProperties = new HashMap<String, Object>()
+            Map<String, Object> extensionProperties = [:]
             for (ExtensionProperty extensionProperty : extension.properties()) {
                 String name = extensionProperty.name()
                 if (!name.isEmpty()) {
@@ -160,11 +140,11 @@ abstract class AbstractReader implements ClassSwaggerReader {
                 }
             }
             if (!extension.name().isEmpty()) {
-                Map<String, Object> wrapper = new HashMap<String, Object>()
+                Map<String, Object> wrapper = [:]
                 wrapper.put(extension.name(), extensionProperties)
-                resultSet.add(wrapper)
+                resultSet += wrapper
             } else {
-                resultSet.add(extensionProperties)
+                resultSet += extensionProperties
             }
         }
         return resultSet
@@ -189,7 +169,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
         for (String tag : apiOperation.tags()) {
             if (!tag.isEmpty()) {
                 operation.tag(tag)
-                swagger.tag(new Tag().name(tag))
+                swagger.tag(new io.swagger.models.Tag().name(tag))
             }
         }
     }
@@ -198,15 +178,15 @@ abstract class AbstractReader implements ClassSwaggerReader {
         return !api || readHidden || api.hidden()
     }
 
-    protected static Set<Tag> extractTags(Api api) {
-        def output = new LinkedHashSet<Tag>()
+    protected static Set<io.swagger.models.Tag> extractTags(Api api) {
+        def output = new LinkedHashSet<io.swagger.models.Tag>()
         if (!api) {
             return output
         }
 
         api.tags().each { String tag ->
             if (tag) {
-                output.add(new Tag().name(tag))
+                output += new io.swagger.models.Tag().name(tag)
             }
         }
 
@@ -214,7 +194,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
         if (!output) {
             def tagString = api.value().replace("/", "")
             if (tagString) {
-                output.add(new Tag().name(tagString))
+                output += new io.swagger.models.Tag().name(tagString)
             }
         }
         return output
@@ -233,16 +213,16 @@ abstract class AbstractReader implements ClassSwaggerReader {
         }
     }
 
-    protected Map<String, Tag> updateTagsForApi(Map<String, Tag> parentTags, Api api) {
+    protected Map<String, io.swagger.models.Tag> updateTagsForApi(Map<String, io.swagger.models.Tag> parentTags, Api api) {
         // the value will be used as a tag for 2.0 UNLESS a Tags annotation is present
-        def tagsMap = new HashMap<String, Tag>()
-        for (Tag tag : extractTags(api)) {
+        Map<String, io.swagger.models.Tag> tagsMap = [:]
+        for (io.swagger.models.Tag tag : extractTags(api)) {
             tagsMap.put(tag.getName(), tag)
         }
         if (parentTags) {
             tagsMap.putAll(parentTags)
         }
-        for (Tag tag : tagsMap.values()) {
+        for (io.swagger.models.Tag tag : tagsMap.values()) {
             swagger.tag(tag)
         }
         return tagsMap
@@ -272,7 +252,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
 
     protected static void updateOperation(String[] apiConsumes,
                                           String[] apiProduces,
-                                          Map<String, Tag> tags,
+                                          Map<String, io.swagger.models.Tag> tags,
                                           List<SecurityRequirement> securities,
                                           Operation operation) {
         if (operation) {
@@ -332,17 +312,14 @@ abstract class AbstractReader implements ClassSwaggerReader {
         }
 
         Iterator<SwaggerExtension> chain = SwaggerExtensions.chain()
-        List<Parameter> parameters = new ArrayList<Parameter>()
+        List<Parameter> parameters = []
 
-        def cls
-        if (LOG.isDebugEnabled()) {
-            cls = TypeUtils.getRawType(type, type)
-            LOG.debug("Looking for path/query/header/form/cookie params in ${cls}")
-        }
+        def cls = TypeUtils.getRawType(type, type)
+        LOG.debug("Looking for path/query/header/form/cookie params in ${cls}")
 
         //FIXME this code is confusing because there are many things calling next on the chain
         if (chain.hasNext()) {
-            SwaggerExtension extension = chain.next()
+            SwaggerExtension extension = ++chain
             LOG.debug("trying extension " + extension)
             parameters = extension.extractParameters(annotations, type, typesToSkip, chain)
         }
@@ -356,7 +333,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
             if (!typesToSkip.contains(type)) {
                 Parameter param = ParameterProcessor.applyAnnotations(swagger, null, type, annotations)
                 if (param != null) {
-                    parameters.add(param)
+                    parameters += param
                 }
             }
         }
@@ -371,7 +348,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
                 .description(apiResponse.message())
                 .headers(responseHeaders)
 
-            if (responseClass == Void.class) {
+            if (responseClass == Void) {
                 if (operation.getResponses() != null) {
                     Response apiOperationResponse = operation.getResponses().get(String.valueOf(apiResponse.code()))
                     if (apiOperationResponse != null) {
@@ -448,7 +425,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
             Class<?> cls
             try {
                 cls = Class.forName(param.dataType())
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
                 cls = method.getDeclaringClass()
             }
 

@@ -17,7 +17,7 @@ class SpringResource {
     SpringResource(Class<?> clazz, String description) {
         this.controllerClass = clazz
         this.description = description
-        methods = new ArrayList<>()
+        methods = []
 
         String[] controllerRequestMappingValues = Utils.getControllerRequestMapping(controllerClass)
 
@@ -28,6 +28,6 @@ class SpringResource {
     }
 
     void addMethod(Method m) {
-        this.methods.add(m)
+        this.methods += m
     }
 }

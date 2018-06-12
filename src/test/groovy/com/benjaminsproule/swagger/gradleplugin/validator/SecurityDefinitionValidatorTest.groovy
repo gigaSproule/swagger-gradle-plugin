@@ -1,11 +1,12 @@
 package com.benjaminsproule.swagger.gradleplugin.validator
 
 import com.benjaminsproule.swagger.gradleplugin.model.SecurityDefinitionExtension
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class SecurityDefinitionValidatorTest extends Specification {
 
-    def 'isValid returns empty list security defintion not provided'() {
+    def 'isValid returns empty list security definition not provided'() {
         when:
         def errors = new SecurityDefinitionValidator().isValid(null)
 
@@ -92,6 +93,62 @@ class SecurityDefinitionValidatorTest extends Specification {
         then:
         errors.size() == 1
         errors[0] == 'securityDefinition.keyName is required by the swagger spec'
+    }
+
+    @Ignore
+    // TODO: To be fixed as part of https://github.com/gigaSproule/swagger-gradle-plugin/issues/43
+    def 'isValid returns error messages if type is oauth2 and authorizationUrl is not set'() {
+        given:
+        def securityDefinitionExtension = new SecurityDefinitionExtension()
+        securityDefinitionExtension.name = 'name'
+        securityDefinitionExtension.type = 'oauth2'
+//        def scopeExtension = new ScopeExtension()
+//        scopeExtension.name = 'scope'
+//        scopeExtension.description = 'description'
+//        securityDefinitionExtension.scopes = [scopeExtension]
+
+        when:
+        def errors = new SecurityDefinitionValidator().isValid(securityDefinitionExtension)
+
+        then:
+        errors.size() == 1
+        errors[0] == 'securityDefinition.authorizationUrl is required by the swagger spec for OAuth 2.0'
+    }
+
+    @Ignore
+    // TODO: To be fixed as part of https://github.com/gigaSproule/swagger-gradle-plugin/issues/43
+    def 'isValid returns error messages if type is oauth2 and scopes is not set'() {
+        given:
+        def securityDefinitionExtension = new SecurityDefinitionExtension()
+        securityDefinitionExtension.type = 'oauth2'
+        securityDefinitionExtension.authorizationUrl = 'authorizationUrl'
+
+        when:
+        def errors = new SecurityDefinitionValidator().isValid(securityDefinitionExtension)
+
+        then:
+        errors.size() == 1
+        errors[0] == 'securityDefinition.scopes is required by the swagger spec for OAuth 2.0'
+    }
+
+    @Ignore
+    // TODO: To be fixed as part of https://github.com/gigaSproule/swagger-gradle-plugin/issues/43
+    def 'isValid returns error messages if type is accessCode oauth2 and tokenUrl is not set'() {
+        given:
+        def securityDefinitionExtension = new SecurityDefinitionExtension()
+        securityDefinitionExtension.type = 'oauth2'
+//        def scopeExtension = new ScopeExtension()
+//        scopeExtension.name = 'scope'
+//        scopeExtension.description = 'description'
+//        securityDefinitionExtension.scopes = [scopeExtension]
+        securityDefinitionExtension.flow = 'accessCode'
+
+        when:
+        def errors = new SecurityDefinitionValidator().isValid(securityDefinitionExtension)
+
+        then:
+        errors.size() == 1
+        errors[0] == 'securityDefinition.tokenUrl is required by the swagger spec for access code OAuth 2.0'
     }
 
     def 'isValid returns empty list if type and name are set'() {

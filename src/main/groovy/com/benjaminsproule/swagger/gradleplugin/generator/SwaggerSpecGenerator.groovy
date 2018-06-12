@@ -26,7 +26,7 @@ class SwaggerSpecGenerator implements Generator {
 
     SwaggerSpecGenerator(ApiSourceExtension apiSourceExtension) {
         this.apiSource = apiSourceExtension
-        this.encoding = apiSource.project.compileJava.options.encoding ?: "UTF-8"
+        this.encoding = 'UTF-8'
     }
 
     @Override

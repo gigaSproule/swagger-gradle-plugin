@@ -17,7 +17,7 @@ class Utils {
      * Extracts all routes from the annotated class
      *
      * @param controllerClazz
-     *            Instrospected class
+     *            Introspected class
      * @return At least 1 route value (empty string)
      */
     static String[] getControllerRequestMapping(Class<?> controllerClazz) {

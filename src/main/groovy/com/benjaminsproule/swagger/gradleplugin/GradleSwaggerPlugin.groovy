@@ -4,7 +4,7 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
-import com.benjaminsproule.swagger.gradleplugin.validator.ApiSourceValidator
+import com.benjaminsproule.swagger.gradleplugin.validator.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -24,7 +24,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
                 classFinder = createdClassFinder
                 readerFactory = new ReaderFactory(createdClassFinder)
                 generatorFactory = new GeneratorFactory(createdClassFinder)
-                apiSourceValidator = new ApiSourceValidator()
+                apiSourceValidator = new ApiSourceValidator(new InfoValidator(new LicenseValidator()), new SecurityDefinitionValidator(), new TagValidator(new ExternalDocsValidator()))
             }) as GenerateSwaggerDocsTask
 
         if (project.hasProperty('swagger.skip')) {

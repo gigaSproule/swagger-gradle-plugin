@@ -122,6 +122,7 @@ class EnvironmentConfigurer {
 
     void cleanUp() {
         classFinder.clearClassCache() // TODO: Maybe do something better here?
+        classFinder.clearAnnotationCache() // TODO: Maybe do something better here?
         (modelConverters + modelModifiers).each {
             ModelConverters.instance.removeConverter(it)
         }

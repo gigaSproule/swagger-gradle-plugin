@@ -5,6 +5,14 @@ import spock.lang.Specification
 
 class SecurityDefinitionValidatorTest extends Specification {
 
+    def 'isValid returns empty list security defintion not provided'() {
+        when:
+        def errors = new SecurityDefinitionValidator().isValid(null)
+
+        then:
+        errors.size() == 0
+    }
+
     def 'isValid returns error message if name, type, json and jsonPath not set'() {
         when:
         def errors = new SecurityDefinitionValidator().isValid(new SecurityDefinitionExtension())

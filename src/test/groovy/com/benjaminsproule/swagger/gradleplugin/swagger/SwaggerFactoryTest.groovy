@@ -1,4 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin.factory
+package com.benjaminsproule.swagger.gradleplugin.swagger
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.*
@@ -16,8 +16,8 @@ class SwaggerFactoryTest extends Specification {
     def setup() {
         def mockClassFinder = Mock(ClassFinder)
         mockClassFinder.getClassLoader() >> getClass().getClassLoader()
-        mockClassFinder.getValidClasses(_, locations) >> { args ->
-            new Reflections(getClass().getClassLoader(), locations[0]).getTypesAnnotatedWith(args[0] as Class<? extends Annotation>)
+        mockClassFinder.getValidClasses(_, _) >> { args ->
+            new Reflections(getClass().getClassLoader(), args[1]).getTypesAnnotatedWith(args[0] as Class<? extends Annotation>)
         }
 
         swaggerFactory = new SwaggerFactory(mockClassFinder)

@@ -9,7 +9,7 @@ class SwaggerExtension {
 
     private Project project
 
-    Collection<ApiSourceExtension> apiSourceExtensions = []
+    List<ApiSourceExtension> apiSourceExtensions = []
 
     SwaggerExtension(Project project) {
         this.project = project

@@ -4,6 +4,15 @@ import com.benjaminsproule.swagger.gradleplugin.model.LicenseExtension
 import spock.lang.Specification
 
 class LicenseValidatorTest extends Specification {
+
+    def 'isValid returns empty list if license extension not provided'() {
+        when:
+        def errors = new LicenseValidator().isValid(null)
+
+        then:
+        errors.size() == 0
+    }
+
     def 'isValid returns error message if name not set'() {
         when:
         def errors = new LicenseValidator().isValid(new LicenseExtension())

@@ -6,7 +6,7 @@ class SecurityDefinitionValidator implements ModelValidator<SecurityDefinitionEx
 
     @Override
     List<String> isValid(SecurityDefinitionExtension securityDefinitionExtension) {
-        if (securityDefinitionExtension.json || securityDefinitionExtension.jsonPath) {
+        if (!securityDefinitionExtension || securityDefinitionExtension.json || securityDefinitionExtension.jsonPath) {
             return []
         }
 

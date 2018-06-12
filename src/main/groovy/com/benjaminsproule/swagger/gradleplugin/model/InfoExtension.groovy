@@ -9,7 +9,8 @@ class InfoExtension {
     String version
     ContactExtension contact
     LicenseExtension license
-    Project project
+
+    private Project project
 
     InfoExtension(Project project) {
         this.project = project

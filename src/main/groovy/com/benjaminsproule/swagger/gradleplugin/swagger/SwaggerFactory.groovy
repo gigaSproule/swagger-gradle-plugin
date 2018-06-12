@@ -1,18 +1,16 @@
-package com.benjaminsproule.swagger.gradleplugin.factory
+package com.benjaminsproule.swagger.gradleplugin.swagger
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.*
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.swagger.annotations.SwaggerDefinition
 import io.swagger.models.*
 import io.swagger.models.auth.ApiKeyAuthDefinition
 import io.swagger.models.auth.BasicAuthDefinition
 import io.swagger.models.auth.OAuth2Definition
 import io.swagger.models.auth.SecuritySchemeDefinition
 import org.gradle.api.GradleException
-import org.springframework.core.annotation.AnnotationUtils
 
 class SwaggerFactory {
 
@@ -24,10 +22,10 @@ class SwaggerFactory {
 
     Swagger swagger(ApiSourceExtension apiSourceExtension) {
         def swagger = new Swagger()
-        swagger.setHost(apiSourceExtension.host ?: getHostFromAnnotation(apiSourceExtension))
-        swagger.setBasePath(apiSourceExtension.basePath ?: getBasePathFromAnnotation(apiSourceExtension))
+        swagger.setHost(apiSourceExtension.host)
+        swagger.setBasePath(apiSourceExtension.basePath)
         swagger.setInfo(generateInfo(apiSourceExtension.info))
-        swagger.setTags(getTagsFromAnnotation(apiSourceExtension))
+        swagger.setTags(generateTags(apiSourceExtension.tags))
 
         if (apiSourceExtension.schemes) {
             for (String scheme : apiSourceExtension.schemes) {
@@ -51,44 +49,6 @@ class SwaggerFactory {
         return swagger
     }
 
-    private String getHostFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition, apiSourceExtension.locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition)
-            return swaggerDefinition.host()
-        }
-
-        return null
-    }
-
-    private String getBasePathFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition, apiSourceExtension.locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition)
-            return swaggerDefinition.basePath()
-        }
-
-        return null
-    }
-
-    private List<Tag> getTagsFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def tags = []
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition, apiSourceExtension.locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition)
-            def tagAnnotations = swaggerDefinition.tags()
-            tags.addAll(tagAnnotations.collect {
-                Tag tag = new Tag()
-                    .name(it.name())
-                    .description(it.description())
-                tag.externalDocs(new ExternalDocs()
-                    .description(it.externalDocs().value())
-                    .url(it.externalDocs().url()))
-            })
-        }
-        if (!tags) {
-            return null
-        }
-        return tags as List<Tag>
-    }
-
     private static Info generateInfo(InfoExtension infoExtension) {
         Info info = new Info()
         info.setDescription(infoExtension.description)
@@ -97,17 +57,39 @@ class SwaggerFactory {
         info.setTitle(infoExtension.title)
 
         if (infoExtension.contact != null) {
-            info.setContact(getSwaggerContact(infoExtension.contact))
+            info.setContact(generateSwaggerContact(infoExtension.contact))
         }
 
         if (infoExtension.license != null) {
-            info.setLicense(getSwaggerLicence(infoExtension.license))
+            info.setLicense(generateSwaggerLicence(infoExtension.license))
         }
 
         return info
     }
 
-    private static Contact getSwaggerContact(ContactExtension contactExtension) {
+    private static List<Tag> generateTags(List<TagExtension> tagExtensions) {
+        def tags = []
+        tagExtensions.each {
+            def tag = new Tag()
+            tag.name = it.name
+            tag.description = it.description
+            tag.externalDocs = generateExternalDocs(it.externalDocs)
+            tags += tag
+        }
+        tags
+    }
+
+    private static ExternalDocs generateExternalDocs(ExternalDocsExtension externalDocsExtension) {
+        if (!externalDocsExtension) {
+            return null
+        }
+        def externalDocs = new ExternalDocs()
+        externalDocs.description = externalDocsExtension.description
+        externalDocs.url = externalDocsExtension.url
+        externalDocs
+    }
+
+    private static Contact generateSwaggerContact(ContactExtension contactExtension) {
         Contact contact = new Contact()
         contact.setName(contactExtension.name)
         contact.setUrl(contactExtension.url)
@@ -116,7 +98,7 @@ class SwaggerFactory {
         return contact
     }
 
-    private static License getSwaggerLicence(LicenseExtension licenseExtension) {
+    private static License generateSwaggerLicence(LicenseExtension licenseExtension) {
         License license = new License()
         license.setName(licenseExtension.name)
         license.setUrl(licenseExtension.url)

@@ -5,9 +5,9 @@ import org.gradle.api.Project
 
 @ToString(includeNames = true)
 class ApiSourceExtension {
-    Project project
     InfoExtension info
     SecurityDefinitionExtension securityDefinition
+    List<TagExtension> tags = []
     List<String> locations
     List<String> schemes // Values MUST be from the list: "http", "https", "ws", "wss"
     List<String> outputFormats
@@ -31,6 +31,8 @@ class ApiSourceExtension {
     List<String> apiModelPropertyAccessExclusionsList = []
     List<String> modelConverters
 
+    private Project project
+
     ApiSourceExtension(Project project) {
         this.project = project
     }
@@ -44,10 +46,19 @@ class ApiSourceExtension {
     }
 
     /**
-     * Used for taking in configuration for security defintion object.
+     * Used for taking in configuration for security definition object.
      * @param closure {@link SecurityDefinitionExtension} closure
      */
     void securityDefinition(Closure closure) {
         securityDefinition = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
+    }
+
+    /**
+     * Used for taking in configuration for tag object.
+     * @param closure {@link TagExtension} closure
+     */
+    void tag(Closure closure) {
+        TagExtension tagExtension = project.configure(new TagExtension(project), closure) as TagExtension
+        tags += tagExtension
     }
 }

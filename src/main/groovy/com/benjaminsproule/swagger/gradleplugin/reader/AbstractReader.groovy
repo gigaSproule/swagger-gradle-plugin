@@ -1,7 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.factory.SwaggerFactory
+import com.benjaminsproule.swagger.gradleplugin.swagger.SwaggerFactory
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
@@ -319,7 +319,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
 
         //FIXME this code is confusing because there are many things calling next on the chain
         if (chain.hasNext()) {
-            SwaggerExtension extension = ++chain
+            SwaggerExtension extension = chain.next()
             LOG.debug("trying extension " + extension)
             parameters = extension.extractParameters(annotations, type, typesToSkip, chain)
         }

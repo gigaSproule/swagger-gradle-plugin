@@ -38,7 +38,7 @@ class BeanParamInjectionParamExtension extends AbstractSwaggerExtension {
             }
         }
         if (chain.hasNext()) {
-            return (++chain).extractParameters(annotations, type, typesToSkip, chain)
+            return chain.next().extractParameters(annotations, type, typesToSkip, chain)
         }
         return []
     }

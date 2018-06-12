@@ -57,6 +57,8 @@ class GenerateSwaggerDocsTask extends DefaultTask {
                     .configureSwaggerFilter()
                     .initOutputDirectory()
 
+                new AnnotationPopulator(project, classFinder)
+                    .populateExtensionsFromAnnotations(apiSourceExtension)
 
                 validateApiSourceExtension(apiSourceExtension)
 
@@ -72,7 +74,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     }
 
     private void validateApiSourceExtension(ApiSourceExtension apiSourceExtension) {
-        // Validate Extensions without inputting annotated defaults
         def errors = apiSourceValidator.isValid(apiSourceExtension)
 
         if (errors) {
@@ -81,13 +82,12 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     }
 
     private void processApiSourceExtension(ApiSourceExtension apiSourceExtension) {
-        // Create Swagger object - throwing exception if errors
-        def reader = readerFactory.reader(apiSourceExtension)
-        Swagger swagger = reader.read()
+        Swagger swagger = readerFactory.reader(apiSourceExtension)
+            .read()
         swagger = applySwaggerFilter(swagger)
 
-        def generator = generatorFactory.generator(apiSourceExtension)
-        generator.generate(swagger)
+        generatorFactory.generator(apiSourceExtension)
+            .generate(swagger)
 
         if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory && this.project) {
             String classifierName = new File(apiSourceExtension.swaggerDirectory).getName()

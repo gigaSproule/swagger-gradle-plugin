@@ -4,17 +4,17 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.generator.GeneratorFactory
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
+import com.benjaminsproule.swagger.gradleplugin.validator.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.internal.classloader.VisitableURLClassLoader
 
 class GradleSwaggerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        def createdClassFinder = new ClassFinder(project)
-        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project, createdClassFinder)
+        SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project)
 
+        def createdClassFinder = new ClassFinder(project)
         def generateSwaggerDocsTask = project.task(type: GenerateSwaggerDocsTask,
             dependsOn: 'classes',
             group: 'swagger',
@@ -24,6 +24,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
                 classFinder = createdClassFinder
                 readerFactory = new ReaderFactory(createdClassFinder)
                 generatorFactory = new GeneratorFactory(createdClassFinder)
+                apiSourceValidator = new ApiSourceValidator(new InfoValidator(new LicenseValidator()), new SecurityDefinitionValidator(), new TagValidator(new ExternalDocsValidator()))
             }) as GenerateSwaggerDocsTask
 
         if (project.hasProperty('swagger.skip')) {
@@ -61,7 +62,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
                 it != null
             }
             def classLoader = createdClassFinder.getClassLoader() as URLClassLoader
-            generateSwaggerDocsTask.inputFiles = ((classLoader.getURLs() + (classLoader.parent as VisitableURLClassLoader).URLs) as Set).collect {
+            generateSwaggerDocsTask.inputFiles = classLoader.getURLs().collect {
                 new File(it.toURI())
             }
         }

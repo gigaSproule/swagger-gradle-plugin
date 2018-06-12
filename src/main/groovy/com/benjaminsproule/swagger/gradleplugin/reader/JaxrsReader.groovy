@@ -45,32 +45,32 @@ import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 class JaxrsReader extends AbstractReader {
-    private static final Logger LOG = LoggerFactory.getLogger(JaxrsReader.class)
+    private static final Logger LOG = LoggerFactory.getLogger(JaxrsReader)
 
     JaxrsReader(ApiSourceExtension apiSourceExtension, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions, ClassFinder classFinder) {
         super(apiSourceExtension, typesToSkip, swaggerExtensions, classFinder)
     }
 
     @Override
-    void updateExtensionChain(List<SwaggerExtension> swaggerExtensions) {
-        List<SwaggerExtension> extensions = swaggerExtensions ?: new ArrayList<SwaggerExtension>()
-        extensions.add(new BeanParamInjectionParamExtension())
-        extensions.add(new SwaggerJersey2Jaxrs())
-        extensions.add(new JaxrsParameterExtension())
-        SwaggerExtensions.setExtensions(extensions)
+    List<SwaggerExtension> customSwaggerExtensions() {
+        [
+            new BeanParamInjectionParamExtension(),
+            new SwaggerJersey2Jaxrs(),
+            new JaxrsParameterExtension()
+        ]
     }
 
     @Override
     Swagger read() {
         Set<Class<?>> classes = getValidClasses()
         for (Class<?> cls : classes) {
-            read(cls)
+            readClass(cls)
         }
         return swagger
     }
 
-    Swagger read(Class<?> cls) {
-        return read(cls, "", null, false, new String[0], new String[0], new HashMap<String, Tag>(), new ArrayList<Parameter>())
+    private Swagger readClass(Class<?> cls) {
+        return readClass(cls, "", null, false, new String[0], new String[0], [:], [])
     }
 
     private Set<Class<?>> getValidClasses() {
@@ -86,7 +86,7 @@ class JaxrsReader extends AbstractReader {
         copied
     }
 
-    protected Swagger read(Class<?> cls, String parentPath, String parentMethod, boolean readHidden, String[] parentConsumes, String[] parentProduces, Map<String, Tag> parentTags, List<Parameter> parentParameters) {
+    private Swagger readClass(Class<?> cls, String parentPath, String parentMethod, boolean readHidden, String[] parentConsumes, String[] parentProduces, Map<String, io.swagger.models.Tag> parentTags, List<Parameter> parentParameters) {
         Api api = AnnotationUtils.findAnnotation(cls, Api)
 
         // only read if allowing hidden apis OR api is not marked as hidden
@@ -98,9 +98,9 @@ class JaxrsReader extends AbstractReader {
         Consumes consumes = AnnotationUtils.findAnnotation(cls, Consumes)
         Produces produces = AnnotationUtils.findAnnotation(cls, Produces)
 
-        Map<String, Tag> tags = updateTagsForApi(parentTags, api)
+        Map<String, io.swagger.models.Tag> tags = updateTagsForApi(parentTags, api)
         List<SecurityRequirement> securities = getSecurityRequirements(api)
-        Map<String, Tag> discoveredTags = scanClasspathForTags()
+        Map<String, io.swagger.models.Tag> discoveredTags = scanClasspathForTags()
         String apiDescription = api.description()
 
         // merge consumes, produces
@@ -125,7 +125,7 @@ class JaxrsReader extends AbstractReader {
 
             String operationPath = getPath(apiPath, methodPath, parentPath)
             if (operationPath != null) {
-                Map<String, String> regexMap = new HashMap<String, String>()
+                Map<String, String> regexMap = [:]
                 operationPath = parseOperationPath(operationPath, regexMap)
 
                 String httpMethod = extractOperationMethod(apiOperation, method, SwaggerExtensions.chain())
@@ -166,10 +166,10 @@ class JaxrsReader extends AbstractReader {
         return swagger
     }
 
-    private void updateTagDescriptions(Map<String, Tag> discoveredTags) {
+    private void updateTagDescriptions(Map<String, io.swagger.models.Tag> discoveredTags) {
         if (swagger.getTags() != null) {
-            for (Tag tag : swagger.getTags()) {
-                Tag rightTag = discoveredTags.get(tag.getName())
+            for (io.swagger.models.Tag tag : swagger.getTags()) {
+                io.swagger.models.Tag rightTag = discoveredTags.get(tag.getName())
                 if (rightTag != null && rightTag.getDescription() != null) {
                     tag.setDescription(rightTag.getDescription())
                 }
@@ -177,8 +177,8 @@ class JaxrsReader extends AbstractReader {
         }
     }
 
-    private Map<String, Tag> scanClasspathForTags() {
-        def tags = new HashMap<>()
+    private Map<String, io.swagger.models.Tag> scanClasspathForTags() {
+        def tags = [:]
 
         classFinder
             .getValidClasses(SwaggerDefinition, apiSource.locations)
@@ -187,7 +187,7 @@ class JaxrsReader extends AbstractReader {
 
             swaggerDefinition.tags().each {
                 if (it.name()) {
-                    tags.put(it.name(), new Tag().name(it.name()).description(it.description()))
+                    tags.put(it.name(), new io.swagger.models.Tag().name(it.name()).description(it.description()))
                 }
             }
         }
@@ -195,10 +195,10 @@ class JaxrsReader extends AbstractReader {
         return tags
     }
 
-    private void handleSubResource(String[] apiConsumes, String httpMethod, String[] apiProduces, Map<String, Tag> tags, Method method, String operationPath, Operation operation) {
+    private void handleSubResource(String[] apiConsumes, String httpMethod, String[] apiProduces, Map<String, io.swagger.models.Tag> tags, Method method, String operationPath, Operation operation) {
         if (isSubResource(httpMethod, method)) {
             Class<?> responseClass = method.getReturnType()
-            read(responseClass, operationPath, httpMethod, true, apiConsumes, apiProduces, tags, operation.getParameters())
+            readClass(responseClass, operationPath, httpMethod, true, apiConsumes, apiProduces, tags, operation.getParameters())
         }
     }
 
@@ -281,7 +281,7 @@ class JaxrsReader extends AbstractReader {
                 }
             }
 
-            if (apiOperation.response() != Void.class && apiOperation.response() != void.class) {
+            if (apiOperation.response() != Void && apiOperation.response() != void) {
                 responseClassType = apiOperation.response()
             }
             if (!apiOperation.responseContainer().isEmpty()) {
@@ -289,10 +289,10 @@ class JaxrsReader extends AbstractReader {
             }
             for (Authorization auth : apiOperation.authorizations()) {
                 if (!auth.value().isEmpty()) {
-                    def scopes = new ArrayList<>()
+                    def scopes = []
                     for (AuthorizationScope scope : auth.scopes()) {
                         if (!scope.scope().isEmpty()) {
-                            scopes.add(scope.scope())
+                            scopes += scope.scope()
                         }
                     }
                     operation.addSecurity(auth.value(), scopes)
@@ -311,9 +311,9 @@ class JaxrsReader extends AbstractReader {
             hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api) != null
         }
         if (responseClassType != null
-            && responseClassType != Void.class
-            && responseClassType != void.class
-            && responseClassType != javax.ws.rs.core.Response.class
+            && responseClassType != Void
+            && responseClassType != void
+            && responseClassType != javax.ws.rs.core.Response
             && !hasApiAnnotation
             && !isSubResource(httpMethod, method)) {
             if (isPrimitive(responseClassType)) {
@@ -326,7 +326,7 @@ class JaxrsReader extends AbstractReader {
                         .schema(responseProperty)
                         .headers(defaultResponseHeaders))
                 }
-            } else if (responseClassType != Void.class && responseClassType != void.class) {
+            } else if (responseClassType != Void && responseClassType != void) {
                 Map<String, Model> models = ModelConverters.getInstance().read(responseClassType)
                 if (models.isEmpty()) {
                     Property p = ModelConverters.getInstance().readAsProperty(responseClassType)
@@ -421,7 +421,7 @@ class JaxrsReader extends AbstractReader {
 
     private static Annotation[] merge(Annotation[] annotations,
                                       Annotation[] annotations2) {
-        List<Annotation> mergedAnnotations = new ArrayList<Annotation>()
+        List<Annotation> mergedAnnotations = []
         mergedAnnotations.addAll(Arrays.asList(annotations))
         mergedAnnotations.addAll(Arrays.asList(annotations2))
         return mergedAnnotations.toArray(new Annotation[0])

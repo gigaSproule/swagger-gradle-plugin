@@ -44,14 +44,14 @@ class TestResourceWithoutClassAnnotation {
         return Response.ok().build()
     }
 
-    @ApiOperation(value = 'A response operation', response = ResponseModel.class)
+    @ApiOperation(value = 'A response operation', response = ResponseModel)
     @Path('/root/withoutannotation/response')
     @POST
     ResponseModel response() {
         return new ResponseModel()
     }
 
-    @ApiOperation(value = 'A response container operation', response = ResponseModel.class, responseContainer = 'List')
+    @ApiOperation(value = 'A response container operation', response = ResponseModel, responseContainer = 'List')
     @Path('/root/withoutannotation/responseContainer')
     @POST
     List<ResponseModel> responseContainer() {

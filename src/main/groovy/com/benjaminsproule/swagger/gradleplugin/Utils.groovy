@@ -17,14 +17,14 @@ class Utils {
      * Extracts all routes from the annotated class
      *
      * @param controllerClazz
-     *            Instrospected class
+     *            Introspected class
      * @return At least 1 route value (empty string)
      */
     static String[] getControllerRequestMapping(Class<?> controllerClazz) {
         String[] controllerRequestMappingValues = []
 
         // Determine if we will use class-level requestmapping or dummy string
-        RequestMapping classRequestMapping = AnnotationUtils.findAnnotation(controllerClazz, RequestMapping.class)
+        RequestMapping classRequestMapping = AnnotationUtils.findAnnotation(controllerClazz, RequestMapping)
         if (classRequestMapping != null) {
             controllerRequestMappingValues = classRequestMapping.value()
         }
@@ -71,7 +71,7 @@ class Utils {
 
     private static void sortResponses(Path path, String method) throws GenerateException {
         try {
-            Method m = Path.class.getDeclaredMethod("get" + method)
+            Method m = Path.getDeclaredMethod("get" + method)
             Operation op = (Operation) m.invoke(path)
             if (op == null) {
                 return

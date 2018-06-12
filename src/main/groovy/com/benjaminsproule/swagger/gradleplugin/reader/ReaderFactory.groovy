@@ -31,14 +31,10 @@ class ReaderFactory {
     private Set<Type> loadTypesToSkip(ApiSourceExtension apiSourceExtension) throws GenerateException {
         def typesToSkip = []
 
-        if (!apiSourceExtension.getTypesToSkip()) {
-            return typesToSkip
-        }
-
-        for (String typeToSkip : apiSourceExtension.getTypesToSkip()) {
+        for (String typeToSkip : apiSourceExtension.typesToSkipList) {
             try {
                 Type type = classFinder.loadClass(typeToSkip)
-                typesToSkip.add(type)
+                typesToSkip += type
             } catch (ClassNotFoundException e) {
                 throw new GenerateException("${typesToSkip} could not be found", e)
             }
@@ -55,7 +51,7 @@ class ReaderFactory {
      */
     private List<SwaggerExtension> resolveSwaggerExtensions(ApiSourceExtension apiSourceExtension) throws GenerateException {
         List<String> clazzes = apiSourceExtension.getSwaggerExtensions()
-        List<SwaggerExtension> resolved = new ArrayList<SwaggerExtension>()
+        List<SwaggerExtension> resolved = []
         if (clazzes != null) {
             for (String clazz : clazzes) {
                 SwaggerExtension extension
@@ -64,7 +60,7 @@ class ReaderFactory {
                 } catch (Exception e) {
                     throw new GenerateException("Cannot load Swagger extension: " + clazz, e)
                 }
-                resolved.add(extension)
+                resolved += extension
             }
         }
         return resolved
@@ -76,7 +72,7 @@ class ReaderFactory {
         try {
             LOG.info("Reading custom API reader: " + customReaderClassName)
             Class<?> clazz = classFinder.loadClass(customReaderClassName)
-            if (AbstractReader.class.isAssignableFrom(clazz)) {
+            if (AbstractReader.isAssignableFrom(clazz)) {
                 Constructor<?> constructor = clazz.getConstructor(ApiSourceExtension, Set, List, ClassFinder)
                 return (ClassSwaggerReader) constructor.newInstance(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions(), ClassFinder)
             } else {

@@ -5,12 +5,7 @@ import io.swagger.annotations.ApiParam
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.AbstractSwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtension
-import io.swagger.models.parameters.CookieParameter
-import io.swagger.models.parameters.FormParameter
-import io.swagger.models.parameters.HeaderParameter
-import io.swagger.models.parameters.Parameter
-import io.swagger.models.parameters.PathParameter
-import io.swagger.models.parameters.QueryParameter
+import io.swagger.models.parameters.*
 import io.swagger.models.properties.ArrayProperty
 import io.swagger.models.properties.FileProperty
 import io.swagger.models.properties.Property
@@ -18,12 +13,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.reflect.TypeUtils
 import org.springframework.beans.BeanUtils
 import org.springframework.core.annotation.AnnotationUtils
-import org.springframework.web.bind.annotation.CookieValue
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 import java.beans.PropertyDescriptor
@@ -35,11 +25,11 @@ class SpringSwaggerExtension extends AbstractSwaggerExtension {
     @Override
     List<Parameter> extractParameters(List<Annotation> annotations, Type type, Set<Type> typesToSkip, Iterator<SwaggerExtension> chain) {
         if (this.shouldIgnoreType(type, typesToSkip)) {
-            return new ArrayList<Parameter>()
+            return []
         }
 
         String defaultValue = ""
-        List<Parameter> parameters = new ArrayList<Parameter>()
+        List<Parameter> parameters = []
         Parameter parameter = null
         for (Annotation annotation : annotations) {
             if (annotation instanceof ModelAttribute) {
@@ -49,7 +39,7 @@ class SpringSwaggerExtension extends AbstractSwaggerExtension {
             }
 
             if (parameter != null) {
-                parameters.add(parameter)
+                parameters += parameter
             }
         }
 
@@ -125,10 +115,10 @@ class SpringSwaggerExtension extends AbstractSwaggerExtension {
             JavaType ct = constructType(type)
             Property schema
 
-            if (MultipartFile.class.isAssignableFrom(ct.getRawClass())) {
+            if (MultipartFile.isAssignableFrom(ct.getRawClass())) {
                 schema = new FileProperty()
             } else if (ct.isContainerType() &&
-                MultipartFile.class.isAssignableFrom(ct.getContentType().getRawClass())) {
+                MultipartFile.isAssignableFrom(ct.getContentType().getRawClass())) {
                 schema = new ArrayProperty().items(new FileProperty())
             } else {
                 schema = ModelConverters.getInstance().readAsProperty(type)
@@ -151,12 +141,12 @@ class SpringSwaggerExtension extends AbstractSwaggerExtension {
 
         Class<?> cls = TypeUtils.getRawType(type, type)
 
-        List<Parameter> parameters = new ArrayList<Parameter>()
+        List<Parameter> parameters = []
         for (PropertyDescriptor propertyDescriptor : BeanUtils.getPropertyDescriptors(cls)) {
             // Get all the valid setter methods inside the bean
             Method propertyDescriptorSetter = propertyDescriptor.getWriteMethod()
             if (propertyDescriptorSetter != null) {
-                ApiParam propertySetterApiParam = AnnotationUtils.findAnnotation(propertyDescriptorSetter, ApiParam.class)
+                ApiParam propertySetterApiParam = AnnotationUtils.findAnnotation(propertyDescriptorSetter, ApiParam)
                 if (propertySetterApiParam == null) {
                     // If we find a setter that doesn't have @ApiParam annotation, then skip it
                     continue
@@ -195,9 +185,9 @@ class SpringSwaggerExtension extends AbstractSwaggerExtension {
                     if (!propertySetterApiParam.name().isEmpty()) {
                         queryParameter.setName(propertySetterApiParam.name())
                     }
-                    parameters.add(queryParameter)
+                    parameters += queryParameter
                 } else {
-                    parameters.add(propertySetterExtractedParameter)
+                    parameters += propertySetterExtractedParameter
                 }
             }
         }

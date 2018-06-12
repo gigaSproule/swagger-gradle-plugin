@@ -24,7 +24,7 @@ abstract class AbstractPluginITest extends Specification {
     GradleRunner pluginTaskRunnerBuilder() {
         GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME)
+            .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
             .withPluginClasspath()
             .withTestKitDir(File.createTempDir())
             .withGradleVersion(System.getProperty('test.gradleVersion', '4.7'))

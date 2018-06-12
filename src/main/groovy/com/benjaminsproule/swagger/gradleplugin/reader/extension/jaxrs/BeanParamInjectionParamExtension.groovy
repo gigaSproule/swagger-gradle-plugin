@@ -26,10 +26,10 @@ class BeanParamInjectionParamExtension extends AbstractSwaggerExtension {
     List<Parameter> extractParameters(List<Annotation> annotations, Type type, Set<Type> typesToSkip, Iterator<SwaggerExtension> chain) {
         def cls = TypeUtils.getRawType(type, type)
 
-        List<Parameter> output = new ArrayList<>()
+        List<Parameter> output = []
         if (shouldIgnoreClass(cls) || typesToSkip.contains(type)) {
             // stop the processing chain
-            typesToSkip.add(type)
+            typesToSkip += type
             return output
         }
         for (Annotation annotation : annotations) {
@@ -40,11 +40,11 @@ class BeanParamInjectionParamExtension extends AbstractSwaggerExtension {
         if (chain.hasNext()) {
             return chain.next().extractParameters(annotations, type, typesToSkip, chain)
         }
-        return Collections.emptyList()
+        return []
     }
 
     private List<Parameter> extractParametersFromAnnotation(Class<?> cls) {
-        List<Parameter> parameters = new ArrayList<>()
+        List<Parameter> parameters = []
 
         for (AccessibleObject accessibleObject : getDeclaredAndInheritedFieldsAndMethods(cls)) {
             SerializableParameter parameter = null
@@ -90,7 +90,7 @@ class BeanParamInjectionParamExtension extends AbstractSwaggerExtension {
                     }
                 }
                 if (!hidden) {
-                    parameters.add(parameter)
+                    parameters += parameter
                 }
             }
         }
@@ -104,7 +104,7 @@ class BeanParamInjectionParamExtension extends AbstractSwaggerExtension {
     }
 
     private List<AccessibleObject> getDeclaredAndInheritedFieldsAndMethods(Class<?> clazz) {
-        List<AccessibleObject> accessibleObjects = new ArrayList<>()
+        List<AccessibleObject> accessibleObjects = []
         recurseGetDeclaredAndInheritedFields(clazz, accessibleObjects)
         recurseGetDeclaredAndInheritedMethods(clazz, accessibleObjects)
         return accessibleObjects

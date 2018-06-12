@@ -9,14 +9,15 @@ import java.lang.annotation.Annotation
 
 class ClassFinder {
     private static final Logger LOG = LoggerFactory.getLogger(ClassFinder)
-    static ClassFinder instance
     private Map<Class<? extends Annotation>, Set<Class<?>>> classCache
+    private Map<Class<? extends Annotation>, Set<? extends Annotation>> annotationCache
     private Project project
     private ClassLoader classLoader
 
     ClassFinder(Project project) {
         this.project = project
-        this.classCache = new HashMap<>()
+        this.classCache = [:]
+        this.annotationCache = [:]
     }
 
     Class<?> loadClass(String name) {
@@ -27,12 +28,36 @@ class ClassFinder {
         classCache.clear()
     }
 
-    Set<Class<?>> getValidClasses(Class<? extends Annotation> clazz, List<String> packages) {
+    void clearAnnotationCache() {
+        annotationCache.clear()
+    }
+
+    def <T extends Annotation> Set<T> getAnnotations(Class<T> annotation, List<String> packages) {
+        if (annotationCache.containsKey(annotation)) {
+            return annotationCache.get(annotation)
+        }
+
+        def annotations = []
+
+        Set<Class<?>> classes = getValidClasses(annotation, packages)
+        classes.each {
+            it.annotations.each {
+                if (it.annotationType() == annotation) {
+                    annotations.add(it)
+                }
+            }
+        }
+
+        annotationCache.put(annotation, annotations)
+        annotations
+    }
+
+    def <T extends Annotation> Set<Class<T>> getValidClasses(Class<T> clazz, List<String> packages) {
         if (classCache.containsKey(clazz)) {
             return classCache.get(clazz)
         }
 
-        Set<Class<?>> classes = new HashSet<Class<?>>()
+        def classes = []
 
         if (packages) {
             packages.each { location ->
@@ -46,7 +71,7 @@ class ClassFinder {
         }
 
         classCache.put(clazz, classes)
-        return classes
+        classes
     }
 
     ClassLoader getClassLoader() {
@@ -62,20 +87,20 @@ class ClassFinder {
             classpaths += project.configurations.runtime.resolve()
         }
         classpaths.flatten().each {
-            urls.add(it.toURI().toURL())
+            urls += it.toURI().toURL()
         }
 
         if (project.sourceSets.main.output.getProperties()['classesDirs']) {
             project.sourceSets.main.output.classesDirs.each {
                 if (it.exists()) {
-                    urls.add(it.toURI().toURL())
+                    urls += it.toURI().toURL()
                 }
             }
         } else {
-            urls.add(project.sourceSets.main.output.classesDir.toURI().toURL())
+            urls += project.sourceSets.main.output.classesDir.toURI().toURL()
         }
 
-        urls.add(project.sourceSets.main.output.resourcesDir.toURI().toURL())
+        urls += project.sourceSets.main.output.resourcesDir.toURI().toURL()
 
         return new URLClassLoader(urls as URL[], getClass().getClassLoader())
     }

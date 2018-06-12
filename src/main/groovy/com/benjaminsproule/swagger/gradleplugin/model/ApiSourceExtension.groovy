@@ -1,24 +1,13 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
-import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import groovy.transform.ToString
-import io.swagger.annotations.Contact
-import io.swagger.annotations.Info
-import io.swagger.annotations.License
-import io.swagger.annotations.SwaggerDefinition
-import io.swagger.models.ExternalDocs
-import io.swagger.models.Scheme
-import io.swagger.models.Swagger
-import io.swagger.models.Tag
-import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.springframework.core.annotation.AnnotationUtils
 
 @ToString(includeNames = true)
-class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
-    Project project
+class ApiSourceExtension {
     InfoExtension info
     SecurityDefinitionExtension securityDefinition
+    List<TagExtension> tags = []
     List<String> locations
     List<String> schemes // Values MUST be from the list: "http", "https", "ws", "wss"
     List<String> outputFormats
@@ -38,155 +27,38 @@ class ApiSourceExtension implements ModelValidator, Swagerable<Swagger> {
     boolean attachSwaggerArtifact
     File descriptionFile
     List<String> swaggerExtensions
-    Set<String> typesToSkip = new HashSet<>()
-    List<String> apiModelPropertyAccessExclusions = []
-    List<String> typesToSkipList
+    List<String> typesToSkipList = []
+    List<String> apiModelPropertyAccessExclusionsList = []
     List<String> modelConverters
-    List<String> apiModelPropertyAccessExclusionsList
 
-    private ClassFinder classFinder
+    private Project project
 
-    ApiSourceExtension(Project project, ClassFinder classFinder) {
+    ApiSourceExtension(Project project) {
         this.project = project
-
-        if (this.apiModelPropertyAccessExclusionsList != null) {
-            this.apiModelPropertyAccessExclusions.addAll(this.apiModelPropertyAccessExclusionsList)
-        }
-
-        if (this.typesToSkipList != null) {
-            this.typesToSkip.addAll(this.typesToSkipList)
-        }
-
-        this.classFinder = classFinder
     }
 
+    /**
+     * Used for taking in configuration for info object.
+     * @param closure {@link InfoExtension} closure
+     */
     void info(Closure closure) {
         info = project.configure(new InfoExtension(project), closure) as InfoExtension
     }
 
+    /**
+     * Used for taking in configuration for security definition object.
+     * @param closure {@link SecurityDefinitionExtension} closure
+     */
     void securityDefinition(Closure closure) {
-        securityDefinition = project.configure(new SecurityDefinitionExtension(classFinder), closure) as SecurityDefinitionExtension
+        securityDefinition = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
     }
 
-    @Override
-    List<String> isValid() {
-        if (!locations) {
-            return ['locations required, specify classes or packages where swagger annotated classes are located']
-        }
-
-        //Order is important because if we have to search annotations we are going to
-        //use the locations in the classpath search
-        if (!info) {
-            info = setInfoFromAnnotation()
-            if (!info) {
-                return ['Info is required by the swagger spec.']
-            }
-        }
-
-        def errors = info.isValid()
-
-        if (securityDefinition) {
-            errors.addAll(securityDefinition.isValid())
-        }
-
-        return errors
-    }
-
-    @Override
-    Swagger asSwaggerType() {
-        def swagger = new Swagger()
-        swagger.setHost(host ?: setHostFromAnnotation())
-        swagger.setBasePath(basePath ?: setBasePathFromAnnotation())
-        swagger.setInfo(info.asSwaggerType())
-        swagger.setTags(setTagsFromAnnotation())
-
-        if (schemes) {
-            for (String scheme : schemes) {
-                swagger.scheme(Scheme.forValue(scheme))
-            }
-        }
-
-        // read description from file
-        if (descriptionFile) {
-            try {
-                swagger.getInfo().setDescription(descriptionFile.getText().trim())
-            } catch (IOException e) {
-                throw new GradleException(e.getMessage(), e)
-            }
-        }
-
-        if (securityDefinition) {
-            swagger.setSecurityDefinitions(securityDefinition.asSwaggerType())
-        }
-
-        return swagger
-    }
-
-    private String setHostFromAnnotation() {
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
-            return swaggerDefinition.host()
-        }
-
-        return null
-    }
-
-    private String setBasePathFromAnnotation() {
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
-            return swaggerDefinition.basePath()
-        }
-
-        return null
-    }
-
-    private List<Tag> setTagsFromAnnotation() {
-        def tags = []
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition.class, locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
-            def tagAnnotations = swaggerDefinition.tags()
-            tags.addAll(tagAnnotations.collect {
-                Tag tag = new Tag()
-                    .name(it.name())
-                    .description(it.description())
-                tag.externalDocs(new ExternalDocs()
-                    .description(it.externalDocs().value())
-                    .url(it.externalDocs().url()))
-            })
-        }
-        if (!tags) {
-            return null
-        }
-        return tags as List<Tag>
-    }
-
-    private InfoExtension setInfoFromAnnotation() {
-        def resultInfo = new InfoExtension(project)
-        for (Class<?> aClass : classFinder.getValidClasses(SwaggerDefinition, locations)) {
-            SwaggerDefinition swaggerDefinition = AnnotationUtils.findAnnotation(aClass, SwaggerDefinition.class)
-            Info infoAnnotation = swaggerDefinition.info()
-            def info = new InfoExtension(project)
-            info.title = infoAnnotation.title()
-            info.description = infoAnnotation.description()
-            info.version = infoAnnotation.version()
-            info.termsOfService = infoAnnotation.termsOfService()
-            info.license = from(infoAnnotation.license())
-            info.contact = from(infoAnnotation.contact())
-            resultInfo.mergeWith(info)
-        }
-        return resultInfo
-    }
-
-    private static ContactExtension from(Contact contactAnnotation) {
-        return new ContactExtension(
-            name: contactAnnotation.name(),
-            email: contactAnnotation.email(),
-            url: contactAnnotation.url())
-    }
-
-    private static LicenseExtension from(License licenseAnnotation) {
-        return new LicenseExtension(
-            name: licenseAnnotation.name(),
-            url: licenseAnnotation.url())
+    /**
+     * Used for taking in configuration for tag object.
+     * @param closure {@link TagExtension} closure
+     */
+    void tag(Closure closure) {
+        TagExtension tagExtension = project.configure(new TagExtension(project), closure) as TagExtension
+        tags += tagExtension
     }
 }

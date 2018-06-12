@@ -6,6 +6,7 @@ import com.benjaminsproule.swagger.gradleplugin.misc.EnvironmentConfigurer
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
+import com.benjaminsproule.swagger.gradleplugin.validator.ApiSourceValidator
 import io.swagger.config.FilterFactory
 import io.swagger.core.filter.SpecFilter
 import io.swagger.models.Swagger
@@ -38,6 +39,8 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     ReaderFactory readerFactory
     @Internal
     GeneratorFactory generatorFactory
+    @Internal
+    ApiSourceValidator apiSourceValidator
 
     @TaskAction
     generateSwaggerDocuments() {
@@ -53,7 +56,14 @@ class GenerateSwaggerDocsTask extends DefaultTask {
                     .configureModelConverters()
                     .configureSwaggerFilter()
                     .initOutputDirectory()
-                processSwaggerPluginExtension(apiSourceExtension)
+
+                new AnnotationPopulator(project, classFinder)
+                    .populateExtensionsFromAnnotations(apiSourceExtension)
+
+                validateApiSourceExtension(apiSourceExtension)
+
+                processApiSourceExtension(apiSourceExtension)
+
                 environmentConfigurer.cleanUp()
             }
         } catch (InvalidUserDataException iude) {
@@ -63,19 +73,21 @@ class GenerateSwaggerDocsTask extends DefaultTask {
         }
     }
 
-    private void processSwaggerPluginExtension(ApiSourceExtension apiSourceExtension) {
-        def errors = apiSourceExtension.isValid()
+    private void validateApiSourceExtension(ApiSourceExtension apiSourceExtension) {
+        def errors = apiSourceValidator.isValid(apiSourceExtension)
 
         if (errors) {
             throw new InvalidUserDataException(errors.join(","))
         }
+    }
 
-        def reader = readerFactory.reader(apiSourceExtension)
-        Swagger swagger = reader.read()
+    private void processApiSourceExtension(ApiSourceExtension apiSourceExtension) {
+        Swagger swagger = readerFactory.reader(apiSourceExtension)
+            .read()
         swagger = applySwaggerFilter(swagger)
 
-        def generator = generatorFactory.generator(apiSourceExtension)
-        generator.generate(swagger)
+        generatorFactory.generator(apiSourceExtension)
+            .generate(swagger)
 
         if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory && this.project) {
             String classifierName = new File(apiSourceExtension.swaggerDirectory).getName()
@@ -96,8 +108,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
     private static Swagger applySwaggerFilter(Swagger swagger) {
         if (FilterFactory.getFilter()) {
-            return new SpecFilter().filter(swagger, FilterFactory.getFilter(), new HashMap<String, List<String>>(), new HashMap<String, String>(),
-                new HashMap<String, List<String>>())
+            return new SpecFilter().filter(swagger, FilterFactory.getFilter(), [:], [:], [:])
         }
         swagger
     }

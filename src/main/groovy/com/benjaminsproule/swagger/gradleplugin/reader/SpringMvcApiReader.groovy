@@ -7,11 +7,11 @@ import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.spring.SpringSwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.model.SpringResource
 import com.google.common.collect.Sets
-import io.swagger.models.*
 import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
+import io.swagger.models.*
 import io.swagger.models.parameters.Parameter
 import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
@@ -33,7 +33,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 class SpringMvcApiReader extends AbstractReader {
-    private static final Logger LOG = LoggerFactory.getLogger(SpringMvcApiReader.class)
+    private static final Logger LOG = LoggerFactory.getLogger(SpringMvcApiReader)
     private String resourcePath
 
     SpringMvcApiReader(ApiSourceExtension apiSourceExtension, Set<Type> typesToSkip, List<SwaggerExtension> swaggerExtensions, ClassFinder classFinder) {
@@ -41,10 +41,8 @@ class SpringMvcApiReader extends AbstractReader {
     }
 
     @Override
-    void updateExtensionChain(List<SwaggerExtension> swaggerExtensions) {
-        List<SwaggerExtension> extensions = swaggerExtensions ?: new ArrayList<SwaggerExtension>()
-        extensions.add(new SpringSwaggerExtension())
-        SwaggerExtensions.setExtensions(extensions)
+    List<SwaggerExtension> customSwaggerExtensions() {
+        [new SpringSwaggerExtension()]
     }
 
     @Override
@@ -76,7 +74,7 @@ class SpringMvcApiReader extends AbstractReader {
 
     protected
     static Map<String, SpringResource> generateResourceMap(Set<Class<?>> validClasses) throws GenerateException {
-        Map<String, SpringResource> resourceMap = new HashMap<String, SpringResource>()
+        Map<String, SpringResource> resourceMap = [:]
         for (Class<?> aClass : validClasses) {
             //This try/catch block is to stop a bamboo build from failing due to NoClassDefFoundError
             //This occurs when a class or method loaded by reflections contains a type that has no dependency
@@ -94,14 +92,14 @@ class SpringMvcApiReader extends AbstractReader {
 
     Swagger read(SpringResource resource) {
         List<Method> methods = resource.methods
-        Map<String, Tag> tags = new HashMap<String, Tag>()
+        Map<String, io.swagger.models.Tag> tags = [:]
 
-        List<SecurityRequirement> resourceSecurities = new ArrayList<SecurityRequirement>()
+        List<SecurityRequirement> resourceSecurities = []
         String apiDescription
 
         // Add the description from the controller api
         Class<?> controller = resource.controllerClass
-        RequestMapping controllerRM = AnnotatedElementUtils.findMergedAnnotation(controller, RequestMapping.class)
+        RequestMapping controllerRM = AnnotatedElementUtils.findMergedAnnotation(controller, RequestMapping)
 
         String[] controllerProduces = new String[0]
         String[] controllerConsumes = new String[0]
@@ -110,8 +108,8 @@ class SpringMvcApiReader extends AbstractReader {
             controllerProduces = controllerRM.produces()
         }
 
-        if (controller.isAnnotationPresent(Api.class)) {
-            Api api = AnnotatedElementUtils.findMergedAnnotation(controller, Api.class)
+        if (controller.isAnnotationPresent(Api)) {
+            Api api = AnnotatedElementUtils.findMergedAnnotation(controller, Api)
             if (isApiUnreadable(false, api)) {
                 return swagger
             }
@@ -133,16 +131,16 @@ class SpringMvcApiReader extends AbstractReader {
 
         for (String path : apiMethodMap.keySet()) {
             for (Method method : apiMethodMap.get(path)) {
-                RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class)
+                RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping)
                 if (requestMapping == null) {
                     continue
                 }
-                ApiOperation apiOperation = AnnotatedElementUtils.findMergedAnnotation(method, ApiOperation.class)
+                ApiOperation apiOperation = AnnotatedElementUtils.findMergedAnnotation(method, ApiOperation)
                 if (apiOperation != null && apiOperation.hidden()) {
                     continue
                 }
 
-                Map<String, String> regexMap = new HashMap<String, String>()
+                Map<String, String> regexMap = [:]
                 String operationPath = parseOperationPath(path, regexMap)
 
                 //http method
@@ -150,7 +148,7 @@ class SpringMvcApiReader extends AbstractReader {
                     String httpMethod = requestMethod.toString().toLowerCase()
                     Operation operation = parseMethod(method)
 
-                    updateOperationParameters(new ArrayList<Parameter>(), regexMap, operation)
+                    updateOperationParameters([], regexMap, operation)
 
                     updateOperationProtocols(apiOperation, operation)
 
@@ -180,15 +178,15 @@ class SpringMvcApiReader extends AbstractReader {
         int responseCode = 200
         Operation operation = new Operation()
 
-        RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class)
+        RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping)
         Type responseClassType = null
-        List<String> produces = new ArrayList<String>()
-        List<String> consumes = new ArrayList<String>()
+        List<String> produces = []
+        List<String> consumes = []
         String responseContainer = null
         String operationId = method.getName()
         Map<String, Property> defaultResponseHeaders = null
 
-        ApiOperation apiOperation = AnnotatedElementUtils.findMergedAnnotation(method, ApiOperation.class)
+        ApiOperation apiOperation = AnnotatedElementUtils.findMergedAnnotation(method, ApiOperation)
 
         if (apiOperation != null) {
             if (apiOperation.hidden()) {
@@ -217,7 +215,7 @@ class SpringMvcApiReader extends AbstractReader {
                 }
             }
 
-            if (apiOperation.response() != Void.class && apiOperation.response() != void.class) {
+            if (apiOperation.response() != Void && apiOperation.response() != void) {
                 responseClassType = apiOperation.response()
             }
             if (!apiOperation.responseContainer().isEmpty()) {
@@ -225,7 +223,7 @@ class SpringMvcApiReader extends AbstractReader {
             }
 
             ///security
-            List<SecurityRequirement> securities = new ArrayList<SecurityRequirement>()
+            List<SecurityRequirement> securities = []
             for (Authorization auth : apiOperation.authorizations()) {
                 if (!auth.value().isEmpty()) {
                     SecurityRequirement security = new SecurityRequirement()
@@ -235,7 +233,7 @@ class SpringMvcApiReader extends AbstractReader {
                             security.addScope(scope.scope())
                         }
                     }
-                    securities.add(security)
+                    securities += security
                 }
             }
             for (SecurityRequirement sec : securities) {
@@ -250,17 +248,17 @@ class SpringMvcApiReader extends AbstractReader {
             LOG.info("picking up response class from method " + method)
             responseClassType = method.getGenericReturnType()
         }
-        if (responseClassType instanceof ParameterizedType && ResponseEntity.class == ((ParameterizedType) responseClassType).getRawType()) {
+        if (responseClassType instanceof ParameterizedType && ResponseEntity == ((ParameterizedType) responseClassType).getRawType()) {
             responseClassType = ((ParameterizedType) responseClassType).getActualTypeArguments()[0]
         }
         boolean hasApiAnnotation = false
         if (responseClassType instanceof Class) {
-            hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api.class) != null
+            hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api) != null
         }
         if (responseClassType != null
-            && responseClassType != Void.class
-            && responseClassType != void.class
-            && responseClassType != ResponseEntity.class
+            && responseClassType != Void
+            && responseClassType != void
+            && responseClassType != ResponseEntity
             && !hasApiAnnotation) {
             if (isPrimitive(responseClassType)) {
                 Property property = ModelConverters.getInstance().readAsProperty(responseClassType)
@@ -271,7 +269,7 @@ class SpringMvcApiReader extends AbstractReader {
                         .schema(responseProperty)
                         .headers(defaultResponseHeaders))
                 }
-            } else if (responseClassType != Void.class && responseClassType != void.class) {
+            } else if (responseClassType != Void && responseClassType != void) {
                 Map<String, Model> models = ModelConverters.getInstance().read(responseClassType)
                 if (models.isEmpty()) {
                     Property pp = ModelConverters.getInstance().readAsProperty(responseClassType)
@@ -299,26 +297,26 @@ class SpringMvcApiReader extends AbstractReader {
 
         for (String str : requestMapping.produces()) {
             if (!produces.contains(str)) {
-                produces.add(str)
+                produces += str
             }
         }
         for (String str : requestMapping.consumes()) {
             if (!consumes.contains(str)) {
-                consumes.add(str)
+                consumes += str
             }
         }
 
-        ApiResponses responseAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, ApiResponses.class)
+        ApiResponses responseAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, ApiResponses)
         if (responseAnnotation != null) {
             updateApiResponse(operation, responseAnnotation)
         } else {
-            ResponseStatus responseStatus = AnnotatedElementUtils.findMergedAnnotation(method, ResponseStatus.class)
+            ResponseStatus responseStatus = AnnotatedElementUtils.findMergedAnnotation(method, ResponseStatus)
             if (responseStatus != null) {
                 operation.response(responseStatus.value().value(), new Response().description(responseStatus.reason()))
             }
         }
 
-        Deprecated annotation = AnnotationUtils.findAnnotation(method, Deprecated.class)
+        Deprecated annotation = AnnotationUtils.findAnnotation(method, Deprecated)
         if (annotation != null) {
             operation.deprecated(true)
         }
@@ -363,9 +361,9 @@ class SpringMvcApiReader extends AbstractReader {
     }
 
     private Map<String, List<Method>> collectApisByRequestMapping(List<Method> methods) {
-        Map<String, List<Method>> apiMethodMap = new HashMap<String, List<Method>>()
+        Map<String, List<Method>> apiMethodMap = [:]
         for (Method method : methods) {
-            RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class)
+            RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping)
             if (requestMapping != null) {
                 String path
                 if (requestMapping.value().length != 0) {
@@ -376,8 +374,8 @@ class SpringMvcApiReader extends AbstractReader {
                 if (apiMethodMap.containsKey(path)) {
                     apiMethodMap.get(path).add(method)
                 } else {
-                    List<Method> ms = new ArrayList<Method>()
-                    ms.add(method)
+                    List<Method> ms = []
+                    ms += method
                     apiMethodMap.put(path, ms)
                 }
             }
@@ -402,7 +400,7 @@ class SpringMvcApiReader extends AbstractReader {
         // Iterate over all value attributes of the class-level RequestMapping annotation
         for (String controllerRequestMappingValue : controllerRequestMappingValues) {
             for (Method method : controllerClazz.getMethods()) {
-                RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class)
+                RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping)
 
                 // Look for method-level @RequestMapping annotation
                 if (methodRequestMapping != null) {

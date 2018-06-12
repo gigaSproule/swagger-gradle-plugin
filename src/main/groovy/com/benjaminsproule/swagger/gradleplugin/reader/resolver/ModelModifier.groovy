@@ -21,8 +21,8 @@ import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 class ModelModifier extends ModelResolver {
-    private Map<JavaType, JavaType> modelSubtitutes = new HashMap<JavaType, JavaType>()
-    List<String> apiModelPropertyAccessExclusions = new ArrayList<String>()
+    private Map<JavaType, JavaType> modelSubtitutes = [:]
+    List<String> apiModelPropertyAccessExclusions = []
     private ClassFinder classFinder
 
     private static Logger LOG = LoggerFactory.getLogger(ModelModifier)
@@ -84,13 +84,13 @@ class ModelModifier extends ModelResolver {
         Class<?> cls = javaType.getRawClass()
 
         for (Method method : cls.getDeclaredMethods()) {
-            ApiModelProperty apiModelPropertyAnnotation = AnnotationUtils.findAnnotation(method, ApiModelProperty.class)
+            ApiModelProperty apiModelPropertyAnnotation = AnnotationUtils.findAnnotation(method, ApiModelProperty)
 
             processProperty(apiModelPropertyAnnotation, model)
         }
 
         for (Field field : FieldUtils.getAllFields(cls)) {
-            ApiModelProperty apiModelPropertyAnnotation = AnnotationUtils.getAnnotation(field, ApiModelProperty.class)
+            ApiModelProperty apiModelPropertyAnnotation = AnnotationUtils.getAnnotation(field, ApiModelProperty)
 
             processProperty(apiModelPropertyAnnotation, model)
         }

@@ -40,13 +40,13 @@ class TestResourceWithClassAnnotation {
         return ResponseEntity.ok().build()
     }
 
-    @ApiOperation(value = 'A response operation', response = ResponseModel.class)
+    @ApiOperation(value = 'A response operation', response = ResponseModel)
     @RequestMapping(path = '/response', method = RequestMethod.POST)
     ResponseModel response() {
         return new ResponseModel()
     }
 
-    @ApiOperation(value = 'A response container operation', response = ResponseModel.class, responseContainer = 'List')
+    @ApiOperation(value = 'A response container operation', response = ResponseModel, responseContainer = 'List')
     @RequestMapping(path = '/responseContainer', method = RequestMethod.POST)
     List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel())

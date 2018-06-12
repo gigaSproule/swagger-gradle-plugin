@@ -3,21 +3,10 @@ package com.benjaminsproule.swagger.gradleplugin.reader.extension.jaxrs
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.AbstractSwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtension
-import io.swagger.models.parameters.CookieParameter
-import io.swagger.models.parameters.FormParameter
-import io.swagger.models.parameters.HeaderParameter
-import io.swagger.models.parameters.Parameter
-import io.swagger.models.parameters.PathParameter
-import io.swagger.models.parameters.QueryParameter
-import io.swagger.models.parameters.SerializableParameter
+import io.swagger.models.parameters.*
 import io.swagger.models.properties.Property
 
-import javax.ws.rs.CookieParam
-import javax.ws.rs.DefaultValue
-import javax.ws.rs.FormParam
-import javax.ws.rs.HeaderParam
-import javax.ws.rs.PathParam
-import javax.ws.rs.QueryParam
+import javax.ws.rs.*
 import java.lang.annotation.Annotation
 import java.lang.reflect.Type
 
@@ -26,23 +15,23 @@ class JaxrsParameterExtension extends AbstractSwaggerExtension {
     @Override
     List<Parameter> extractParameters(List<Annotation> annotations, Type type, Set<Type> typesToSkip, Iterator<SwaggerExtension> chain) {
         if (this.shouldIgnoreType(type, typesToSkip)) {
-            return new ArrayList<>()
+            return []
         }
 
-        List<Parameter> parameters = new ArrayList<>()
+        List<Parameter> parameters = []
         SerializableParameter parameter = null
         for (Annotation annotation : annotations) {
             parameter = getParameter(type, parameter, annotation)
         }
         if (parameter != null) {
-            parameters.add(parameter)
+            parameters += parameter
         }
 
         return parameters
     }
 
     static SerializableParameter getParameter(Type type, SerializableParameter parameter, Annotation annotation) {
-        String defaultValue = ""
+        def defaultValue = ''
         if (annotation instanceof DefaultValue) {
             DefaultValue defaultValueAnnotation = (DefaultValue) annotation
             defaultValue = defaultValueAnnotation.value()

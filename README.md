@@ -343,7 +343,7 @@ You can instruct `swagger-gradle-plugin` to deploy the generated `swagger.json` 
 ```groovy
 attachSwaggerArtifact = true
 ```
-The above setting attaches the generated file to Gradle for install/deploy purpose with `swagger.json` as classifier and `json` as type.
+The above setting attaches the generated file to Gradle for install/deploy purpose with `swaggerDirectory`'s name as classifier and the `outputFormat` as type.
 
 Please note that when using the `maven-publish` plugin instead of the `maven` plugin, the classifier _must_ be specified in the configuration as it uses a different mechanism for the classifier. This is especially important when using multiple `apiSource` closures. Example:
 ```groovy

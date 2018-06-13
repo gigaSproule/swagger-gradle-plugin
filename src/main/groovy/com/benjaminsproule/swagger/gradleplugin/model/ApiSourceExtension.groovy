@@ -6,7 +6,7 @@ import org.gradle.api.Project
 @ToString(includeNames = true)
 class ApiSourceExtension {
     InfoExtension info
-    SecurityDefinitionExtension securityDefinition
+    List<SecurityDefinitionExtension> securityDefinition = []
     List<TagExtension> tags = []
     List<String> locations
     List<String> schemes // Values MUST be from the list: "http", "https", "ws", "wss"
@@ -50,7 +50,7 @@ class ApiSourceExtension {
      * @param closure {@link SecurityDefinitionExtension} closure
      */
     void securityDefinition(Closure closure) {
-        securityDefinition = project.configure(new SecurityDefinitionExtension(), closure) as SecurityDefinitionExtension
+        securityDefinition += project.configure(new SecurityDefinitionExtension(project), closure) as SecurityDefinitionExtension
     }
 
     /**
@@ -58,7 +58,6 @@ class ApiSourceExtension {
      * @param closure {@link TagExtension} closure
      */
     void tag(Closure closure) {
-        TagExtension tagExtension = project.configure(new TagExtension(project), closure) as TagExtension
-        tags += tagExtension
+        tags += project.configure(new TagExtension(project), closure) as TagExtension
     }
 }

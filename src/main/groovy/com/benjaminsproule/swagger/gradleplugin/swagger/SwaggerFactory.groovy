@@ -106,15 +106,19 @@ class SwaggerFactory {
         return license
     }
 
-    private Map<String, SecuritySchemeDefinition> generateSecuritySchemeDefinitions(SecurityDefinitionExtension securityDefinitionExtension) throws GenerateException {
+    private Map<String, SecuritySchemeDefinition> generateSecuritySchemeDefinitions(List<SecurityDefinitionExtension> securityDefinitionExtensions) throws GenerateException {
         //Tree map to ensure consistent output
         def map = new TreeMap<String, SecuritySchemeDefinition>()
 
         def securityDefinitions = new HashMap<String, JsonNode>()
-        if (securityDefinitionExtension.json || securityDefinitionExtension.jsonPath) {
-            securityDefinitions = loadSecurityDefinitionsFromJsonFile(securityDefinitionExtension)
-        } else {
-            securityDefinitions.put(securityDefinitionExtension.name, new ObjectMapper().valueToTree(securityDefinitionExtension))
+        securityDefinitionExtensions.each { securityDefinitionExtension ->
+            if (securityDefinitionExtension.json) {
+                loadSecurityDefinitionsFromJsonFile(securityDefinitionExtension).each {
+                    securityDefinitions.put(it.key, it.value)
+                }
+            } else {
+                securityDefinitions.put(securityDefinitionExtension.name, new ObjectMapper().valueToTree(securityDefinitionExtension))
+            }
         }
 
         securityDefinitions.each { key, value ->
@@ -131,9 +135,10 @@ class SwaggerFactory {
         def securityDefinitions = [:]
 
         try {
-            InputStream jsonStream = securityDefinitionExtension.json != null ?
-                classFinder.getClassLoader().getResourceAsStream(securityDefinitionExtension.json)
-                : new FileInputStream(securityDefinitionExtension.jsonPath)
+            InputStream jsonStream = classFinder.getClassLoader().getResourceAsStream(securityDefinitionExtension.json)
+            if (jsonStream == null) {
+                jsonStream = new FileInputStream(securityDefinitionExtension.json)
+            }
 
             JsonNode tree = new ObjectMapper().readTree(jsonStream)
 

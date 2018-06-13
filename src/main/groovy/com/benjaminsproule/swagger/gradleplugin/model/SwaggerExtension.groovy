@@ -7,9 +7,9 @@ import org.gradle.api.Project
 class SwaggerExtension {
     public static final String EXTENSION_NAME = 'swagger'
 
-    private Project project
-
     List<ApiSourceExtension> apiSourceExtensions = []
+
+    private Project project
 
     SwaggerExtension(Project project) {
         this.project = project
@@ -20,7 +20,6 @@ class SwaggerExtension {
      * @param closure {@link ApiSourceExtension} closure
      */
     void apiSource(Closure closure) {
-        ApiSourceExtension apiSourceExtension = project.configure(new ApiSourceExtension(project), closure) as ApiSourceExtension
-        apiSourceExtensions += apiSourceExtension
+        apiSourceExtensions += project.configure(new ApiSourceExtension(project), closure) as ApiSourceExtension
     }
 }

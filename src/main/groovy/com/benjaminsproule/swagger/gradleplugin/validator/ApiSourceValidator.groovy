@@ -29,7 +29,11 @@ class ApiSourceValidator implements ModelValidator<ApiSourceExtension> {
         }
 
         errors += infoValidator.isValid(apiSourceExtension.info)
-        errors += securityDefinitionValidator.isValid(apiSourceExtension.securityDefinition)
+
+        apiSourceExtension.securityDefinition.each { securityDefinition ->
+            errors += securityDefinitionValidator.isValid(securityDefinition)
+        }
+
         apiSourceExtension.tags.each { tag ->
             errors += tagValidator.isValid(tag)
         }

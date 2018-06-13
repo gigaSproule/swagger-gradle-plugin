@@ -15,5 +15,4 @@ class SecurityDefinitionExtension {
     String keyName
     String description
     String json
-    String jsonPath
 }

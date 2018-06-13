@@ -6,13 +6,13 @@ class SecurityDefinitionValidator implements ModelValidator<SecurityDefinitionEx
 
     @Override
     List<String> isValid(SecurityDefinitionExtension securityDefinitionExtension) {
-        if (!securityDefinitionExtension || securityDefinitionExtension.json || securityDefinitionExtension.jsonPath) {
+        if (!securityDefinitionExtension || securityDefinitionExtension.json) {
             return []
         }
 
         def errors = []
-        if (!securityDefinitionExtension.name && !securityDefinitionExtension.type && !securityDefinitionExtension.json && !securityDefinitionExtension.jsonPath) {
-            return ['securityDefinition.name and securityDefinition.type OR securityDefinition.json OR securityDefinition.jsonPath is required by the swagger spec']
+        if (!securityDefinitionExtension.name && !securityDefinitionExtension.type && !securityDefinitionExtension.json) {
+            return ['securityDefinition.name and securityDefinition.type OR securityDefinition.json is required by the swagger spec']
         }
 
         if (!securityDefinitionExtension.name) {

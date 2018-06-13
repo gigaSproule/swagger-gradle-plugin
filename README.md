@@ -154,13 +154,12 @@ securityDefinition {
     json = 'securityDefinition.json'
 }
 ```
-The file will be read by `getClass().getResourceAsStream`, so please note the path you configured.
 
-Alternatively, specify the __absolute__ file path to the json definition file: 
+Alternatively, specify the __absolute__ file path to the json definition file:
 
 ```groovy
 securityDefinition {
-    jsonPath = "${project.projectDir}/securityDefinition.json"
+    json = "${project.projectDir}/securityDefinition.json"
 }
 ```
 

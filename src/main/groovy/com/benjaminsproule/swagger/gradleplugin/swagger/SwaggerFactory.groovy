@@ -111,7 +111,7 @@ class SwaggerFactory {
         def map = new TreeMap<String, SecuritySchemeDefinition>()
 
         def securityDefinitions = new HashMap<String, JsonNode>()
-        if (securityDefinitionExtension.json || securityDefinitionExtension.jsonPath) {
+        if (securityDefinitionExtension.json) {
             securityDefinitions = loadSecurityDefinitionsFromJsonFile(securityDefinitionExtension)
         } else {
             securityDefinitions.put(securityDefinitionExtension.name, new ObjectMapper().valueToTree(securityDefinitionExtension))
@@ -131,9 +131,10 @@ class SwaggerFactory {
         def securityDefinitions = [:]
 
         try {
-            InputStream jsonStream = securityDefinitionExtension.json != null ?
-                classFinder.getClassLoader().getResourceAsStream(securityDefinitionExtension.json)
-                : new FileInputStream(securityDefinitionExtension.jsonPath)
+            InputStream jsonStream = classFinder.getClassLoader().getResourceAsStream(securityDefinitionExtension.json)
+            if (jsonStream == null) {
+                jsonStream = new FileInputStream(securityDefinitionExtension.json)
+            }
 
             JsonNode tree = new ObjectMapper().readTree(jsonStream)
 

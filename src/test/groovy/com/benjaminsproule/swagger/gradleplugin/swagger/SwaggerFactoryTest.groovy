@@ -79,7 +79,7 @@ class SwaggerFactoryTest extends Specification {
         swagger.securityDefinitions.name.type == 'basic'
     }
 
-    def 'Should generate security definitions from json'() {
+    def 'Should generate security definitions from json with classpath path'() {
         given:
         def apiSourceExtension = new ApiSourceExtension()
         apiSourceExtension.locations = locations
@@ -108,7 +108,7 @@ class SwaggerFactoryTest extends Specification {
         swagger.securityDefinitions.petstore_auth.scopes['read:pets'] == 'read your pets'
     }
 
-    def 'Should generate security definitions from jsonPath'() {
+    def 'Should generate security definitions from json with full path'() {
         given:
         def apiSourceExtension = new ApiSourceExtension()
         apiSourceExtension.locations = locations
@@ -118,7 +118,7 @@ class SwaggerFactoryTest extends Specification {
         apiSourceExtension.info = infoExtension
 
         def securityDefinitionExtension = new SecurityDefinitionExtension()
-        securityDefinitionExtension.jsonPath = new File(getClass().getClassLoader().getResource('security-definition/securityDefinitionExtensionTest.json').toURI()).absolutePath
+        securityDefinitionExtension.json = new File(getClass().getClassLoader().getResource('security-definition/securityDefinitionExtensionTest.json').toURI()).absolutePath
         apiSourceExtension.securityDefinition = securityDefinitionExtension
 
         when:

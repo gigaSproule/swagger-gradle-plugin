@@ -14,16 +14,16 @@ class SecurityDefinitionValidatorTest extends Specification {
         errors.size() == 0
     }
 
-    def 'isValid returns error message if name, type, json and jsonPath not set'() {
+    def 'isValid returns error message if name, type and json not set'() {
         when:
         def errors = new SecurityDefinitionValidator().isValid(new SecurityDefinitionExtension())
 
         then:
         errors.size() == 1
-        errors[0] == 'securityDefinition.name and securityDefinition.type OR securityDefinition.json OR securityDefinition.jsonPath is required by the swagger spec'
+        errors[0] == 'securityDefinition.name and securityDefinition.type OR securityDefinition.json is required by the swagger spec'
     }
 
-    def 'isValid returns error message if name, json and jsonPath not set'() {
+    def 'isValid returns error message if name and json not set'() {
         given:
         def securityDefinitionExtension = new SecurityDefinitionExtension()
         securityDefinitionExtension.type = 'type'
@@ -36,7 +36,7 @@ class SecurityDefinitionValidatorTest extends Specification {
         errors[0] == 'securityDefinition.name is required by the swagger spec'
     }
 
-    def 'isValid returns error message if type, json and jsonPath not set'() {
+    def 'isValid returns error message if type and json not set'() {
         given:
         def securityDefinitionExtension = new SecurityDefinitionExtension()
         securityDefinitionExtension.name = 'name'
@@ -168,18 +168,6 @@ class SecurityDefinitionValidatorTest extends Specification {
         given:
         def securityDefinitionExtension = new SecurityDefinitionExtension()
         securityDefinitionExtension.json = 'json'
-
-        when:
-        def errors = new SecurityDefinitionValidator().isValid(securityDefinitionExtension)
-
-        then:
-        errors.size() == 0
-    }
-
-    def 'isValid returns empty list if jsonPath set'() {
-        given:
-        def securityDefinitionExtension = new SecurityDefinitionExtension()
-        securityDefinitionExtension.jsonPath = 'jsonPath'
 
         when:
         def errors = new SecurityDefinitionValidator().isValid(securityDefinitionExtension)

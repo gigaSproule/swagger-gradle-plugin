@@ -3,9 +3,11 @@ package com.benjaminsproule.swagger.gradleplugin.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.ToString
+import org.gradle.api.Project
 
 @ToString(includeNames = true)
 class SecurityDefinitionExtension {
+    List<ScopeExtension> scopes = []
     @JsonIgnore
     String name
     String type
@@ -14,6 +16,22 @@ class SecurityDefinitionExtension {
     @JsonProperty("name")
     String keyName
     String description
+    String authorizationUrl
+    String tokenUrl
+    String flow
     String json
-    String jsonPath
+
+    private Project project
+
+    SecurityDefinitionExtension(Project project) {
+        this.project = project
+    }
+
+    /**
+     * Used for taking in configuration for scope object.
+     * @param closure {@link ScopeExtension} closure
+     */
+    void scope(Closure closure) {
+        scopes += project.configure(new ScopeExtension(), closure) as ScopeExtension
+    }
 }

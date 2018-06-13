@@ -50,10 +50,31 @@ class SwaggerFactoryTest extends Specification {
 
         apiSourceExtension.info = infoExtension
 
-        def securityDefinitionExtension = new SecurityDefinitionExtension()
-        securityDefinitionExtension.type = 'basic'
-        securityDefinitionExtension.name = 'name'
-        apiSourceExtension.securityDefinition = securityDefinitionExtension
+        def tagExtension1 = new TagExtension()
+        tagExtension1.name = 'tag 1'
+        tagExtension1.description = 'description'
+
+        def externalDocsExtension = new ExternalDocsExtension()
+        externalDocsExtension.description = 'description'
+        externalDocsExtension.url = 'url'
+
+        tagExtension1.externalDocs = externalDocsExtension
+
+        def tagExtension2 = new TagExtension()
+        tagExtension2.name = 'tag 2'
+        tagExtension2.description = 'description'
+
+        apiSourceExtension.tags = [tagExtension1, tagExtension2]
+
+        def securityDefinitionExtension1 = new SecurityDefinitionExtension()
+        securityDefinitionExtension1.type = 'basic'
+        securityDefinitionExtension1.name = 'security definition 1'
+
+        def securityDefinitionExtension2 = new SecurityDefinitionExtension()
+        securityDefinitionExtension2.type = 'basic'
+        securityDefinitionExtension2.name = 'security definition 2'
+
+        apiSourceExtension.securityDefinition = [securityDefinitionExtension1, securityDefinitionExtension2]
 
         when:
         def swagger = swaggerFactory.swagger(apiSourceExtension)
@@ -75,11 +96,19 @@ class SwaggerFactoryTest extends Specification {
         swagger.info.license
         swagger.info.license.name == 'license name'
         swagger.info.license.url == 'license url'
+        swagger.tags
+        swagger.tags[0].name == 'tag 1'
+        swagger.tags[0].description == 'description'
+        swagger.tags[0].externalDocs.description == 'description'
+        swagger.tags[0].externalDocs.url == 'url'
+        swagger.tags[1].name == 'tag 2'
+        swagger.tags[1].description == 'description'
         swagger.securityDefinitions
-        swagger.securityDefinitions.name.type == 'basic'
+        swagger.securityDefinitions.'security definition 1'.type == 'basic'
+        swagger.securityDefinitions.'security definition 2'.type == 'basic'
     }
 
-    def 'Should generate security definitions from json'() {
+    def 'Should generate security definitions from json with classpath path'() {
         given:
         def apiSourceExtension = new ApiSourceExtension()
         apiSourceExtension.locations = locations
@@ -90,7 +119,7 @@ class SwaggerFactoryTest extends Specification {
 
         def securityDefinitionExtension = new SecurityDefinitionExtension()
         securityDefinitionExtension.json = 'security-definition/securityDefinitionExtensionTest.json'
-        apiSourceExtension.securityDefinition = securityDefinitionExtension
+        apiSourceExtension.securityDefinition = [securityDefinitionExtension]
 
         when:
         def swagger = swaggerFactory.swagger(apiSourceExtension)
@@ -108,7 +137,7 @@ class SwaggerFactoryTest extends Specification {
         swagger.securityDefinitions.petstore_auth.scopes['read:pets'] == 'read your pets'
     }
 
-    def 'Should generate security definitions from jsonPath'() {
+    def 'Should generate security definitions from json with full path'() {
         given:
         def apiSourceExtension = new ApiSourceExtension()
         apiSourceExtension.locations = locations
@@ -118,8 +147,8 @@ class SwaggerFactoryTest extends Specification {
         apiSourceExtension.info = infoExtension
 
         def securityDefinitionExtension = new SecurityDefinitionExtension()
-        securityDefinitionExtension.jsonPath = new File(getClass().getClassLoader().getResource('security-definition/securityDefinitionExtensionTest.json').toURI()).absolutePath
-        apiSourceExtension.securityDefinition = securityDefinitionExtension
+        securityDefinitionExtension.json = new File(getClass().getClassLoader().getResource('security-definition/securityDefinitionExtensionTest.json').toURI()).absolutePath
+        apiSourceExtension.securityDefinition = [securityDefinitionExtension]
 
         when:
         def swagger = swaggerFactory.swagger(apiSourceExtension)

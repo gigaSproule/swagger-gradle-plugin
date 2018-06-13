@@ -21,7 +21,7 @@ class InfoExtension {
      * @param closure {@link ContactExtension} closure
      */
     void contact(Closure closure) {
-        this.contact = project.configure(new ContactExtension(), closure) as ContactExtension
+        contact = project.configure(new ContactExtension(), closure) as ContactExtension
     }
 
     /**
@@ -29,6 +29,6 @@ class InfoExtension {
      * @param closure {@link LicenseExtension} closure
      */
     void license(Closure closure) {
-        this.license = project.configure(new LicenseExtension(), closure) as LicenseExtension
+        license = project.configure(new LicenseExtension(), closure) as LicenseExtension
     }
 }

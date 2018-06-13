@@ -126,8 +126,8 @@ securityDefinition {
 }
 ```
 
-## ApiKeyAuth - Security Definitions
-You can also define a `ApiKeyAuth` definition link this:
+## ApiKey - Security Definitions
+You can also define a `ApiKey` definition like this:
 
 ```groovy
 swagger {
@@ -146,6 +146,30 @@ swagger {
 }
 ```
 
+## Oauth2 - Security Definitions
+You can also define a `Oauth2` definition like this:
+
+```groovy
+swagger {
+    apiSource {
+        ...
+        securityDefinition {
+            // `name` can be used refer to this security schemes from elsewhere
+            name = 'OAuth2Authentication'
+            type = 'oauth2'
+            // The flow used by the OAuth2 security scheme
+            flow = 'accessCode'
+            authorizationUrl = 'https://somewhere.com/authorization'
+            tokenUrl = 'https://somewhere.com/token'
+            scope {
+                name = 'read:model'
+                description = 'Read the details of the model'
+            }
+        }
+    }
+}
+```
+
 ## Json - Security Definitions
 It is also possible to define several definitions in a json file and specify the json path like this:
 
@@ -154,13 +178,12 @@ securityDefinition {
     json = 'securityDefinition.json'
 }
 ```
-The file will be read by `getClass().getResourceAsStream`, so please note the path you configured.
 
-Alternatively, specify the __absolute__ file path to the json definition file: 
+Alternatively, specify the __absolute__ file path to the json definition file:
 
 ```groovy
 securityDefinition {
-    jsonPath = "${project.projectDir}/securityDefinition.json"
+    json = "${project.projectDir}/securityDefinition.json"
 }
 ```
 

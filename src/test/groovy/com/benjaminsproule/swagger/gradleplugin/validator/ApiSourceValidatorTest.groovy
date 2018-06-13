@@ -23,7 +23,7 @@ class ApiSourceValidatorTest extends Specification {
     def 'isValid returns error message if locations not set'() {
         given:
         1 * mockInfoValidator.isValid(_) >> []
-        1 * mockSecurityDefinitionValidator.isValid(_) >> []
+        0 * mockSecurityDefinitionValidator.isValid(_) >> []
         0 * mockTagValidator.isValid(_) >> []
 
         when:
@@ -40,7 +40,7 @@ class ApiSourceValidatorTest extends Specification {
         apiSourceExtension.locations = []
 
         1 * mockInfoValidator.isValid(_) >> []
-        1 * mockSecurityDefinitionValidator.isValid(_) >> []
+        0 * mockSecurityDefinitionValidator.isValid(_) >> []
         0 * mockTagValidator.isValid(_) >> []
 
         when:
@@ -58,7 +58,7 @@ class ApiSourceValidatorTest extends Specification {
         apiSourceExtension.schemes = ['schemes']
 
         1 * mockInfoValidator.isValid(_) >> []
-        1 * mockSecurityDefinitionValidator.isValid(_) >> []
+        0 * mockSecurityDefinitionValidator.isValid(_) >> []
         0 * mockTagValidator.isValid(_) >> []
 
         when:
@@ -76,7 +76,7 @@ class ApiSourceValidatorTest extends Specification {
         apiSourceExtension.schemes = ['http', 'schemes']
 
         1 * mockInfoValidator.isValid(_) >> []
-        1 * mockSecurityDefinitionValidator.isValid(_) >> []
+        0 * mockSecurityDefinitionValidator.isValid(_) >> []
         0 * mockTagValidator.isValid(_) >> []
 
         when:
@@ -93,7 +93,7 @@ class ApiSourceValidatorTest extends Specification {
         apiSourceExtension.schemes = ['invalid']
 
         1 * mockInfoValidator.isValid(_) >> []
-        1 * mockSecurityDefinitionValidator.isValid(_) >> []
+        0 * mockSecurityDefinitionValidator.isValid(_) >> []
         0 * mockTagValidator.isValid(_) >> []
 
         when:
@@ -111,7 +111,7 @@ class ApiSourceValidatorTest extends Specification {
         apiSourceExtension.locations = ['location']
 
         1 * mockInfoValidator.isValid(_) >> []
-        1 * mockSecurityDefinitionValidator.isValid(_) >> []
+        0 * mockSecurityDefinitionValidator.isValid(_) >> []
         0 * mockTagValidator.isValid(_) >> []
 
         when:
@@ -127,7 +127,7 @@ class ApiSourceValidatorTest extends Specification {
         apiSourceExtension.locations = ['location']
         apiSourceExtension.info = new InfoExtension()
         apiSourceExtension.tags = [new TagExtension()]
-        apiSourceExtension.securityDefinition = new SecurityDefinitionExtension()
+        apiSourceExtension.securityDefinition = [new SecurityDefinitionExtension()]
 
         1 * mockInfoValidator.isValid(_) >> ['info validator error 1', 'info validator error 2']
         1 * mockSecurityDefinitionValidator.isValid(_) >> ['security definition validator error 1', 'security definition validator error 2']

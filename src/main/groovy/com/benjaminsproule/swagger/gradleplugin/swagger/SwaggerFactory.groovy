@@ -106,15 +106,19 @@ class SwaggerFactory {
         return license
     }
 
-    private Map<String, SecuritySchemeDefinition> generateSecuritySchemeDefinitions(SecurityDefinitionExtension securityDefinitionExtension) throws GenerateException {
+    private Map<String, SecuritySchemeDefinition> generateSecuritySchemeDefinitions(List<SecurityDefinitionExtension> securityDefinitionExtensions) throws GenerateException {
         //Tree map to ensure consistent output
         def map = new TreeMap<String, SecuritySchemeDefinition>()
 
         def securityDefinitions = new HashMap<String, JsonNode>()
-        if (securityDefinitionExtension.json) {
-            securityDefinitions = loadSecurityDefinitionsFromJsonFile(securityDefinitionExtension)
-        } else {
-            securityDefinitions.put(securityDefinitionExtension.name, new ObjectMapper().valueToTree(securityDefinitionExtension))
+        securityDefinitionExtensions.each { securityDefinitionExtension ->
+            if (securityDefinitionExtension.json) {
+                loadSecurityDefinitionsFromJsonFile(securityDefinitionExtension).each {
+                    securityDefinitions.put(it.key, it.value)
+                }
+            } else {
+                securityDefinitions.put(securityDefinitionExtension.name, new ObjectMapper().valueToTree(securityDefinitionExtension))
+            }
         }
 
         securityDefinitions.each { key, value ->

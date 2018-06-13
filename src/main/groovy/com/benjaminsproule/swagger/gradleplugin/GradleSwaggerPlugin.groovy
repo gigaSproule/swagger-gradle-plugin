@@ -24,7 +24,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
                 classFinder = createdClassFinder
                 readerFactory = new ReaderFactory(createdClassFinder)
                 generatorFactory = new GeneratorFactory(createdClassFinder)
-                apiSourceValidator = new ApiSourceValidator(new InfoValidator(new LicenseValidator()), new SecurityDefinitionValidator(), new TagValidator(new ExternalDocsValidator()))
+                apiSourceValidator = new ApiSourceValidator(new InfoValidator(new LicenseValidator()), new SecurityDefinitionValidator(new ScopeValidator()), new TagValidator(new ExternalDocsValidator()))
             }) as GenerateSwaggerDocsTask
 
         if (project.hasProperty('swagger.skip')) {

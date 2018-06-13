@@ -126,8 +126,8 @@ securityDefinition {
 }
 ```
 
-## ApiKeyAuth - Security Definitions
-You can also define a `ApiKeyAuth` definition link this:
+## ApiKey - Security Definitions
+You can also define a `ApiKey` definition like this:
 
 ```groovy
 swagger {
@@ -141,6 +141,30 @@ swagger {
             keyLocation = 'header'
             // The name of the header
             keyName = 'X-API-Key'
+        }
+    }
+}
+```
+
+## Oauth2 - Security Definitions
+You can also define a `Oauth2` definition like this:
+
+```groovy
+swagger {
+    apiSource {
+        ...
+        securityDefinition {
+            // `name` can be used refer to this security schemes from elsewhere
+            name = 'OAuth2Authentication'
+            type = 'oauth2'
+            // The flow used by the OAuth2 security scheme
+            flow = 'accessCode'
+            authorizationUrl = 'https://somewhere.com/authorization'
+            tokenUrl = 'https://somewhere.com/token'
+            scope {
+                name = 'read:model'
+                description = 'Read the details of the model'
+            }
         }
     }
 }

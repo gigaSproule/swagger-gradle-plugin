@@ -97,7 +97,6 @@ class SpringMvcSampleITest extends AbstractPluginITest {
 
       then:
       result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
-      System.out.println(result.output)
 
       assertSwaggerJsonGlobalSecurity("${expectedSwaggerDirectory}/swagger.json")
 
@@ -115,8 +114,6 @@ class SpringMvcSampleITest extends AbstractPluginITest {
   
   private static void assertSwaggerJsonGlobalSecurity(String swaggerJsonFile) {
     def producedSwaggerDocument = new JsonSlurper().parse(new File(swaggerJsonFile), 'UTF-8')
-    
-    System.out.println(new File(swaggerJsonFile).text)
 
     assert producedSwaggerDocument.swagger == '2.0'
     assert producedSwaggerDocument.basePath == '/'

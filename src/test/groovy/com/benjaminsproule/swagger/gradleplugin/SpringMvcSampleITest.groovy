@@ -117,6 +117,7 @@ class SpringMvcSampleITest extends AbstractPluginITest {
     def paths = producedSwaggerDocument.get('paths')
     assert paths
     assert paths.size() == 4
+
     assert paths."/api/sample".get
     assert paths."/api/sample".get.operationId == "getSample"
     assert paths."/api/sample".get.tags == ['SampleController']

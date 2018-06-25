@@ -1,11 +1,16 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import groovy.transform.ToString
+
+import java.util.List
+import java.util.Map
+
 import org.gradle.api.Project
 
 @ToString(includeNames = true)
 class ApiSourceExtension {
     InfoExtension info
+    List<Map<String, List<String>>> security  // see https://swagger.io/docs/specification/2-0/authentication/
     List<SecurityDefinitionExtension> securityDefinition = []
     List<TagExtension> tags = []
     List<String> locations

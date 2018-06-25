@@ -5,12 +5,18 @@ import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.*
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+
 import io.swagger.models.*
 import io.swagger.models.auth.ApiKeyAuthDefinition
 import io.swagger.models.auth.BasicAuthDefinition
 import io.swagger.models.auth.OAuth2Definition
 import io.swagger.models.auth.SecuritySchemeDefinition
+
+import java.util.List
+import java.util.Map
+
 import org.gradle.api.GradleException
+import org.gradle.api.InvalidUserDataException
 
 class SwaggerFactory {
 
@@ -44,6 +50,10 @@ class SwaggerFactory {
 
         if (apiSourceExtension.securityDefinition) {
             swagger.setSecurityDefinitions(generateSecuritySchemeDefinitions(apiSourceExtension.securityDefinition))
+        }
+
+        if (apiSourceExtension.security) {
+            swagger.setSecurity(generateSecurity(apiSourceExtension.security, swagger.getSecurityDefinitions().keySet()))
         }
 
         return swagger
@@ -182,4 +192,23 @@ class SwaggerFactory {
             throw new GenerateException(e)
         }
     }
+    
+    private List<SecurityRequirement> generateSecurity(List<Map<String, List<String>>> securityList, Set<String> securityDefinitionNames) {
+        def requirements = []
+        securityList.each { securityMap -> 
+            def sr = new SecurityRequirement()
+            securityMap.each { key, value ->
+                // Valdiation is done here and not in the ApiSourceValidator, otherwise
+                // we have to load twice the securityDefinitions
+                if(!securityDefinitionNames.contains(key)) {
+                  throw new InvalidUserDataException("security '${key}' does not exists in a securityDefinition")
+                }
+                sr.requirement(key, value)
+            }
+            requirements.add(sr)
+        }
+        
+        return requirements
+    }
+    
 }

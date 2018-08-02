@@ -123,4 +123,24 @@ public class TestResourceWithoutClassAnnotation {
     String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
+
+    @ApiOperation("A PATCH operation")
+    @Path("/root/withoutannotation/patch")
+    @PATCH
+    public String patch() {
+        return "";
+    }
+
+    @ApiOperation("An OPTIONS operation")
+    @Path("/root/withoutannotation/options")
+    @OPTIONS
+    public void options() {
+    }
+
+    @ApiOperation("An HEAD operation")
+    @Path("/root/withoutannotation/head")
+    @HEAD
+    public String head() {
+        return "";
+    }
 }

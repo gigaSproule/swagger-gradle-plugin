@@ -6,7 +6,7 @@ class ApiDocsITest extends AbstractPluginITest {
 
     def 'Use specified templates to generate Swagger docs'() {
         given:
-        def expectedSwaggerDocsDirectory = "${testProjectOutputDir}/swaggerdocs-${UUID.randomUUID()}"
+        def expectedSwaggerDocsDirectory = "${testProjectOutputDirAsString}/swaggerdocs-${UUID.randomUUID()}"
         def expectedSwaggerApiDocsFile = "${expectedSwaggerDocsDirectory}/api.html"
         //Template path is not actually a template path but a template file and it probably has to be the root
         def templatePathValue = "classpath:/api-doc-template/strapdown.html.hbs"

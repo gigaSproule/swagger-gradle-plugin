@@ -100,11 +100,30 @@ open class TestResourceWithoutClassAnnotation {
 
     @ApiOperation("A multiple parameters operation")
     @RequestMapping(path = ["/root/withoutannotation/multipleParameters/{parameter1}"], method = [(RequestMethod.GET)])
-    fun multipleParameters(@RequestParam("parameter1") parameterDouble: Double, @RequestParam(name = "parameter2", required = false) parameterBool: Boolean): String {
+    fun multipleParameters(
+        @RequestParam("parameter1") parameterDouble: Double,
+        @RequestParam(name = "parameter2", required = false) parameterBool: Boolean): String {
         return ""
     }
 
     fun ignoredModel(ignoredModel: IgnoredModel): String {
+        return ""
+    }
+
+    @ApiOperation("A PATCH operation")
+    @RequestMapping(path = ["/root/withoutannotation/patch"], method = [(RequestMethod.PATCH)])
+    fun patch(): String {
+        return ""
+    }
+
+    @ApiOperation("An OPTIONS operation")
+    @RequestMapping(path = ["/root/withoutannotation/options"], method = [(RequestMethod.OPTIONS)])
+    fun options() {
+    }
+
+    @ApiOperation("An HEAD operation")
+    @RequestMapping(path = ["/root/withoutannotation/head"], method = [(RequestMethod.HEAD)])
+    fun head(): String {
         return ""
     }
 }

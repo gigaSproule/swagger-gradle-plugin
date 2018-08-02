@@ -8,7 +8,7 @@ class MultipleApiSourceITest extends AbstractPluginITest {
 
     def 'Produces Swagger Documentation'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'

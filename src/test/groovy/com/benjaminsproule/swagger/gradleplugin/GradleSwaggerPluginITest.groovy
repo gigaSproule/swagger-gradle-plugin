@@ -24,7 +24,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}'
+                    swaggerDirectory = '${testProjectOutputDirAsString}'
                     host = 'localhost:8080'
                     basePath = '/'
                 }
@@ -44,7 +44,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Should read missing config from annotations'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -93,7 +93,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
     def 'Generate Swagger artifact when flag is set'() {
         given:
         def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/${swaggerRelativeDirectory}"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/${swaggerRelativeDirectory}"
         buildFile << """
             plugins {
                 id 'java'
@@ -134,7 +134,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Skips task if nothing has changed'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui"
         buildFile << """
             plugins {
                 id 'java'
@@ -174,7 +174,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Runs task if output directory changed'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui"
         buildFile << """
             plugins {
                 id 'java'
@@ -215,7 +215,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Runs task if input directory changed'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui"
         buildFile << """
             plugins {
                 id 'java'
@@ -262,7 +262,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Runs task if file in input directory changed'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui"
         buildFile << """
             plugins {
                 id 'java'
@@ -310,7 +310,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Can apply plugin before declaring dependencies'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui"
         buildFile << """
             plugins {
                 id 'java'

@@ -124,4 +124,25 @@ class TestResourceWithClassAnnotation {
     String ignoredModel(IgnoredModel ignoredModel) {
         return ''
     }
+
+    @ApiOperation('A PATCH operation')
+    @Path('/patch')
+    @PATCH
+    String patch() {
+        return ''
+    }
+
+    @ApiOperation('An OPTIONS operation')
+    @Path('/options')
+    @OPTIONS
+    String options() {
+        return ''
+    }
+
+    @ApiOperation('An HEAD operation')
+    @Path('/head')
+    @HEAD
+    String head() {
+        return ''
+    }
 }

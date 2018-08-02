@@ -121,4 +121,24 @@ open class TestResourceWithClassAnnotation {
     fun ignoredModel(ignoredModel: IgnoredModel): String {
         return ""
     }
+
+    @ApiOperation("A PATCH operation")
+    @Path("/patch")
+    @PATCH
+    fun patch(): String {
+        return ""
+    }
+
+    @ApiOperation("An OPTIONS operation")
+    @Path("/options")
+    @OPTIONS
+    fun options() {
+    }
+
+    @ApiOperation("An HEAD operation")
+    @Path("/head")
+    @HEAD
+    fun head(): String {
+        return ""
+    }
 }

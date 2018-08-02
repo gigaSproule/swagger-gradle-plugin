@@ -24,7 +24,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produces Swagger documentation with JAX-RS'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -54,7 +54,7 @@ class OutputITest extends AbstractPluginITest {
 
     void 'Produces Swagger documentation with Spring MVC'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -85,7 +85,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produces Swagger documentation with model substitution'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -116,7 +116,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produces Swagger documentation with model substitution on an apiSource level'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -155,7 +155,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produce Swagger documentation in multiple formats'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -411,5 +411,12 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].type == 'number'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].name == 'parameter2'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].type == 'boolean'
+
+        assert paths."/root/${path}/patch".patch.tags == ['Test']
+        assert paths."/root/${path}/patch".patch.summary == 'A PATCH operation'
+        assert paths."/root/${path}/patch".patch.description == 'Test resource'
+        assert paths."/root/${path}/patch".patch.operationId == 'patch'
+        assert paths."/root/${path}/patch".patch.produces == null
+//        assert paths."/root/${path}/patch".patch.responses
     }
 }

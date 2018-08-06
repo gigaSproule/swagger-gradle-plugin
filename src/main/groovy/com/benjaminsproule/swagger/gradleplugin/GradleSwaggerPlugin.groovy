@@ -32,6 +32,19 @@ class GradleSwaggerPlugin implements Plugin<Project> {
         }
 
         project.afterEvaluate {
+            swaggerExtension.apiSourceExtensions.each { apiSourceExtension ->
+                if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory) {
+                    apiSourceExtension.outputFormats.each { outputFormat ->
+                        project.artifacts.add('archives', project.file("${apiSourceExtension.swaggerDirectory}/${apiSourceExtension.swaggerFileName}.${outputFormat}")) {
+                            builtBy project.tasks.generateSwaggerDocumentation
+                            name project.name
+                            type outputFormat
+                            classifier apiSourceExtension.swaggerFileName
+                        }
+                    }
+                }
+            }
+
             generateSwaggerDocsTask.outputDirectories = swaggerExtension.apiSourceExtensions.collect {
                 if (it.swaggerDirectory) {
                     return new File(it.swaggerDirectory)

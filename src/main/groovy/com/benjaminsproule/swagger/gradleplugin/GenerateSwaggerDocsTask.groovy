@@ -14,7 +14,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.*
-import org.gradle.jvm.tasks.Jar
 
 import static com.benjaminsproule.swagger.gradleplugin.VersionUtils.ensureCompatibleSwaggerSpec
 
@@ -88,22 +87,6 @@ class GenerateSwaggerDocsTask extends DefaultTask {
 
         generatorFactory.generator(apiSourceExtension)
             .generate(swagger)
-
-        if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory && this.project) {
-            String classifierName = new File(apiSourceExtension.swaggerDirectory).getName()
-            File swaggerFile = new File(apiSourceExtension.swaggerDirectory)
-
-            project.task('createSwaggerArtifact', type: Jar, dependsOn: project.tasks.classes) {
-                classifier = classifierName
-                from swaggerFile
-            }
-
-            project.artifacts {
-                archives project.tasks.createSwaggerArtifact
-            }
-
-            project.tasks.createSwaggerArtifact.execute()
-        }
     }
 
     private static Swagger applySwaggerFilter(Swagger swagger) {

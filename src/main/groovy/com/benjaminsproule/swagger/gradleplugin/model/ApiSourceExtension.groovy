@@ -10,7 +10,7 @@ class ApiSourceExtension {
     List<TagExtension> tags = []
     List<String> locations
     List<String> schemes // Values MUST be from the list: "http", "https", "ws", "wss"
-    List<String> outputFormats
+    List<String> outputFormats = ['json']
     String basePath
     String host
     String templatePath

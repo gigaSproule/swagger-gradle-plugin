@@ -81,7 +81,7 @@ swagger {
 | `swaggerDirectory` | The directory of generated `swagger.json` file. If null, no `swagger.json` will be generated. |
 | `swaggerFileName` | The filename of generated filename.json file. If null, `swagger.json` will be generated. |
 | `swaggerApiReader` | If not null, the value should be a full name of the class implementing `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader`. More details [below](#swaggerApiReader)|
-| `attachSwaggerArtifact` | If enabled, the generated `swagger.json` file will be attached as a gradle artifact. The `swaggerDirectory`'s name will be used as an artifact classifier. Default is `false`. |
+| `attachSwaggerArtifact` | If enabled, the generated `swagger.json` file will be attached as a gradle artifact. The `swaggerFileName` will be used as an artifact classifier. Default is `false`. |
 | `modelSubstitute` | The model substitute file's path, see more details [below](#model-substitution)|
 | `typesToSkip` | Nodes of class names to explicitly skip during parameter processing. More details [below](#typesToSkip)|
 | `apiModelPropertyAccessExclusionsList` | Allows the exclusion of specified `@ApiModelProperty` fields. This can be used to hide certain model properties from the swagger spec. More details [below](#apiModelPropertyAccessExclusionsList)|
@@ -341,11 +341,40 @@ To skip generating the swagger documentation, you need to include the property `
 You can instruct `swagger-gradle-plugin` to deploy the generated `swagger.json` by adding the following to your build.gradle:
 
 ```groovy
-swaggerDirectory = "${project.rootDir}/swagger-ui"
 attachSwaggerArtifact = true
-
 ```
-The above setting attaches the generated file to Gradle for install/deploy purpose with `swagger-ui`as classifier and `json` as type
+The above setting attaches the generated file to Gradle for install/deploy purpose with `swaggerDirectory`'s name as classifier and the `outputFormat` as type.
+
+Please note that when using the `maven-publish` plugin instead of the `maven` plugin, the classifier _must_ be specified in the configuration as it uses a different mechanism for the classifier. This is especially important when using multiple `apiSource` closures. Example:
+```groovy
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact source: "${swaggerDirectory}/publicApiSwagger.json", classifier: 'publicApiSwagger'
+            artifact source: "${swaggerDirectory}/privateApiSwagger.json", classifier: 'privateApiSwagger'
+        }
+    }
+    repositories {
+        maven {
+            url "https://path/to/repo"
+        }
+    }
+}
+swagger {
+     apiSource {
+         attachSwaggerArtifact = true
+         locations = ['com.benjaminsproule.public']
+         swaggerDirectory = "${swaggerDirectory}"
+         swaggerFileName = 'publicSwagger'
+     }
+     apiSource {
+         attachSwaggerArtifact = true
+         locations = ['com.benjaminsproule.private']
+         swaggerDirectory = "${swaggerDirectory}"
+         swaggerFileName = 'privateSwagger'
+     }
+}
+```
 
 
 # Example
@@ -396,7 +425,7 @@ swagger {
         swaggerDirectory = "${project.rootDir}/generated/swagger-ui"
         swaggerApiReader = 'com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader'
         modelConverters = [ 'io.swagger.validator.BeanValidator' ]
-        // attachSwaggerArtifact = true - WILL BE ADDED IN THE FUTURE
+        attachSwaggerArtifact = true
     }
 }
 ```

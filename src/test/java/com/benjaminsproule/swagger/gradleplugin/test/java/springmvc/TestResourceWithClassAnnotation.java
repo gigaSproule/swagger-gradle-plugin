@@ -112,4 +112,22 @@ public class TestResourceWithClassAnnotation {
     String ignoredModel(IgnoredModel ignoredModel) {
         return "";
     }
+
+    @ApiOperation("A PATCH operation")
+    @RequestMapping(path = "/patch", method = RequestMethod.PATCH)
+    public String patch() {
+        return "";
+    }
+
+    @ApiOperation("An OPTIONS operation")
+    @RequestMapping(path = "/options", method = RequestMethod.OPTIONS)
+    public ResponseEntity options() {
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("An HEAD operation")
+    @RequestMapping(path = "/head", method = RequestMethod.HEAD)
+    public String head() {
+        return "";
+    }
 }

@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
+import javax.ws.rs.HEAD
+import javax.ws.rs.OPTIONS
+import javax.ws.rs.PATCH
+import javax.ws.rs.Path
+
 import static java.util.Collections.singletonList
 
 @Api(tags = 'Test', description = 'Test resource', authorizations = @Authorization('basic'))
@@ -108,6 +113,24 @@ class TestResourceWithClassAnnotation {
     }
 
     String ignoredModel(IgnoredModel ignoredModel) {
+        return ''
+    }
+
+    @ApiOperation('A PATCH operation')
+    @RequestMapping(path = '/patch', method = RequestMethod.PATCH)
+    String patch() {
+        return ''
+    }
+
+    @ApiOperation('An OPTIONS operation')
+    @RequestMapping(path = '/options', method = RequestMethod.OPTIONS)
+    ResponseEntity options() {
+        return ResponseEntity.ok().build()
+    }
+
+    @ApiOperation('An HEAD operation')
+    @RequestMapping(path = '/head', method = RequestMethod.HEAD)
+    String head() {
         return ''
     }
 }

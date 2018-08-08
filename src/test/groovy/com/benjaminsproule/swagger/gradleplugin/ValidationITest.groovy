@@ -22,7 +22,7 @@ class ValidationITest extends AbstractPluginITest {
                         license { name = 'Apache 2.0' }
                         contact { name = 'Joe Blogs' }
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                 }
@@ -54,7 +54,7 @@ class ValidationITest extends AbstractPluginITest {
                 apiSource {
                     locations = ['com.benjaminsproule.swager.gradleplugin.classpath']
                     schemes = ['http']
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                 }
@@ -89,7 +89,7 @@ class ValidationITest extends AbstractPluginITest {
                     info {
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                 }
@@ -124,7 +124,7 @@ class ValidationITest extends AbstractPluginITest {
                     info {
                         title = 'test'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                 }
@@ -161,7 +161,7 @@ class ValidationITest extends AbstractPluginITest {
                         version = '1'
                         license { url = 'license url' }
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                 }
@@ -197,7 +197,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -236,7 +236,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -276,7 +276,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -316,7 +316,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -361,7 +361,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -407,7 +407,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -449,7 +449,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -494,7 +494,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -539,7 +539,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -588,7 +588,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {
@@ -634,7 +634,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     tag {
@@ -673,7 +673,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     tag {

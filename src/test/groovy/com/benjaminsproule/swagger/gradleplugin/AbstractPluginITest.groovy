@@ -9,11 +9,18 @@ abstract class AbstractPluginITest extends Specification {
     File buildFile
     File testProjectOutputDir
 
+    /**
+     * Required as when run on Windows, it only includes a single '\' in the generated build.gradle,
+     * therefore trying to escape the next character
+     */
+    String testProjectOutputDirAsString
+
     def setup() {
         testProjectDir = File.createTempDir()
         buildFile = new File(testProjectDir, 'build.gradle')
         buildFile.createNewFile()
         testProjectOutputDir = new File(testProjectDir, 'build/swagger')
+        testProjectOutputDirAsString = "${testProjectOutputDir}".replace('\\', '/')
     }
 
     BuildResult runPluginTask() {

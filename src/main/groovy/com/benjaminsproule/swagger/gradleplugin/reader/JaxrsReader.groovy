@@ -12,7 +12,6 @@ import io.swagger.annotations.Authorization
 import io.swagger.annotations.AuthorizationScope
 import io.swagger.annotations.SwaggerDefinition
 import io.swagger.converter.ModelConverters
-import io.swagger.jaxrs.PATCH
 import io.swagger.jaxrs.ext.SwaggerExtension
 import io.swagger.jaxrs.ext.SwaggerExtensions
 import io.swagger.jersey.SwaggerJersey2Jaxrs
@@ -21,7 +20,6 @@ import io.swagger.models.Operation
 import io.swagger.models.Response
 import io.swagger.models.SecurityRequirement
 import io.swagger.models.Swagger
-import io.swagger.models.Tag
 import io.swagger.models.parameters.Parameter
 import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
@@ -36,6 +34,7 @@ import javax.ws.rs.GET
 import javax.ws.rs.HEAD
 import javax.ws.rs.HttpMethod
 import javax.ws.rs.OPTIONS
+import javax.ws.rs.PATCH
 import javax.ws.rs.POST
 import javax.ws.rs.PUT
 import javax.ws.rs.Path
@@ -117,7 +116,9 @@ class JaxrsReader extends AbstractReader {
             }
 
             if (!AnnotationUtils.findAnnotation(method, GET) && !AnnotationUtils.findAnnotation(method, POST)
-                && !AnnotationUtils.findAnnotation(method, PUT) && !AnnotationUtils.findAnnotation(method, DELETE)) {
+                && !AnnotationUtils.findAnnotation(method, PUT) && !AnnotationUtils.findAnnotation(method, DELETE)
+                && !AnnotationUtils.findAnnotation(method, OPTIONS)&& !AnnotationUtils.findAnnotation(method, HEAD)
+                && !AnnotationUtils.findAnnotation(method, PATCH)) {
                 continue // Skip processing for non-API methods
             }
 

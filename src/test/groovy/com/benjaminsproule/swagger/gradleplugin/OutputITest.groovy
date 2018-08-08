@@ -24,7 +24,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produces Swagger documentation with JAX-RS'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -54,7 +54,7 @@ class OutputITest extends AbstractPluginITest {
 
     void 'Produces Swagger documentation with Spring MVC'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -85,7 +85,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produces Swagger documentation with model substitution'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -116,7 +116,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produces Swagger documentation with model substitution on an apiSource level'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -155,7 +155,7 @@ class OutputITest extends AbstractPluginITest {
 
     def 'Produce Swagger documentation in multiple formats'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -243,9 +243,10 @@ class OutputITest extends AbstractPluginITest {
 
         def paths = producedSwaggerDocument.paths
         assert paths
-        assert paths.size() == 26
         assertPaths(paths, format, type, 'withannotation')
         assertPaths(paths, format, type, 'withoutannotation')
+        // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
+        assert paths.size() == 32
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -411,5 +412,38 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].type == 'number'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].name == 'parameter2'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].type == 'boolean'
+
+        assert paths."/root/${path}/patch".patch.tags == ['Test']
+        assert paths."/root/${path}/patch".patch.summary == 'A PATCH operation'
+        assert paths."/root/${path}/patch".patch.description == 'Test resource'
+        assert paths."/root/${path}/patch".patch.operationId == 'patch'
+        assert paths."/root/${path}/patch".patch.produces == null
+        assert paths."/root/${path}/patch".patch.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/patch".patch.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/patch".patch.security.basic
+
+        assert paths."/root/${path}/options".options.tags == ['Test']
+        assert paths."/root/${path}/options".options.summary == 'An OPTIONS operation'
+        assert paths."/root/${path}/options".options.description == 'Test resource'
+        assert paths."/root/${path}/options".options.operationId == 'options'
+        assert paths."/root/${path}/options".options.produces == null
+        // Are these if statements really correct? Also, shouldn't they be testing for response.schema.type?
+        if (paths."/root/${path}/options".options.responses.default) {
+            assert paths."/root/${path}/options".options.responses.default.description == 'successful operation'
+        } else if (paths."/root/${path}/options".options.responses.get(ok)) {
+            assert paths."/root/${path}/options".options.responses.get(ok).description == 'successful operation'
+        } else {
+            assert false: "No response found for /root/${path}/options"
+        }
+        assert paths."/root/${path}/options".options.security.basic
+
+        assert paths."/root/${path}/head".head.tags == ['Test']
+        assert paths."/root/${path}/head".head.summary == 'An HEAD operation'
+        assert paths."/root/${path}/head".head.description == 'Test resource'
+        assert paths."/root/${path}/head".head.operationId == 'head'
+        assert paths."/root/${path}/head".head.produces == null
+        assert paths."/root/${path}/head".head.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/head".head.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/head".head.security.basic
     }
 }

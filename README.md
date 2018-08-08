@@ -436,6 +436,8 @@ This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/
 ./gradlew pluginUnderTestMetadata
 ```
 
+N.B. for reliable test runs in an IDE, it's best to include this as a Gradle build step as part of the test run configuration.
+
 # To run tests against different versions of Gradle
 This plugin will by default run the tests against Gradle 4.7. To change which version it runs tests against, `test.gradleVersion` system property is required.
 ```bash

@@ -243,9 +243,10 @@ class OutputITest extends AbstractPluginITest {
 
         def paths = producedSwaggerDocument.paths
         assert paths
-        assert paths.size() == 26
         assertPaths(paths, format, type, 'withannotation')
         assertPaths(paths, format, type, 'withoutannotation')
+        // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
+        assert paths.size() == 32
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -417,6 +418,32 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/patch".patch.description == 'Test resource'
         assert paths."/root/${path}/patch".patch.operationId == 'patch'
         assert paths."/root/${path}/patch".patch.produces == null
-//        assert paths."/root/${path}/patch".patch.responses
+        assert paths."/root/${path}/patch".patch.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/patch".patch.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/patch".patch.security.basic
+
+        assert paths."/root/${path}/options".options.tags == ['Test']
+        assert paths."/root/${path}/options".options.summary == 'An OPTIONS operation'
+        assert paths."/root/${path}/options".options.description == 'Test resource'
+        assert paths."/root/${path}/options".options.operationId == 'options'
+        assert paths."/root/${path}/options".options.produces == null
+        // Are these if statements really correct? Also, shouldn't they be testing for response.schema.type?
+        if (paths."/root/${path}/options".options.responses.default) {
+            assert paths."/root/${path}/options".options.responses.default.description == 'successful operation'
+        } else if (paths."/root/${path}/options".options.responses.get(ok)) {
+            assert paths."/root/${path}/options".options.responses.get(ok).description == 'successful operation'
+        } else {
+            assert false: "No response found for /root/${path}/options"
+        }
+        assert paths."/root/${path}/options".options.security.basic
+
+        assert paths."/root/${path}/head".head.tags == ['Test']
+        assert paths."/root/${path}/head".head.summary == 'An HEAD operation'
+        assert paths."/root/${path}/head".head.description == 'Test resource'
+        assert paths."/root/${path}/head".head.operationId == 'head'
+        assert paths."/root/${path}/head".head.produces == null
+        assert paths."/root/${path}/head".head.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/head".head.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/head".head.security.basic
     }
 }

@@ -135,8 +135,8 @@ class TestResourceWithClassAnnotation {
     @ApiOperation('An OPTIONS operation')
     @Path('/options')
     @OPTIONS
-    String options() {
-        return ''
+    Response options() {
+        return Response.ok().build()
     }
 
     @ApiOperation('An HEAD operation')

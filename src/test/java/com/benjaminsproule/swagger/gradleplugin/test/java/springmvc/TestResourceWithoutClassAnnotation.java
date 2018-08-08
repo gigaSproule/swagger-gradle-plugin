@@ -120,7 +120,8 @@ public class TestResourceWithoutClassAnnotation {
 
     @ApiOperation("An OPTIONS operation")
     @RequestMapping(path = "/root/withoutannotation/options", method = RequestMethod.OPTIONS)
-    public void options() {
+    public ResponseEntity options() {
+        return ResponseEntity.ok().build();
     }
 
     @ApiOperation("An HEAD operation")

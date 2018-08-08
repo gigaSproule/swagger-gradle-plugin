@@ -131,7 +131,8 @@ open class TestResourceWithoutClassAnnotation {
     @ApiOperation("An OPTIONS operation")
     @Path("/root/withoutannotation/options")
     @OPTIONS
-    fun options() {
+    fun options(): Response {
+        return Response.ok().build()
     }
 
     @ApiOperation("An HEAD operation")

@@ -132,7 +132,8 @@ open class TestResourceWithClassAnnotation {
     @ApiOperation("An OPTIONS operation")
     @Path("/options")
     @OPTIONS
-    fun options() {
+    fun options(): Response {
+        return Response.ok().build()
     }
 
     @ApiOperation("An HEAD operation")

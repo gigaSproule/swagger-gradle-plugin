@@ -129,4 +129,13 @@ public class TestResourceWithoutClassAnnotation {
     public String head() {
         return "";
     }
+
+    @ApiOperation(value = "An implicit params operation")
+    @ApiImplicitParams(
+        @ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body")
+    )
+    @RequestMapping(path = "/root/withoutannotation/implicitparams", method = RequestMethod.POST)
+    public String implicitParams(String requestModel) {
+        return "";
+    }
 }

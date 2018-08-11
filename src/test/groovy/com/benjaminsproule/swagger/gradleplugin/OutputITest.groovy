@@ -246,7 +246,7 @@ class OutputITest extends AbstractPluginITest {
         assertPaths(paths, format, type, 'withannotation')
         assertPaths(paths, format, type, 'withoutannotation')
         // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
-        assert paths.size() == 32
+        assert paths.size() == 34
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -445,5 +445,16 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/head".head.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/head".head.responses.get(ok).schema.type == type
         assert paths."/root/${path}/head".head.security.basic
+
+        assert paths."/root/${path}/implicitparams".post.tags == ['Test']
+        assert paths."/root/${path}/implicitparams".post.summary == 'An implicit params operation'
+        assert paths."/root/${path}/implicitparams".post.description == 'Test resource'
+        assert paths."/root/${path}/implicitparams".post.operationId == 'implicitParams'
+        assert paths."/root/${path}/implicitparams".post.produces == null
+        assert paths."/root/${path}/implicitparams".post.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/implicitparams".post.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/implicitparams".post.security.basic
+        assert paths."/root/${path}/implicitparams".post.parameters[0].name == 'body'
+        assert paths."/root/${path}/implicitparams".post.parameters[0].schema.'$ref' == '#/definitions/RequestModel'
     }
 }

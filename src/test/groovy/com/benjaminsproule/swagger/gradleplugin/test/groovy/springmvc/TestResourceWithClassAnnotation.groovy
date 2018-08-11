@@ -10,11 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
-import javax.ws.rs.HEAD
-import javax.ws.rs.OPTIONS
-import javax.ws.rs.PATCH
-import javax.ws.rs.Path
-
 import static java.util.Collections.singletonList
 
 @Api(tags = 'Test', description = 'Test resource', authorizations = @Authorization('basic'))
@@ -132,5 +127,14 @@ class TestResourceWithClassAnnotation {
     @RequestMapping(path = '/head', method = RequestMethod.HEAD)
     String head() {
         return ''
+    }
+
+    @ApiOperation(value = "An implicit params operation")
+    @ApiImplicitParams(
+        @ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body")
+    )
+    @RequestMapping(path = "/implicitparams", method = RequestMethod.POST)
+    String implicitParams(String requestModel) {
+        return ""
     }
 }

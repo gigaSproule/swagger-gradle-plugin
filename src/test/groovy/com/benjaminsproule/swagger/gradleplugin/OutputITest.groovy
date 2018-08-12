@@ -459,7 +459,6 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/options".options.operationId == 'options'
         assert paths."/root/${path}/options".options.produces == null
         assert paths."/root/${path}/options".options.consumes == null
-        // Are these if statements really correct? Also, shouldn't they be testing for response.schema.type?
         if (paths."/root/${path}/options".options.responses.default) {
             assert paths."/root/${path}/options".options.responses.default.description == 'successful operation'
             assert paths."/root/${path}/options".options.responses.default.schema == null

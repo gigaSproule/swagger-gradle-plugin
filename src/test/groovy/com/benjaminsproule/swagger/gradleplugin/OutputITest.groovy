@@ -46,7 +46,7 @@ class OutputITest extends AbstractPluginITest {
         then:
         result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
-        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
 
         where:
         testSpecificConfig << locations

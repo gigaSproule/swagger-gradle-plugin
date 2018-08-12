@@ -1,8 +1,8 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
-import com.benjaminsproule.swagger.gradleplugin.swagger.SwaggerFactory
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
+import com.benjaminsproule.swagger.gradleplugin.swagger.SwaggerFactory
 import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
@@ -422,12 +422,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
             return
         }
         for (ApiImplicitParam param : implicitParams.value()) {
-            Class<?> cls
-            try {
-                cls = Class.forName(param.dataType())
-            } catch (ClassNotFoundException ignored) {
-                cls = method.getDeclaringClass()
-            }
+            Class<?> cls = Class.forName(param.dataType())
 
             Parameter p = readImplicitParam(param, cls)
             if (p != null) {

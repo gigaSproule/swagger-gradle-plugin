@@ -102,8 +102,8 @@ class TestResourceWithClassAnnotation {
     @ApiOperation('A multiple parameters operation')
     @RequestMapping(path = '/multipleParameters/{parameter1}', method = RequestMethod.GET)
     String multipleParameters(
-        @RequestParam("parameter1") Double parameterDouble,
-        @RequestParam(name = "parameter2", required = false) Boolean parameterBool) {
+        @RequestParam('parameter1') Double parameterDouble,
+        @RequestParam(name = 'parameter2', required = false) Boolean parameterBool) {
         return ''
     }
 
@@ -129,12 +129,12 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
-    @ApiOperation(value = "An implicit params operation")
+    @ApiOperation(value = 'An implicit params operation')
     @ApiImplicitParams(
-        @ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body")
+        @ApiImplicitParam(name = 'body', required = true, dataType = 'com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel', paramType = 'body')
     )
-    @RequestMapping(path = "/implicitparams", method = RequestMethod.POST)
+    @RequestMapping(path = '/implicitparams', method = RequestMethod.POST)
     String implicitParams(String requestModel) {
-        return ""
+        return ''
     }
 }

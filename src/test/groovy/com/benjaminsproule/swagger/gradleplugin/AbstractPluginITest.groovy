@@ -23,9 +23,13 @@ abstract class AbstractPluginITest extends Specification {
         testProjectOutputDirAsString = "${testProjectOutputDir}".replace('\\', '/')
     }
 
-    BuildResult runPluginTask() {
-        pluginTaskRunnerBuilder()
-            .build()
+    BuildResult runPluginTask(boolean shouldSucceed = true) {
+        def gradleRunner = pluginTaskRunnerBuilder()
+        if (shouldSucceed) {
+            return gradleRunner.build()
+        } else {
+            return gradleRunner.buildAndFail()
+        }
     }
 
     GradleRunner pluginTaskRunnerBuilder() {
@@ -36,5 +40,6 @@ abstract class AbstractPluginITest extends Specification {
             .withTestKitDir(File.createTempDir())
             .withGradleVersion(System.getProperty('test.gradleVersion', '4.7'))
             .withDebug(true)
+            .forwardOutput()
     }
 }

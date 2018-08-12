@@ -431,12 +431,10 @@ class SpringMvcApiReader extends AbstractReader {
                                 String resourceKey = controllerRequestMappingValue +
                                     methodRequestMappingValue +
                                     requestMappingRequestMethod
-                                if (!methodRequestMappingValue.isEmpty()) {
-                                    if (!resourceMap.containsKey(resourceKey)) {
-                                        resourceMap.put(resourceKey, new SpringResource(controllerClazz, description))
-                                    }
-                                    resourceMap.get(resourceKey).addMethod(method)
+                                if (!resourceMap.containsKey(resourceKey)) {
+                                    resourceMap.put(resourceKey, new SpringResource(controllerClazz, description))
                                 }
+                                resourceMap.get(resourceKey).addMethod(method)
                             }
                         }
                     }

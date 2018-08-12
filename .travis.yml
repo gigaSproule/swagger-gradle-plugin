@@ -2,8 +2,8 @@ dist: trusty
 sudo: false
 language: java
 jdk:
-  - openjdk11
-  - oraclejdk11
+  - openjdk10
+  - oraclejdk10
   - oraclejdk8
   - openjdk8
 script:

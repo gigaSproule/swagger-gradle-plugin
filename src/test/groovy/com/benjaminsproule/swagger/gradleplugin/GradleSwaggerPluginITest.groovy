@@ -119,7 +119,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             swagger {
                 apiSource {
                     attachSwaggerArtifact = true
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'
@@ -184,7 +184,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                 apiSource {
                     attachSwaggerArtifact = true
                     outputFormats = ['json', 'yaml']
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'
@@ -318,7 +318,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             swagger {
                 apiSource {
                     attachSwaggerArtifact = true
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'
@@ -358,7 +358,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             swagger {
                 apiSource {
                     attachSwaggerArtifact = true
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'
@@ -399,7 +399,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             swagger {
                 apiSource {
                     attachSwaggerArtifact = true
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'
@@ -446,7 +446,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             swagger {
                 apiSource {
                     attachSwaggerArtifact = true
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'
@@ -503,7 +503,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
             swagger {
                 apiSource {
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'test'

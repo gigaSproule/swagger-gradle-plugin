@@ -92,7 +92,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Generate Swagger artifact when flag is set'() {
         given:
-        def localRepo = "${testProjectOutputDir}/repo"
+        def localRepo = "${testProjectOutputDirAsString}/repo"
         def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
         def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/${swaggerRelativeDirectory}"
         buildFile << """
@@ -155,9 +155,9 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Generate Swagger artifact when flag is set for multiple formats'() {
         given:
-        def localRepo = "${testProjectOutputDir}/repo"
+        def localRepo = "${testProjectOutputDirAsString}/repo"
         def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/${swaggerRelativeDirectory}"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/${swaggerRelativeDirectory}"
         buildFile << """
             plugins {
                 id 'java'
@@ -222,9 +222,9 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
     def 'Generate Swagger artifact when flag is set for multiple api source closures'() {
         given:
-        def localRepo = "${testProjectOutputDir}/repo"
+        def localRepo = "${testProjectOutputDirAsString}/repo"
         def swaggerRelativeDirectory = "swaggerui-" + UUID.randomUUID()
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/${swaggerRelativeDirectory}"
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/${swaggerRelativeDirectory}"
         buildFile << """
             plugins {
                 id 'java'

@@ -716,7 +716,7 @@ class ValidationITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
-                    swaggerDirectory = '${testProjectOutputDir}/swaggerui'
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
                     host = 'localhost:8080'
                     basePath = '/'
                     securityDefinition {

@@ -34,4 +34,12 @@ class SecurityDefinitionExtension {
     void scope(Closure closure) {
         scopes += project.configure(new ScopeExtension(), closure) as ScopeExtension
     }
+    
+    List<ScopeExtension> getScopeExtensions() {
+      return scopes;
+    }
+    
+    Map<String,String> getScopes() {
+      return scopes.collectEntries { [ (it.name) : it.description ] }
+    }
 }

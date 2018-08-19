@@ -69,7 +69,7 @@ class SpringMvcSampleITest extends AbstractPluginITest {
     
     def 'Produces tag for controller when no Api'() {
       given:
-      def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+      def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
       buildFile << """
             plugins {
                 id 'java'
@@ -85,6 +85,7 @@ class SpringMvcSampleITest extends AbstractPluginITest {
                         title = 'test'
                         version = '1'
                     }
+                    tagStrategy = "class"
                     swaggerDirectory = '${expectedSwaggerDirectory}'
                     ${testSpecificConfig}
                 }

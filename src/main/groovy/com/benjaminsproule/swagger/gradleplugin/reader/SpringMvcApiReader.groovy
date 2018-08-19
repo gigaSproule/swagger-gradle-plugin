@@ -116,7 +116,7 @@ class SpringMvcApiReader extends AbstractReader {
             tags = updateTagsForApi(null, api)
             resourceSecurities = getSecurityRequirements(api)
             apiDescription = api.description()
-        } else {
+        } else if(StringUtils.equals("class", apiSource.tagStrategy)) {
           // Apply a default tag when no Api present
           io.swagger.models.Tag controllerTag  = new io.swagger.models.Tag().name(controller.getSimpleName())
           tags.put(controllerTag.getName(), controllerTag)

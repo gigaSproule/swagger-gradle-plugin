@@ -7,6 +7,7 @@ import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.model.SwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.ReaderFactory
 import com.benjaminsproule.swagger.gradleplugin.validator.ApiSourceValidator
+import groovy.transform.Synchronized
 import io.swagger.config.FilterFactory
 import io.swagger.core.filter.SpecFilter
 import io.swagger.models.Swagger
@@ -42,6 +43,7 @@ class GenerateSwaggerDocsTask extends DefaultTask {
     ApiSourceValidator apiSourceValidator
 
     @TaskAction
+    @Synchronized
     generateSwaggerDocuments() {
         SwaggerExtension swaggerExtension = project.extensions.getByName(SwaggerExtension.EXTENSION_NAME) as SwaggerExtension
 

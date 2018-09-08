@@ -41,18 +41,18 @@ class AnnotationPopulator {
     }
 
     private String getHostFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def swaggerDefinition = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations).first()
-        if (swaggerDefinition) {
-            return swaggerDefinition.host()
+        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations)
+        if (swaggerDefinitions && !swaggerDefinitions.isEmpty()) {
+            return swaggerDefinitions.first().host()
         }
 
         return null
     }
 
     private String getBasePathFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def swaggerDefinition = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations).first()
-        if (swaggerDefinition) {
-            return swaggerDefinition.basePath()
+        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations)
+        if (swaggerDefinitions && !swaggerDefinitions.isEmpty()) {
+            return swaggerDefinitions.first().basePath()
         }
 
         return null

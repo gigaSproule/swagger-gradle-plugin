@@ -6,9 +6,9 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class SpringMvcSampleITest extends AbstractPluginITest {
 
-    def 'Produces Swagger Documentation'() {
+   def 'Produces Swagger Documentation'() {
         given:
-        def expectedSwaggerDirectory = "${testProjectOutputDir}/swaggerui-" + UUID.randomUUID()
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
         buildFile << """
             plugins {
                 id 'java'
@@ -66,4 +66,5 @@ class SpringMvcSampleITest extends AbstractPluginITest {
         assert paths."/api/sample".post
         assert paths."/api/sample".post.operationId == "postSample"
     }
+ 
 }

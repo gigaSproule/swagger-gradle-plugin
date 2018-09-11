@@ -698,4 +698,46 @@ class ValidationITest extends AbstractPluginITest {
         then:
         runResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == FAILED
     }
+    
+    def 'Should fail task if security contains key without securityDefinition with same name'() {
+      given:
+      buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+
+            swagger {
+                apiSource {
+                    locations = ['com.benjaminsproule.swager.gradleplugin.classpath']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                    }
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                    securityDefinition {
+                        name = 'MyBasicAuth'
+                        type = 'basic'
+                    }
+                    security = [ [ NonMatchingAuth : [] ] ]
+                  
+                }
+            }
+        """
+
+      when:
+      def runResult
+      try {
+          runResult = runPluginTask()
+      } catch (Exception e) {
+          runResult = e.buildResult
+      }
+
+      then:
+      runResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == FAILED
+  }
 }

@@ -8,6 +8,7 @@ abstract class AbstractPluginITest extends Specification {
     File testProjectDir
     File buildFile
     File testProjectOutputDir
+    List<File> pluginClasspath
 
     /**
      * Required as when run on Windows, it only includes a single '\' in the generated build.gradle,
@@ -21,6 +22,13 @@ abstract class AbstractPluginITest extends Specification {
         buildFile.createNewFile()
         testProjectOutputDir = new File(testProjectDir, 'build/swagger')
         testProjectOutputDirAsString = "${testProjectOutputDir}".replace('\\', '/')
+
+        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
+        if (pluginClasspathResource == null) {
+            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
+        }
+
+        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
     }
 
     BuildResult runPluginTask() {
@@ -32,9 +40,9 @@ abstract class AbstractPluginITest extends Specification {
         GradleRunner.create()
             .withProjectDir(testProjectDir)
             .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
-            .withPluginClasspath()
+            .withPluginClasspath(pluginClasspath)
             .withTestKitDir(File.createTempDir())
-            .withGradleVersion(System.getProperty('test.gradleVersion', '4.7'))
+            .withGradleVersion(System.getProperty('test.gradleVersion', '4.10.2'))
             .withDebug(true)
     }
 }

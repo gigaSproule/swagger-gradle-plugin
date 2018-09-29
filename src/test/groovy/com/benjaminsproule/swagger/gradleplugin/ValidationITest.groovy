@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class ValidationITest extends AbstractPluginITest {
 
@@ -178,6 +179,39 @@ class ValidationITest extends AbstractPluginITest {
 
         then:
         runResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == FAILED
+    }
+
+    def 'Should not fail task if non-required info annotations not provided'() {
+        given:
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.benjaminsproule.swagger'
+            }
+
+            swagger {
+                apiSource {
+                    locations = ${locations}
+                    schemes = ['http']
+                    swaggerDirectory = '${testProjectOutputDirAsString}/swaggerui'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                }
+            }
+        """
+
+        when:
+        def runResult = runPluginTask()
+
+        then:
+        runResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+
+        where:
+        locations << [
+            "['com.benjaminsproule.swagger.gradleplugin.test.missingannotation.MissingLicense']",
+            "['com.benjaminsproule.swagger.gradleplugin.test.missingannotation.MissingContact']"
+        ]
     }
 
     def 'Should fail task if security config provided but type not provided'() {

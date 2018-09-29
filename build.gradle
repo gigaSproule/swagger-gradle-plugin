@@ -34,6 +34,19 @@ group = 'com.benjaminsproule'
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        println(sourceSets.test.runtimeClasspath.asPath)
+        file("${outputDir}/plugin-classpath.txt").text = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).join("\n")
+    }
+}
+
 dependencies {
     def jacksonVersion = '2.9.2'
     def springVersion = '5.0.1.RELEASE'
@@ -68,6 +81,8 @@ dependencies {
         //We want to depend on the gradle version of groovy since this is a plugin
         exclude module: 'groovy-all'
     }
+
+    testRuntime files(createClasspathManifest)
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -96,12 +111,6 @@ compileTestGroovy.dependsOn = compileTestGroovy.taskDependencies.getDependencies
 compileTestKotlin.dependsOn compileTestGroovy
 compileTestKotlin.classpath += files(compileTestGroovy.destinationDir)
 testClasses.dependsOn tasks.compileTestKotlin
-
-pluginUnderTestMetadata {
-    pluginClasspath = files("${buildDir}/classes/groovy/test", "${buildDir}/classes/java/test", "${buildDir}/classes/kotlin/test", "${buildDir}/resources/main", "${buildDir}/resources/test") + pluginUnderTestMetadata.pluginClasspath
-}
-
-test.dependsOn tasks.pluginUnderTestMetadata
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {

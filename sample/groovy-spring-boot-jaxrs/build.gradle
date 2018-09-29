@@ -42,21 +42,6 @@ swagger {
         schemes = ['http', 'https']
         host = 'www.example.com:8080'
         basePath = '/sample'
-        info {
-            title = 'Swagger Gradle Plugin Sample'
-            version = 'v1'
-            description = 'This is a sample.'
-            termsOfService = 'http://www.example.com/termsOfService'
-            contact {
-                email = 'email@email.com'
-                name = 'Name'
-                url = 'http://www.example.com'
-            }
-            license {
-                url = 'http://www.apache.org/licenses/LICENSE-2.0.html'
-                name = 'Apache 2.0'
-            }
-        }
         swaggerDirectory = "${project.buildDir}/swagger-ui"
         securityDefinition {
             json = 'securityDefinition.json'

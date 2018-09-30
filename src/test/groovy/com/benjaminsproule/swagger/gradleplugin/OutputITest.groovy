@@ -46,7 +46,7 @@ class OutputITest extends AbstractPluginITest {
         then:
         result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
-        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json")
 
         where:
         testSpecificConfig << locations
@@ -77,7 +77,7 @@ class OutputITest extends AbstractPluginITest {
         then:
         result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
-        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string')
+        assertSwaggerJson("${expectedSwaggerDirectory}/swagger.json", 'string', 'query')
 
         where:
         testSpecificConfig << locations
@@ -207,19 +207,21 @@ class OutputITest extends AbstractPluginITest {
     """
     }
 
-    private static void assertSwaggerJson(String swaggerJsonFilePath, String type = 'string') {
+    // TODO: pathParam shouldn't really be needed, should always be 'query'
+    private static void assertSwaggerJson(String swaggerJsonFilePath, String type = 'string', String pathParam = 'path') {
         def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
-        assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), 'json', type)
+        assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), 'json', type, pathParam)
     }
 
-    private static void assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string') {
+    // TODO: pathParam shouldn't really be needed, should always be 'query'
+    private static void assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string', String pathParam = 'path') {
         def swaggerYamlFile = new File(swaggerYamlFilePath)
         assert Files.exists(swaggerYamlFile.toPath())
-        assertSwaggerDocument(new Yaml().load(swaggerYamlFile.getText('UTF-8')), 'yaml', type)
+        assertSwaggerDocument(new Yaml().load(swaggerYamlFile.getText('UTF-8')), 'yaml', type, pathParam)
     }
 
-    private static void assertSwaggerDocument(def producedSwaggerDocument, String format, String type) {
+    private static void assertSwaggerDocument(def producedSwaggerDocument, String format, String type, String pathParam) {
         assert producedSwaggerDocument.swagger == '2.0'
         assert producedSwaggerDocument.host == 'localhost:8080'
         assert producedSwaggerDocument.basePath == '/'
@@ -243,10 +245,10 @@ class OutputITest extends AbstractPluginITest {
 
         def paths = producedSwaggerDocument.paths
         assert paths
-        assertPaths(paths, format, type, 'withannotation')
-        assertPaths(paths, format, type, 'withoutannotation')
+        assertPaths(paths, format, type, 'withannotation', pathParam)
+        assertPaths(paths, format, type, 'withoutannotation', pathParam)
         // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
-        assert paths.size() == 32
+        assert paths.size() == 34
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -269,7 +271,7 @@ class OutputITest extends AbstractPluginITest {
         assert definitions.SubResponseModel.properties.value.type == type
     }
 
-    private static void assertPaths(paths, String format, String type, String path) {
+    private static void assertPaths(paths, String format, String type, String path, String pathParam) {
         def ok = format == 'json' ? '200' : 200
 
         assert paths."/root/${path}/basic".get.tags == ['Test']
@@ -277,6 +279,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/basic".get.description == 'Test resource'
         assert paths."/root/${path}/basic".get.operationId == 'basic'
         assert paths."/root/${path}/basic".get.produces == null
+        assert paths."/root/${path}/basic".get.consumes == null
         assert paths."/root/${path}/basic".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/basic".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/basic".get.security.basic
@@ -286,10 +289,14 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/default".get.description == 'Test resource'
         assert paths."/root/${path}/default".get.operationId == 'defaultResponse'
         assert paths."/root/${path}/default".get.produces == null
+        assert paths."/root/${path}/default".get.consumes == null
         if (paths."/root/${path}/default".get.responses.default) {
             assert paths."/root/${path}/default".get.responses.default.description == 'successful operation'
+            assert paths."/root/${path}/default".get.responses.default.schema == null
         } else if (paths."/root/${path}/default".get.responses.get(ok)) {
             assert paths."/root/${path}/default".get.responses.get(ok).description == 'successful operation'
+            // TODO: Spring produces `object`, whereas JAX-RS produces null
+//            assert paths."/root/${path}/default".get.responses.get(ok).schema == null
         } else {
             assert false: "No response found for /root/${path}/default"
         }
@@ -300,10 +307,14 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/generics".post.description == 'Test resource'
         assert paths."/root/${path}/generics".post.operationId == 'generics'
         assert paths."/root/${path}/generics".post.produces == null
+        assert paths."/root/${path}/generics".post.consumes == null
         assert paths."/root/${path}/generics".post.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/generics".post.responses.get(ok).schema.type == 'array'
         assert paths."/root/${path}/generics".post.responses.get(ok).schema.items.type == type
         assert paths."/root/${path}/generics".post.security.basic
+        assert paths."/root/${path}/generics".post.parameters[0].in == 'body'
+        assert paths."/root/${path}/generics".post.parameters[0].name == 'body'
+        assert paths."/root/${path}/generics".post.parameters[0].required == false
         assert paths."/root/${path}/generics".post.parameters[0].schema.type == 'array'
         assert paths."/root/${path}/generics".post.parameters[0].schema.items.'$ref' == '#/definitions/RequestModel'
 
@@ -312,15 +323,21 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/datatype".post.description == 'Test resource'
         assert paths."/root/${path}/datatype".post.operationId == 'dataType'
         assert paths."/root/${path}/datatype".post.produces == ['application/json']
+        assert paths."/root/${path}/datatype".post.consumes == ['application/json']
         if (paths."/root/${path}/datatype".post.responses.default) {
             assert paths."/root/${path}/datatype".post.responses.default.description == 'successful operation'
+            assert paths."/root/${path}/datatype".post.responses.default.schema == null
         } else if (paths."/root/${path}/datatype".post.responses.get(ok)) {
             assert paths."/root/${path}/datatype".post.responses.get(ok).description == 'successful operation'
+            // TODO: Spring produces `object`, whereas JAX-RS produces null
+//            assert paths."/root/${path}/datatype".post.responses.get(ok).schema == null
         } else {
             assert false: "No response found for /root/${path}/datatype"
         }
         assert paths."/root/${path}/datatype".post.security.basic
+        assert paths."/root/${path}/datatype".post.parameters[0].in == 'body'
         assert paths."/root/${path}/datatype".post.parameters[0].name == 'body'
+        assert paths."/root/${path}/datatype".post.parameters[0].required == false
         assert paths."/root/${path}/datatype".post.parameters[0].schema.'$ref' == '#/definitions/RequestModel'
 
         assert paths."/root/${path}/response".post.tags == ['Test']
@@ -328,6 +345,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/response".post.description == 'Test resource'
         assert paths."/root/${path}/response".post.operationId == 'response'
         assert paths."/root/${path}/response".post.produces == null
+        assert paths."/root/${path}/response".post.consumes == null
         assert paths."/root/${path}/response".post.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/response".post.responses.get(ok).schema.type == null
         assert paths."/root/${path}/response".post.responses.get(ok).schema.'$ref' == '#/definitions/ResponseModel'
@@ -338,6 +356,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/responseContainer".post.description == 'Test resource'
         assert paths."/root/${path}/responseContainer".post.operationId == 'responseContainer'
         assert paths."/root/${path}/responseContainer".post.produces == null
+        assert paths."/root/${path}/responseContainer".post.consumes == null
         assert paths."/root/${path}/responseContainer".post.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/responseContainer".post.responses.get(ok).schema.type == 'array'
         assert paths."/root/${path}/responseContainer".post.responses.get(ok).schema.items.'$ref' == '#/definitions/ResponseModel'
@@ -348,6 +367,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/extended".get.description == 'Test resource'
         assert paths."/root/${path}/extended".get.operationId == 'extended'
         assert paths."/root/${path}/extended".get.produces == null
+        assert paths."/root/${path}/extended".get.consumes == null
         assert paths."/root/${path}/extended".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/extended".get.responses.get(ok).schema.type == null
         assert paths."/root/${path}/extended".get.responses.get(ok).schema.'$ref' == '#/definitions/SubResponseModel'
@@ -358,6 +378,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/deprecated".get.description == 'Test resource'
         assert paths."/root/${path}/deprecated".get.operationId == 'deprecated'
         assert paths."/root/${path}/deprecated".get.produces == null
+        assert paths."/root/${path}/deprecated".get.consumes == null
         assert paths."/root/${path}/deprecated".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/deprecated".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/deprecated".get.security.basic
@@ -367,6 +388,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/auth".get.description == 'Test resource'
         assert paths."/root/${path}/auth".get.operationId == 'withAuth'
         assert paths."/root/${path}/auth".get.produces == null
+        assert paths."/root/${path}/auth".get.consumes == null
         assert paths."/root/${path}/auth".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/auth".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/auth".get.security.basic
@@ -376,6 +398,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/model".get.description == 'Test resource'
         assert paths."/root/${path}/model".get.operationId == 'model'
         assert paths."/root/${path}/model".get.produces == null
+        assert paths."/root/${path}/model".get.consumes == null
         assert paths."/root/${path}/model".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/model".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/model".get.security.basic
@@ -385,6 +408,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/overriden".get.description == 'Test resource'
         assert paths."/root/${path}/overriden".get.operationId == 'overriden'
         assert paths."/root/${path}/overriden".get.produces == null
+        assert paths."/root/${path}/overriden".get.consumes == null
         assert paths."/root/${path}/overriden".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/overriden".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/overriden".get.security.basic
@@ -394,6 +418,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/overridenWithoutDescription".get.description == 'Test resource'
         assert paths."/root/${path}/overridenWithoutDescription".get.operationId == 'overridenWithoutDescription'
         assert paths."/root/${path}/overridenWithoutDescription".get.produces == null
+        assert paths."/root/${path}/overridenWithoutDescription".get.consumes == null
         assert paths."/root/${path}/overridenWithoutDescription".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/overridenWithoutDescription".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/overridenWithoutDescription".get.security.basic
@@ -405,12 +430,17 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.description == 'Test resource'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.operationId == 'multipleParameters'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.produces == null
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.consumes == null
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.responses.get(ok).schema.type == type
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.security.basic
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].in == pathParam
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].name == 'parameter1'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].required == true
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[0].type == 'number'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].in == 'query'
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].name == 'parameter2'
+        assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].required == false
         assert paths."/root/${path}/multipleParameters/{parameter1}".get.parameters[1].type == 'boolean'
 
         assert paths."/root/${path}/patch".patch.tags == ['Test']
@@ -418,6 +448,7 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/patch".patch.description == 'Test resource'
         assert paths."/root/${path}/patch".patch.operationId == 'patch'
         assert paths."/root/${path}/patch".patch.produces == null
+        assert paths."/root/${path}/patch".patch.consumes == null
         assert paths."/root/${path}/patch".patch.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/patch".patch.responses.get(ok).schema.type == type
         assert paths."/root/${path}/patch".patch.security.basic
@@ -427,11 +458,14 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/options".options.description == 'Test resource'
         assert paths."/root/${path}/options".options.operationId == 'options'
         assert paths."/root/${path}/options".options.produces == null
-        // Are these if statements really correct? Also, shouldn't they be testing for response.schema.type?
+        assert paths."/root/${path}/options".options.consumes == null
         if (paths."/root/${path}/options".options.responses.default) {
             assert paths."/root/${path}/options".options.responses.default.description == 'successful operation'
+            assert paths."/root/${path}/options".options.responses.default.schema == null
         } else if (paths."/root/${path}/options".options.responses.get(ok)) {
             assert paths."/root/${path}/options".options.responses.get(ok).description == 'successful operation'
+            // TODO: Spring produces `object`, whereas JAX-RS produces null
+//            assert paths."/root/${path}/options".options.responses.get(ok).schema == null
         } else {
             assert false: "No response found for /root/${path}/options"
         }
@@ -442,8 +476,23 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/head".head.description == 'Test resource'
         assert paths."/root/${path}/head".head.operationId == 'head'
         assert paths."/root/${path}/head".head.produces == null
+        assert paths."/root/${path}/head".head.consumes == null
         assert paths."/root/${path}/head".head.responses.get(ok).description == 'successful operation'
         assert paths."/root/${path}/head".head.responses.get(ok).schema.type == type
         assert paths."/root/${path}/head".head.security.basic
+
+        assert paths."/root/${path}/implicitparams".post.tags == ['Test']
+        assert paths."/root/${path}/implicitparams".post.summary == 'An implicit params operation'
+        assert paths."/root/${path}/implicitparams".post.description == 'Test resource'
+        assert paths."/root/${path}/implicitparams".post.operationId == 'implicitParams'
+        assert paths."/root/${path}/implicitparams".post.produces == null
+        assert paths."/root/${path}/implicitparams".post.consumes == null
+        assert paths."/root/${path}/implicitparams".post.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/implicitparams".post.responses.get(ok).schema.type == type
+        assert paths."/root/${path}/implicitparams".post.security.basic
+        assert paths."/root/${path}/implicitparams".post.parameters[0].in == 'body'
+        assert paths."/root/${path}/implicitparams".post.parameters[0].name == 'body'
+        assert paths."/root/${path}/implicitparams".post.parameters[0].required == true
+        assert paths."/root/${path}/implicitparams".post.parameters[0].schema.'$ref' == '#/definitions/RequestModel'
     }
 }

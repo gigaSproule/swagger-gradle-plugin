@@ -115,7 +115,7 @@ class TestResourceWithoutClassAnnotation {
     @ApiOperation('A multiple parameters operation')
     @Path('/root/withoutannotation/multipleParameters/{parameter1}')
     @GET
-    String multipleParameters(@PathParam("parameter1") Double parameterDouble, @QueryParam("parameter2") Boolean parameterBool) {
+    String multipleParameters(@PathParam('parameter1') Double parameterDouble, @QueryParam('parameter2') Boolean parameterBool) {
         return ''
     }
 
@@ -141,6 +141,16 @@ class TestResourceWithoutClassAnnotation {
     @Path('/root/withoutannotation/head')
     @HEAD
     String head() {
+        return ''
+    }
+
+    @ApiOperation(value = 'An implicit params operation')
+    @ApiImplicitParams(
+        @ApiImplicitParam(name = 'body', required = true, dataType = 'com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel', paramType = 'body')
+    )
+    @Path('/root/withoutannotation/implicitparams')
+    @POST
+    String implicitParams(String requestModel) {
         return ''
     }
 }

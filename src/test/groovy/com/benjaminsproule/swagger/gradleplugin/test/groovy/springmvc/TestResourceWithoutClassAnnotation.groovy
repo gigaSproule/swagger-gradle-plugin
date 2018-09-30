@@ -101,8 +101,8 @@ class TestResourceWithoutClassAnnotation {
     @ApiOperation('A multiple parameters operation')
     @RequestMapping(path = '/root/withoutannotation/multipleParameters/{parameter1}', method = RequestMethod.GET)
     String multipleParameters(
-        @RequestParam("parameter1") Double parameterDouble,
-        @RequestParam(name = "parameter2", required = false) Boolean parameterBool) {
+        @RequestParam('parameter1') Double parameterDouble,
+        @RequestParam(name = 'parameter2', required = false) Boolean parameterBool) {
         return ''
     }
 
@@ -125,6 +125,15 @@ class TestResourceWithoutClassAnnotation {
     @ApiOperation('An HEAD operation')
     @RequestMapping(path = '/root/withoutannotation/head', method = RequestMethod.HEAD)
     String head() {
+        return ''
+    }
+
+    @ApiOperation(value = 'An implicit params operation')
+    @ApiImplicitParams(
+        @ApiImplicitParam(name = 'body', required = true, dataType = 'com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel', paramType = 'body')
+    )
+    @RequestMapping(path = '/root/withoutannotation/implicitparams', method = RequestMethod.POST)
+    String implicitParams(String requestModel) {
         return ''
     }
 }

@@ -19,7 +19,7 @@ class ApiDocsITest extends AbstractPluginITest {
             }
             swagger {
                 apiSource {
-                    locations = ['com.benjaminsproule']
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
                     schemes = ['http']
                     info {
                         title = 'Project Name'

@@ -12,53 +12,53 @@ import org.springframework.web.bind.annotation.RequestParam
 
 import java.util.Collections.singletonList
 
-@Api(tags = ["Test"], description = "Test resource", authorizations = [(Authorization("basic"))])
+@Api(tags = ["Test"], description = "Test resource", authorizations = [Authorization("basic")])
 open class TestResourceWithoutClassAnnotation {
 
     @ApiOperation("A basic operation")
-    @RequestMapping(path = ["/root/withoutannotation/basic"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/basic"], method = [RequestMethod.GET])
     fun basic(): String {
         return ""
     }
 
     @ApiOperation("A default operation")
-    @RequestMapping(path = ["/root/withoutannotation/default"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/default"], method = [RequestMethod.GET])
     fun defaultResponse(): ResponseEntity<Any> {
         return ResponseEntity.ok().build()
     }
 
     @ApiOperation("A generics operation")
-    @RequestMapping(path = ["/root/withoutannotation/generics"], method = [(RequestMethod.POST)])
+    @RequestMapping(path = ["/root/withoutannotation/generics"], method = [RequestMethod.POST])
     fun generics(@ApiParam body: List<RequestModel>): List<String> {
         return singletonList("")
     }
 
     @ApiOperation("Consumes and Produces operation")
-    @RequestMapping(path = ["/root/withoutannotation/datatype"], method = [(RequestMethod.POST)], consumes = ["application/json"], produces = ["application/json"])
+    @RequestMapping(path = ["/root/withoutannotation/datatype"], method = [RequestMethod.POST], consumes = ["application/json"], produces = ["application/json"])
     fun dataType(@ApiParam requestModel: RequestModel): ResponseEntity<Any> {
         return ResponseEntity.ok().build()
     }
 
     @ApiOperation("A response operation", response = ResponseModel::class)
-    @RequestMapping(path = ["/root/withoutannotation/response"], method = [(RequestMethod.POST)])
+    @RequestMapping(path = ["/root/withoutannotation/response"], method = [RequestMethod.POST])
     fun response(@ApiParam body: List<RequestModel>): ResponseModel {
         return ResponseModel()
     }
 
     @ApiOperation("A response container operation", response = ResponseModel::class, responseContainer = "List")
-    @RequestMapping(path = ["/root/withoutannotation/responseContainer"], method = [(RequestMethod.POST)])
+    @RequestMapping(path = ["/root/withoutannotation/responseContainer"], method = [RequestMethod.POST])
     fun responseContainer(@ApiParam body: List<RequestModel>): List<ResponseModel> {
         return singletonList(ResponseModel())
     }
 
     @ApiOperation("An extended operation")
-    @RequestMapping(path = ["/root/withoutannotation/extended"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/extended"], method = [RequestMethod.GET])
     fun extended(): SubResponseModel {
         return SubResponseModel()
     }
 
     @ApiOperation("A deprecated operation")
-    @RequestMapping(path = ["/root/withoutannotation/deprecated"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/deprecated"], method = [RequestMethod.GET])
     @Deprecated(message = "Deprecated", level = DeprecationLevel.WARNING, replaceWith = ReplaceWith("\"\""))
     fun deprecated(): String {
         return ""
@@ -69,37 +69,37 @@ open class TestResourceWithoutClassAnnotation {
             AuthorizationScope(scope = "scope", description = "scope description")
         ])
     ])
-    @RequestMapping(path = ["/root/withoutannotation/auth"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/auth"], method = [RequestMethod.GET])
     fun withAuth(): String {
         return ""
     }
 
     @ApiOperation("A model operation")
-    @RequestMapping(path = ["/root/withoutannotation/model"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/model"], method = [RequestMethod.GET])
     fun model(): String {
         return ""
     }
 
     @ApiOperation("An overriden operation")
-    @RequestMapping(path = ["/root/withoutannotation/overriden"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/overriden"], method = [RequestMethod.GET])
     open fun overriden(): String {
         return ""
     }
 
     @ApiOperation("An overriden operation")
-    @RequestMapping(path = ["/root/withoutannotation/overridenWithoutDescription"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/overridenWithoutDescription"], method = [RequestMethod.GET])
     open fun overridenWithoutDescription(): String {
         return ""
     }
 
     @ApiOperation("A hidden operation", hidden = true)
-    @RequestMapping(path = ["/root/withoutannotation/hidden"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/hidden"], method = [RequestMethod.GET])
     fun hidden(): String {
         return ""
     }
 
     @ApiOperation("A multiple parameters operation")
-    @RequestMapping(path = ["/root/withoutannotation/multipleParameters/{parameter1}"], method = [(RequestMethod.GET)])
+    @RequestMapping(path = ["/root/withoutannotation/multipleParameters/{parameter1}"], method = [RequestMethod.GET])
     fun multipleParameters(
         @RequestParam("parameter1") parameterDouble: Double,
         @RequestParam(name = "parameter2", required = false) parameterBool: Boolean): String {
@@ -111,20 +111,29 @@ open class TestResourceWithoutClassAnnotation {
     }
 
     @ApiOperation("A PATCH operation")
-    @RequestMapping(path = ["/root/withoutannotation/patch"], method = [(RequestMethod.PATCH)])
+    @RequestMapping(path = ["/root/withoutannotation/patch"], method = [RequestMethod.PATCH])
     fun patch(): String {
         return ""
     }
 
     @ApiOperation("An OPTIONS operation")
-    @RequestMapping(path = ["/root/withoutannotation/options"], method = [(RequestMethod.OPTIONS)])
+    @RequestMapping(path = ["/root/withoutannotation/options"], method = [RequestMethod.OPTIONS])
     fun options(): ResponseEntity<String> {
         return ResponseEntity.ok().build()
     }
 
     @ApiOperation("An HEAD operation")
-    @RequestMapping(path = ["/root/withoutannotation/head"], method = [(RequestMethod.HEAD)])
+    @RequestMapping(path = ["/root/withoutannotation/head"], method = [RequestMethod.HEAD])
     fun head(): String {
+        return ""
+    }
+
+    @ApiOperation(value = "An implicit params operation")
+    @ApiImplicitParams(
+        ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body")
+    )
+    @RequestMapping(path = ["/root/withoutannotation/implicitparams"], method = [RequestMethod.POST])
+    fun implicitParams(requestModel: String): String {
         return ""
     }
 }

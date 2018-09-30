@@ -142,4 +142,14 @@ open class TestResourceWithClassAnnotation {
     fun head(): String {
         return ""
     }
+
+    @ApiOperation(value = "An implicit params operation")
+    @ApiImplicitParams(
+        ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body")
+    )
+    @Path("/implicitparams")
+    @POST
+    fun implicitParams(requestModel: String): String {
+        return ""
+    }
 }

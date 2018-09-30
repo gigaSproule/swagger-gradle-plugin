@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController
 @Api(value = "/sample", description = "Sample REST for Integration Testing")
 class SampleController {
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), path = arrayOf("/sample"), produces = arrayOf("application/json"))
-    @ApiOperation(value = "Return hello message", response = String::class)
-    fun home(): String {
-        return "{\"Hello\": \"World!\"}"
+    @RequestMapping(method = Array(RequestMethod.GET), path = Array("/sample"), produces = Array("application/json"))
+    @ApiOperation(value = "Return hello message", response = classOf[String])
+    def home: String = {
+        "{\"Hello\": \"World!\"}"
     }
 }

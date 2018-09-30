@@ -7,21 +7,21 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import java.util.List
 
 class SecurityITest extends AbstractPluginITest {
-  
-    static final List<String> springMvcAndJaxRs = [
-       """
+
+  static final List<String> springMvcAndJaxRs = [
+    """
           springmvc = true
           locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.SampleController']
        """,
-       """
+    """
           locations = ['com.benjaminsproule.swagger.gradleplugin.test.jaxrs.SampleResource']
        """
-      ]
-    
-    def 'Configure global security'() {
-      given:
-      def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
-      buildFile << """
+  ]
+
+  def 'Configure global security'() {
+    given:
+    def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
+    buildFile << """
             plugins {
                 id 'java'
                 id 'groovy'
@@ -46,24 +46,24 @@ class SecurityITest extends AbstractPluginITest {
             }
         """
 
-      when:
-      def result = runPluginTask()
+    when:
+    def result = runPluginTask()
 
-      then:
-      result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+    then:
+    result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
-      assertSwaggerJsonGlobalSecurity("${expectedSwaggerDirectory}/swagger.json")
+    assertSwaggerJsonGlobalSecurity("${expectedSwaggerDirectory}/swagger.json")
 
-      where:
-      testSpecificConfig << springMvcAndJaxRs
+    where:
+    testSpecificConfig << springMvcAndJaxRs
   }
-  
+
   private static void assertSwaggerJsonGlobalSecurity(String swaggerJsonFile) {
     def producedSwaggerDocument = new JsonSlurper().parse(new File(swaggerJsonFile), 'UTF-8')
 
     assert producedSwaggerDocument.swagger == '2.0'
     assert producedSwaggerDocument.basePath == '/'
-    
+
 
     def info = producedSwaggerDocument.info
     assert info
@@ -74,12 +74,12 @@ class SecurityITest extends AbstractPluginITest {
     assert security
     assert security.size() == 1
     assert security[0].containsKey('MyBasicAuth')
- }
- 
- def 'Configure global security with multiple auths'() {
-   given:
-   def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
-   buildFile << """
+  }
+
+  def 'Configure global security with multiple auths'() {
+    given:
+    def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui-" + UUID.randomUUID()
+    buildFile << """
             plugins {
                 id 'java'
                 id 'groovy'
@@ -103,8 +103,7 @@ class SecurityITest extends AbstractPluginITest {
                         type = 'apiKey'
                         keyLocation = 'header'
                         keyName = 'X-API-Key'
-                    }
-                    /* Add example when  issue https://github.com/gigaSproule/swagger-gradle-plugin/issues/104 is fixed 
+                    } 
                     securityDefinition {
                         name = 'MyOAuth2'
                         type = 'oauth2'
@@ -115,41 +114,66 @@ class SecurityITest extends AbstractPluginITest {
                             description = 'description'
                         }
                     }
-                    */
-                    security = [ [ MyBasicAuth : [], MyApiKey : [] ] ]
+                    security = [ [ MyBasicAuth : [], MyApiKey : [] ], [ MyOAuth2 : [ 'scope1' ] ] ]
                     ${testSpecificConfig}
                 }
             }
         """
 
-   when:
-   def result = runPluginTask()
+    when:
+    def result = runPluginTask()
 
-   then:
-   result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+    then:
+    result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
 
-   assertSwaggerJsonGlobalSecurityMultiple("${expectedSwaggerDirectory}/swagger.json")
+    assertSwaggerJsonGlobalSecurityMultiple("${expectedSwaggerDirectory}/swagger.json")
 
-   where:
-   testSpecificConfig << springMvcAndJaxRs
- }
- 
- private static void assertSwaggerJsonGlobalSecurityMultiple(String swaggerJsonFile) {
-   def producedSwaggerDocument = new JsonSlurper().parse(new File(swaggerJsonFile), 'UTF-8')
+    where:
+    testSpecificConfig << springMvcAndJaxRs
+  }
 
-   assert producedSwaggerDocument.swagger == '2.0'
-   assert producedSwaggerDocument.basePath == '/'
+  private static void assertSwaggerJsonGlobalSecurityMultiple(String swaggerJsonFile) {
+    def producedSwaggerDocument = new JsonSlurper().parse(new File(swaggerJsonFile), 'UTF-8')
 
-   def info = producedSwaggerDocument.info
-   assert info
-   assert info.version == '1'
-   assert info.title == 'test'
+    assert producedSwaggerDocument.swagger == '2.0'
+    assert producedSwaggerDocument.basePath == '/'
 
-   def security = producedSwaggerDocument.security;
-   assert security
-   assert security.size() == 1
-   assert security[0].containsKey('MyBasicAuth')
-   assert security[0].containsKey('MyApiKey')
- }
- 
+    def info = producedSwaggerDocument.info
+    assert info
+    assert info.version == '1'
+    assert info.title == 'test'
+    
+    // Validate securityDefinitions
+    def securityDefinitions = producedSwaggerDocument.securityDefinitions;
+    assert securityDefinitions
+    assert securityDefinitions.size() == 3
+    
+    def basicAuthDef = securityDefinitions['MyBasicAuth']
+    assert basicAuthDef
+    assert basicAuthDef.type == 'basic'
+    
+    def apiKeyDef = securityDefinitions['MyApiKey']
+    assert apiKeyDef
+    assert apiKeyDef.type == 'apiKey'
+    
+    
+    def oauth2Definition = securityDefinitions['MyOAuth2']
+    assert oauth2Definition
+    assert oauth2Definition.type == 'oauth2'
+    assert oauth2Definition.authorizationUrl == 'authorizationUrl'
+    assert oauth2Definition.flow == 'implicit'
+    assert oauth2Definition.scopes
+    assert oauth2Definition.scopes['scope1'] == 'description'
+    
+    
+    // Validate security
+    def security = producedSwaggerDocument.security;
+    assert security
+    assert security.size() == 2
+    assert security[0].containsKey('MyBasicAuth')
+    assert security[0].containsKey('MyApiKey')
+    assert security[1].containsKey('MyOAuth2')
+    
+  }
+
 }

@@ -65,10 +65,10 @@ class SecurityDefinitionValidator implements ModelValidator<SecurityDefinitionEx
             errors += 'securityDefinition.authorizationUrl is required by the swagger spec for OAuth 2.0'
         }
 
-        if (!securityDefinitionExtension.scopes) {
+        if (!securityDefinitionExtension.getScopeExtensions()) {
             errors += 'securityDefinition.scopes is required by the swagger spec for OAuth 2.0'
         } else {
-            securityDefinitionExtension.scopes.each { scope ->
+            securityDefinitionExtension.getScopeExtensions().each { scope ->
                 errors += scopeValidator.isValid(scope)
             }
         }

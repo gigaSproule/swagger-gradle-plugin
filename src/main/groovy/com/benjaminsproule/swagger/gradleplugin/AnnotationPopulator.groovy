@@ -41,18 +41,18 @@ class AnnotationPopulator {
     }
 
     private String getHostFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def swaggerDefinition = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations).first()
-        if (swaggerDefinition) {
-            return swaggerDefinition.host()
+        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations)
+        if (swaggerDefinitions && !swaggerDefinitions.isEmpty()) {
+            return swaggerDefinitions.first().host()
         }
 
         return null
     }
 
     private String getBasePathFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def swaggerDefinition = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations).first()
-        if (swaggerDefinition) {
-            return swaggerDefinition.basePath()
+        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations)
+        if (swaggerDefinitions && !swaggerDefinitions.isEmpty()) {
+            return swaggerDefinitions.first().basePath()
         }
 
         return null
@@ -100,7 +100,12 @@ class AnnotationPopulator {
         infoExtension
     }
 
+    // TODO: Test the logic for when it's default
     private static ContactExtension getContactFromAnnotation(Contact contactAnnotation) {
+        if (!contactAnnotation.name() && !contactAnnotation.url() && !contactAnnotation.email()) {
+            return null
+        }
+
         ContactExtension contactExtension = new ContactExtension()
         contactExtension.name = contactAnnotation.name()
         contactExtension.url = contactAnnotation.url()
@@ -108,7 +113,12 @@ class AnnotationPopulator {
         contactExtension
     }
 
+    // TODO: Test the logic for when it's default
     private static LicenseExtension getLicenseFromAnnotation(License licenseAnnotation) {
+        if (!licenseAnnotation.name() && !licenseAnnotation.url()) {
+            return null
+        }
+
         LicenseExtension licenseExtension = new LicenseExtension()
         licenseExtension.name = licenseAnnotation.name()
         licenseExtension.url = licenseAnnotation.url()

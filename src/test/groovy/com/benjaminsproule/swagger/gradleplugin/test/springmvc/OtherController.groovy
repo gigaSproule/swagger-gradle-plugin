@@ -6,17 +6,16 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/sample")
-public class SampleController {
+@RequestMapping("/api/other")
+public class OtherController {
 
     @GetMapping
-    public String getSample() {
+    public String getOther() {
       return "";
     }
 
-    @PostMapping(path = "")
-    public String postSample() {
+    @PostMapping
+    public String createOther() {
       return "";
     }
 }
-

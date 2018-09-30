@@ -75,6 +75,7 @@ swagger {
 | `descriptionFile` | A Path to file with description to be set to Swagger Spec 2.0's [info Object](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#infoObject) |
 | `info` **required**| The basic information of the api, using same definition as Swagger Spec 2.0's [info Object](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#infoObject) |
 | `securityDefinitions` | You can put your [security definitions](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#security-definitions-object) here, see more details [below](#securityDefinitions)|
+| `security` | A declaration of which security schemes are applied for the API as a whole. [security requirement](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject) see more details [below](#security)|
 | `templatePath` | The path of a [handlebars](http://handlebarsjs.com/) template file, see more details [below](#templatefile).|
 | `outputPath` | The path of the generated static document, not existed parent directories will be created. If you don't want to generate a static document, just don't set it. |
 | `outputFormats` | The format types of the generated swagger spec. Valid values are `json`, `yaml` or both (as a list, e.g. `['json']`). The `json` format is default.|
@@ -88,6 +89,7 @@ swagger {
 | `jsonExampleValues` | If `true`, all example values in `@ApiModelProperty` will be handled as json raw values. This is useful for creating valid examples in the generated json for all property types, including non-string ones. |
 | `modelConverters` | List of custom implementations of `io.swagger.converter.ModelConverter` that should be used when generating the swagger files. More details [below](#modelConverters)|
 | `excludePattern` | Regex of files that will be excluded from the swagger documentation. The default is `.*\\.pom` so it ignores all pom files. |
+| `tagStrategy` | Default no. `class` use class name if no tags are set to group operations specific to controller. (currently only springmvc)  |
 
 # <a id="templatefile">Template File</a>
 
@@ -209,6 +211,23 @@ The `securityDefinition.json` file should also follow the spec, one sample file 
 ```
 
 __Note:__ It is only possible to define the OAuth2 type in a json file and not directly in the gradle configuration.
+
+# <a id="security">Security</a>
+
+Allows to set a security requirement on the whole API. This can be done with multiple security requirements applied as AND or OR values. See https://swagger.io/docs/specification/2-0/authentication/
+The key of the security requirement has to match a name from a securityDefinition.
+
+```groovy
+security = [ [ ApiKeyAuth : [] ] ]
+```
+
+Use BasicAuth with ApiKey or OAuth2 with given scopes 
+(basic(name: MyBasicAuth) && apiKey(name: MyApiKey)) || oauth2(name: MyOAuth2)
+
+```groovy
+security = [ [ MyBasicAuth : [], MyApiKey : [] ], [ MyOAuth2 : [ 'scope1', 'scope2' ] ] ]
+```
+
 
 # <a id="swaggerApiReader">Swagger API Reader</a>
 You can instruct `swagger-gradle-plugin` to use a custom swagger api reader rather than use the default by adding the following to your build.gradle:
@@ -431,9 +450,9 @@ swagger {
 ```
 
 # To run integration tests
-This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the pluginUnderTestMetadata task to be run before hand.
+This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the testClasses task to be run before hand to get the classes into the test plugin classpath.
 ```bash
-./gradlew pluginUnderTestMetadata
+./gradlew testClasses
 ```
 
 N.B. for reliable test runs in an IDE, it's best to include this as a Gradle build step as part of the test run configuration.

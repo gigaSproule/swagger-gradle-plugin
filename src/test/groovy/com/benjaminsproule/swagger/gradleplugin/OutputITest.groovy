@@ -19,6 +19,9 @@ class OutputITest extends AbstractPluginITest {
         """,
         """
             locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+        """,
+        """
+            locations = ['com.benjaminsproule.swagger.gradleplugin.test.scala']
         """
     ]
 

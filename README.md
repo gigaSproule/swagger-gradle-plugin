@@ -450,9 +450,9 @@ swagger {
 ```
 
 # To run integration tests
-This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the pluginUnderTestMetadata task to be run before hand.
+This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the testClasses task to be run before hand to get the classes into the test plugin classpath.
 ```bash
-./gradlew pluginUnderTestMetadata
+./gradlew testClasses
 ```
 
 N.B. for reliable test runs in an IDE, it's best to include this as a Gradle build step as part of the test run configuration.

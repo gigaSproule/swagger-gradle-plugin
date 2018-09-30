@@ -89,6 +89,7 @@ swagger {
 | `jsonExampleValues` | If `true`, all example values in `@ApiModelProperty` will be handled as json raw values. This is useful for creating valid examples in the generated json for all property types, including non-string ones. |
 | `modelConverters` | List of custom implementations of `io.swagger.converter.ModelConverter` that should be used when generating the swagger files. More details [below](#modelConverters)|
 | `excludePattern` | Regex of files that will be excluded from the swagger documentation. The default is `.*\\.pom` so it ignores all pom files. |
+| `tagStrategy` | Default no. `class` use class name if no tags are set to group operations specific to controller. (currently only springmvc)  |
 
 # <a id="templatefile">Template File</a>
 

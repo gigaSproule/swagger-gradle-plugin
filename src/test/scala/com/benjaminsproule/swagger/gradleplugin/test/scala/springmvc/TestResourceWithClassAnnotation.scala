@@ -2,6 +2,7 @@ package com.benjaminsproule.swagger.gradleplugin.test.scala.springmvc
 
 import com.benjaminsproule.swagger.gradleplugin.test.model.{IgnoredModel, RequestModel, ResponseModel, SubResponseModel}
 import io.swagger.annotations._
+import javax.ws.rs.{POST, Path}
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod, RequestParam}
 
@@ -121,6 +122,15 @@ class TestResourceWithClassAnnotation {
     @ApiOperation("An HEAD operation")
     @RequestMapping(path = Array("/head"), method = Array(RequestMethod.HEAD))
     def head(): String = {
+        ""
+    }
+
+    @ApiOperation(value = "An implicit params operation")
+    @ApiImplicitParams(Array(
+        new ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body")
+    ))
+    @RequestMapping(path = Array("/implicitparams"), method = Array(RequestMethod.POST))
+    def implicitParams(requestModel: String): String = {
         ""
     }
 }

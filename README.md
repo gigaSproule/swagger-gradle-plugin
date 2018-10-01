@@ -448,26 +448,3 @@ swagger {
     }
 }
 ```
-
-# To run integration tests
-This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/test_kit.html), so requires the testClasses task to be run before hand to get the classes into the test plugin classpath.
-```bash
-./gradlew testClasses
-```
-
-N.B. for reliable test runs in an IDE, it's best to include this as a Gradle build step as part of the test run configuration.
-
-# To run tests against different versions of Gradle
-This plugin will by default run the tests against Gradle 4.7. To change which version it runs tests against, `test.gradleVersion` system property is required.
-```bash
-./gradlew /gradlew clean test -Dtest.gradleVersion=4.0
-```
-
-# To release
-This plugin uses the [gradle-release](https://github.com/researchgate/gradle-release) plugin, so to release the plugin.
-
-In `~/.gradle/gradle.properties`, `bintray_user` and `bintray_apiKey` need to be set for publishing to Bintray and `gradle.publish.key` and `gradle.publish.secret` for publishing to the central Gradle repository.
-
-```bash
-./gradlew release -Prelease.useAutomaticVersion=true
-```

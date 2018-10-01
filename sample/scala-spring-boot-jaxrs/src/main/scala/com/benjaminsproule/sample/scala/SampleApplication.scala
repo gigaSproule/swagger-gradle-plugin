@@ -4,6 +4,6 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
 @SpringBootApplication
-class Application extends App {
-    SpringApplication.run(classOf[Application], *args)
+class SampleApplication extends App {
+    SpringApplication.run(classOf[SampleApplication], args: _ *)
 }

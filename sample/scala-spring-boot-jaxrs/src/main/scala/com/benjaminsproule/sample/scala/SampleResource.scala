@@ -1,20 +1,17 @@
-package com.benjaminsproule.sample.kotlin;
+package com.benjaminsproule.sample.scala
 
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.{Api, ApiOperation}
+import javax.ws.rs.{GET, Path, Produces}
 import org.springframework.stereotype.Controller
-import javax.ws.rs.GET
-import javax.ws.rs.Path
-import javax.ws.rs.Produces
 
 @Controller
 @Path("/sample")
-@Produces("application/json")
+@Produces(Array("application/json"))
 @Api(value = "/sample", description = "Sample REST for Integration Testing")
 class SampleResource {
     @GET
     @ApiOperation(value = "Return hello message", response = classOf[String])
     def home: String = {
-        "{\"Hello\": \"World!\"}";
+        "{\"Hello\": \"World!\"}"
     }
 }

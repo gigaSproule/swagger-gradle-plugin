@@ -3,7 +3,6 @@ plugins {
     id 'maven-publish'
     id 'java'
     id 'groovy'
-    id 'org.jetbrains.kotlin.jvm' version '1.2.51'
     id 'scala'
     id 'idea'
     id 'jacoco' // Currently this does not exclude methods generated via Annotations (toString in this plugin)
@@ -117,15 +116,6 @@ compileTestScala.dependsOn compileTestGroovy
 compileTestScala.classpath += files(compileTestGroovy.destinationDir)
 testClasses.dependsOn tasks.compileTestKotlin
 
-<<<<<<< HEAD
-=======
-pluginUnderTestMetadata {
-    pluginClasspath = files("${buildDir}/classes/groovy/test", "${buildDir}/classes/java/test", "${buildDir}/classes/kotlin/test", "${buildDir}/classes/scala/test", "${buildDir}/resources/main", "${buildDir}/resources/test") + pluginUnderTestMetadata.pluginClasspath
-}
-
-test.dependsOn tasks.pluginUnderTestMetadata
-
->>>>>>> Added scala to the tests
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {
         user = bintray_user

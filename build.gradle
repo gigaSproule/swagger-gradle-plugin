@@ -165,4 +165,8 @@ publishing {
 tasks.jacocoTestReport.dependsOn('test')
 tasks.check.dependsOn('jacocoTestReport')
 
+jacoco {
+    toolVersion = '0.8.2'
+}
+
 afterReleaseBuild.dependsOn publishPlugins

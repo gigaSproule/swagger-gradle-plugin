@@ -21,7 +21,7 @@ import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 class ModelModifier extends ModelResolver {
-    private Map<JavaType, JavaType> modelSubtitutes = [:]
+    private Map<String, JavaType> modelSubtitutes = [:]
     List<String> apiModelPropertyAccessExclusions = []
     private ClassFinder classFinder
 
@@ -33,20 +33,11 @@ class ModelModifier extends ModelResolver {
     }
 
     void addModelSubstitute(String fromClass, String toClass) throws GenerateException {
-        JavaType type = null
-        JavaType toType = null
         try {
-            type = _mapper.constructType(classFinder.loadClass(fromClass))
-        } catch (ClassNotFoundException ignored) {
-            LOG.warn("Problem with loading class: ${fromClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
-        }
-        try {
-            toType = _mapper.constructType(classFinder.loadClass(toClass))
+            JavaType toType = _mapper.constructType(classFinder.loadClass(toClass))
+            modelSubtitutes.put(fromClass, toType)
         } catch (ClassNotFoundException ignored) {
             LOG.warn("Problem with loading class: ${toClass}. Mapping from: ${fromClass} to: ${toClass} will be ignored.")
-        }
-        if (type != null && toType != null) {
-            modelSubtitutes.put(type, toType)
         }
     }
 
@@ -54,9 +45,10 @@ class ModelModifier extends ModelResolver {
     Property resolveProperty(Type type, ModelConverterContext context, Annotation[] annotations, Iterator<ModelConverter> chain) {
         // for method parameter types we get here Type but we need JavaType
         JavaType javaType = toJavaType(type)
+        String typeName = javaType.getRawClass().getCanonicalName()
 
-        if (modelSubtitutes.containsKey(javaType)) {
-            return super.resolveProperty(modelSubtitutes.get(javaType), context, annotations, chain)
+        if (modelSubtitutes.containsKey(typeName)) {
+            return super.resolveProperty(modelSubtitutes.get(typeName), context, annotations, chain)
         } else if (chain.hasNext()) {
             return chain.next().resolveProperty(type, context, annotations, chain)
         } else {
@@ -69,9 +61,10 @@ class ModelModifier extends ModelResolver {
     Model resolve(Type type, ModelConverterContext context, Iterator<ModelConverter> chain) {
         // for method parameter types we get here Type but we need JavaType
         JavaType javaType = toJavaType(type)
+        String typeName = javaType.getRawClass().getCanonicalName()
         def model
-        if (modelSubtitutes.containsKey(javaType)) {
-            model = super.resolve(modelSubtitutes.get(javaType), context, chain)
+        if (modelSubtitutes.containsKey(typeName)) {
+            model = super.resolve(modelSubtitutes.get(typeName), context, chain)
         } else {
             model = super.resolve(type, context, chain)
         }

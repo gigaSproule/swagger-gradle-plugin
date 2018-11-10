@@ -34,7 +34,7 @@ N.B. for reliable test runs in an IDE, it's best to include this as a Gradle bui
 ## To run tests against different versions of Gradle
 This plugin will by default run the tests against Gradle 4.7. To change which version it runs tests against, `test.gradleVersion` system property is required.
 ```bash
-./gradlew /gradlew clean test -Dtest.gradleVersion=4.0
+./gradlew clean test -Dtest.gradleVersion=4.0
 ```
 
 ## To release

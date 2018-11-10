@@ -136,4 +136,10 @@ open class TestResourceWithoutClassAnnotation {
     fun implicitParams(requestModel: String): String {
         return ""
     }
+
+    @ApiOperation(value = "A created request operation", code = 201)
+    @RequestMapping(path = ["/root/withoutannotation/createdrequest"], method = [RequestMethod.POST])
+    fun createdRequest(): String {
+        return ""
+    }
 }

@@ -248,7 +248,7 @@ class OutputITest extends AbstractPluginITest {
         assertPaths(paths, format, type, 'withannotation', pathParam)
         assertPaths(paths, format, type, 'withoutannotation', pathParam)
         // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
-        assert paths.size() == 34
+        assert paths.size() == 36
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -273,6 +273,7 @@ class OutputITest extends AbstractPluginITest {
 
     private static void assertPaths(paths, String format, String type, String path, String pathParam) {
         def ok = format == 'json' ? '200' : 200
+        def created = format == 'json' ? '201' : 201
 
         assert paths."/root/${path}/basic".get.tags == ['Test']
         assert paths."/root/${path}/basic".get.summary == 'A basic operation'
@@ -494,5 +495,15 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/implicitparams".post.parameters[0].name == 'body'
         assert paths."/root/${path}/implicitparams".post.parameters[0].required == true
         assert paths."/root/${path}/implicitparams".post.parameters[0].schema.'$ref' == '#/definitions/RequestModel'
+
+        assert paths."/root/${path}/createdrequest".post.tags == ['Test']
+        assert paths."/root/${path}/createdrequest".post.summary == 'A created request operation'
+        assert paths."/root/${path}/createdrequest".post.description == 'Test resource'
+        assert paths."/root/${path}/createdrequest".post.operationId == 'createdRequest'
+        assert paths."/root/${path}/createdrequest".post.produces == null
+        assert paths."/root/${path}/createdrequest".post.consumes == null
+        assert paths."/root/${path}/createdrequest".post.responses.get(created).description == 'successful operation'
+        assert paths."/root/${path}/createdrequest".post.responses.get(created).schema.type == type
+        assert paths."/root/${path}/createdrequest".post.security.basic
     }
 }

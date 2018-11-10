@@ -45,7 +45,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
      * Method which allows sub-classes to modify the Swagger extension chain.
      * @param swaggerExtensions user provided swagger extensions
      */
-    abstract List<SwaggerExtension> customSwaggerExtensions()
+    protected abstract List<SwaggerExtension> customSwaggerExtensions()
 
     protected static List<SecurityRequirement> getSecurityRequirements(Api api) {
         List<SecurityRequirement> securities = []

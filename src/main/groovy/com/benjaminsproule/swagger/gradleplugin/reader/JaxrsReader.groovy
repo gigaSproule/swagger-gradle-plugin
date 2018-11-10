@@ -51,7 +51,7 @@ class JaxrsReader extends AbstractReader {
     }
 
     @Override
-    List<SwaggerExtension> customSwaggerExtensions() {
+    protected List<SwaggerExtension> customSwaggerExtensions() {
         [
             new BeanParamInjectionParamExtension(),
             new SwaggerJersey2Jaxrs(),
@@ -117,7 +117,7 @@ class JaxrsReader extends AbstractReader {
 
             if (!AnnotationUtils.findAnnotation(method, GET) && !AnnotationUtils.findAnnotation(method, POST)
                 && !AnnotationUtils.findAnnotation(method, PUT) && !AnnotationUtils.findAnnotation(method, DELETE)
-                && !AnnotationUtils.findAnnotation(method, OPTIONS)&& !AnnotationUtils.findAnnotation(method, HEAD)
+                && !AnnotationUtils.findAnnotation(method, OPTIONS) && !AnnotationUtils.findAnnotation(method, HEAD)
                 && !AnnotationUtils.findAnnotation(method, PATCH)) {
                 continue // Skip processing for non-API methods
             }
@@ -299,6 +299,8 @@ class JaxrsReader extends AbstractReader {
                     operation.addSecurity(auth.value(), scopes)
                 }
             }
+
+            responseCode = apiOperation.code()
         }
         operation.operationId(operationId)
 

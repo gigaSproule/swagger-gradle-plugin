@@ -2,16 +2,16 @@ dist: trusty
 sudo: false
 language: java
 jdk:
-  - openjdk11
-  - oraclejdk10
-  - oraclejdk8
-  - openjdk8
+- openjdk11
+- oraclejdk11
+- oraclejdk8
+- openjdk8
 script:
-    - ./travis-ci/scripts/run-build.sh
+- ./travis-ci/scripts/run-build.sh
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
-  directories:
+    directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/

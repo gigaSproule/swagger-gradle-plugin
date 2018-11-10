@@ -153,4 +153,11 @@ class TestResourceWithoutClassAnnotation {
     String implicitParams(String requestModel) {
         return ''
     }
+
+    @ApiOperation(value = 'A created request operation', code = 201)
+    @Path('/root/withoutannotation/createdrequest')
+    @POST
+    String createdRequest() {
+        return ''
+    }
 }

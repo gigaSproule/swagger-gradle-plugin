@@ -152,4 +152,11 @@ open class TestResourceWithClassAnnotation {
     fun implicitParams(requestModel: String): String {
         return ""
     }
+
+    @ApiOperation(value = "A created request operation", code = 201)
+    @Path("/createdrequest")
+    @POST
+    fun createdRequest(): String {
+        return ""
+    }
 }

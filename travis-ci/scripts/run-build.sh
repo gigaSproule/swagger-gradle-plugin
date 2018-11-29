@@ -17,3 +17,5 @@ done
 ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
 ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
 ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+./gradlew -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation

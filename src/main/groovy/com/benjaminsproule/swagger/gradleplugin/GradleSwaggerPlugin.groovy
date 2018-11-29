@@ -15,6 +15,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
         SwaggerExtension swaggerExtension = project.extensions.create('swagger', SwaggerExtension, project)
 
         def createdClassFinder = new ClassFinder(project)
+        def customReaderClassFinder = new ClassFinder(project, getClass().getClassLoader())
         def generateSwaggerDocsTask = project.task(type: GenerateSwaggerDocsTask,
             dependsOn: 'classes',
             group: 'swagger',
@@ -22,7 +23,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             GenerateSwaggerDocsTask.TASK_NAME,
             {
                 classFinder = createdClassFinder
-                readerFactory = new ReaderFactory(createdClassFinder)
+                readerFactory = new ReaderFactory(createdClassFinder, customReaderClassFinder)
                 generatorFactory = new GeneratorFactory(createdClassFinder)
                 apiSourceValidator = new ApiSourceValidator(new InfoValidator(new LicenseValidator()), new SecurityDefinitionValidator(new ScopeValidator()), new TagValidator(new ExternalDocsValidator()))
             }) as GenerateSwaggerDocsTask

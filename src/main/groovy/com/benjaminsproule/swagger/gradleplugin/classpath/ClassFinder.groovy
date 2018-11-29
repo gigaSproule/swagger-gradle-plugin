@@ -20,6 +20,11 @@ class ClassFinder {
         this.annotationCache = [:]
     }
 
+    ClassFinder(Project project, ClassLoader classLoader) {
+        this(project)
+        this.classLoader = classLoader
+    }
+
     Class<?> loadClass(String name) {
         return getClassLoader().loadClass(name)
     }

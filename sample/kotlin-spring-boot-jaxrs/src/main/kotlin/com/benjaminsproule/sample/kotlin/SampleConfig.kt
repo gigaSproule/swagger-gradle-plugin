@@ -6,6 +6,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class SampleConfig : ResourceConfig() {
     init {
-        register(SampleResource::class)
+        this.register(SampleResource::class)
     }
 }

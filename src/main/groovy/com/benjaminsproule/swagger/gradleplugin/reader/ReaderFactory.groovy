@@ -13,9 +13,11 @@ import java.lang.reflect.Type
 class ReaderFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ReaderFactory)
     private ClassFinder classFinder
+    private ClassFinder customReaderClassFinder
 
-    ReaderFactory(ClassFinder classFinder) {
+    ReaderFactory(ClassFinder classFinder, ClassFinder customReaderClassFinder) {
         this.classFinder = classFinder
+        this.customReaderClassFinder = customReaderClassFinder
     }
 
     ClassSwaggerReader reader(ApiSourceExtension apiSourceExtension) {
@@ -71,12 +73,12 @@ class ReaderFactory {
         String customReaderClassName = apiSourceExtension.getSwaggerApiReader()
         try {
             LOG.info("Reading custom API reader: " + customReaderClassName)
-            Class<?> clazz = classFinder.loadClass(customReaderClassName)
+            Class<?> clazz = customReaderClassFinder.loadClass(customReaderClassName)
             if (AbstractReader.isAssignableFrom(clazz)) {
                 Constructor<?> constructor = clazz.getConstructor(ApiSourceExtension, Set, List, ClassFinder)
                 return (ClassSwaggerReader) constructor.newInstance(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions(), ClassFinder)
             } else {
-                return (ClassSwaggerReader) clazz.newInstance()
+                return (ClassSwaggerReader) clazz.getConstructor().newInstance()
             }
         } catch (Exception e) {
             throw new GenerateException("Cannot load Swagger API reader: ${customReaderClassName}", e)

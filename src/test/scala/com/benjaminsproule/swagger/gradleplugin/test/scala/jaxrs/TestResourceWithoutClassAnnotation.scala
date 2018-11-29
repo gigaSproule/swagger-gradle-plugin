@@ -149,4 +149,11 @@ class TestResourceWithoutClassAnnotation {
     def implicitParams(requestModel: String): String = {
         ""
     }
+
+    @ApiOperation(value = "A created request operation", code = 201)
+    @Path("/root/withoutannotation/createdrequest")
+    @POST
+    def createdRequest(): String = {
+        ""
+    }
 }

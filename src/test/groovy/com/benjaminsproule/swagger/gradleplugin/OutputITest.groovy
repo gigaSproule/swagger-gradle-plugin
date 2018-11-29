@@ -9,7 +9,6 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class OutputITest extends AbstractPluginITest {
 
-
     public static final List<String> locations = [
         """
             locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
@@ -210,14 +209,12 @@ class OutputITest extends AbstractPluginITest {
     """
     }
 
-    // TODO: pathParam shouldn't really be needed, should always be 'query'
     private static void assertSwaggerJson(String swaggerJsonFilePath, String type = 'string', String pathParam = 'path') {
         def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
         assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), 'json', type, pathParam)
     }
 
-    // TODO: pathParam shouldn't really be needed, should always be 'query'
     private static void assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string', String pathParam = 'path') {
         def swaggerYamlFile = new File(swaggerYamlFilePath)
         assert Files.exists(swaggerYamlFile.toPath())

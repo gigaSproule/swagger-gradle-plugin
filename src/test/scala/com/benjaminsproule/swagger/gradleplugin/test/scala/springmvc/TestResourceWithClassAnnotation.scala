@@ -133,4 +133,10 @@ class TestResourceWithClassAnnotation {
     def implicitParams(requestModel: String): String = {
         ""
     }
+
+    @ApiOperation(value = "A created request operation", code = 201)
+    @RequestMapping(path = Array("/createdrequest"), method = Array(RequestMethod.POST))
+    def createdRequest(): String = {
+        ""
+    }
 }

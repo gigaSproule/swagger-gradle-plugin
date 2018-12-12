@@ -15,6 +15,7 @@ import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
 import io.swagger.util.ParameterProcessor
 import io.swagger.util.PathUtils
+import io.swagger.util.ReflectionUtils
 import org.apache.commons.lang3.reflect.TypeUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -422,7 +423,11 @@ abstract class AbstractReader implements ClassSwaggerReader {
             return
         }
         for (ApiImplicitParam param : implicitParams.value()) {
-            Class<?> cls = Class.forName(param.dataType())
+            Class<?> cls = ReflectionUtils.typeFromString(param.dataType());
+
+            if (param.dataType()?.trim() && !cls) {
+                throw new ClassNotFoundException(param.dataType());
+            }
 
             Parameter p = readImplicitParam(param, cls)
             if (p != null) {

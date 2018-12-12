@@ -30,7 +30,7 @@ class MissingImplicitParamsITest extends AbstractPluginITest {
 
         then:
         result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == FAILED
-        result.output.contains("Unrecognized Type: [null]")
+        result.output.contains("Caused by: java.lang.ClassNotFoundException: com.benjaminsproule.swagger.gradleplugin.test.model.MissingRequestModel")
 
         where:
         testSpecificConfig << [

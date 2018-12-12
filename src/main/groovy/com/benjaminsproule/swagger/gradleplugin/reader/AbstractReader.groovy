@@ -425,6 +425,10 @@ abstract class AbstractReader implements ClassSwaggerReader {
         for (ApiImplicitParam param : implicitParams.value()) {
             Class<?> cls = ReflectionUtils.typeFromString(param.dataType());
 
+            if (param.dataType()?.trim() && !cls) {
+                throw new ClassNotFoundException(param.dataType());
+            }
+
             Parameter p = readImplicitParam(param, cls)
             if (p != null) {
                 operation.addParameter(p)

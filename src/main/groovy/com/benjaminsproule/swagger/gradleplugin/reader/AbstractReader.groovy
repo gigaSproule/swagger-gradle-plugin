@@ -15,7 +15,6 @@ import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
 import io.swagger.util.ParameterProcessor
 import io.swagger.util.PathUtils
-import io.swagger.util.PrimitiveType
 import io.swagger.util.ReflectionUtils
 import org.apache.commons.lang3.reflect.TypeUtils
 import org.slf4j.Logger

@@ -198,7 +198,7 @@ class SpringSwaggerExtension extends AbstractSwaggerExtension {
     @Override
     boolean shouldIgnoreType(Type type, Set<Type> typesToSkip) {
         Class<?> cls = TypeUtils.getRawType(type, type)
-        return cls.getName().startsWith("org.springframework") &&
+        return cls != null && cls.getName().startsWith("org.springframework") &&
             cls.getName() != "org.springframework.web.multipart.MultipartFile"
     }
 }

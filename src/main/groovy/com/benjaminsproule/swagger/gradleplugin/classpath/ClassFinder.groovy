@@ -95,7 +95,7 @@ class ClassFinder {
             urls += it.toURI().toURL()
         }
 
-        if (project.sourceSets.main.output.getProperties()['classesDirs']) {
+        if (project.sourceSets.main.output.hasProperty('classesDirs')) {
             project.sourceSets.main.output.classesDirs.each {
                 if (it.exists()) {
                     urls += it.toURI().toURL()

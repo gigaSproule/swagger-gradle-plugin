@@ -495,6 +495,14 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/implicitparams".post.parameters[0].name == 'body'
         assert paths."/root/${path}/implicitparams".post.parameters[0].required == true
         assert paths."/root/${path}/implicitparams".post.parameters[0].schema.'$ref' == '#/definitions/RequestModel'
+        assert paths."/root/${path}/implicitparams".post.parameters[1].in == 'header'
+        assert paths."/root/${path}/implicitparams".post.parameters[1].name == 'id'
+        assert paths."/root/${path}/implicitparams".post.parameters[1].required == false
+        assert paths."/root/${path}/implicitparams".post.parameters[1].type == 'string'
+        assert paths."/root/${path}/implicitparams".post.parameters[2].in == 'header'
+        assert paths."/root/${path}/implicitparams".post.parameters[2].name == 'something'
+        assert paths."/root/${path}/implicitparams".post.parameters[2].required == false
+        assert paths."/root/${path}/implicitparams".post.parameters[2].type == 'SomethingElse'
 
         assert paths."/root/${path}/createdrequest".post.tags == ['Test']
         assert paths."/root/${path}/createdrequest".post.summary == 'A created request operation'

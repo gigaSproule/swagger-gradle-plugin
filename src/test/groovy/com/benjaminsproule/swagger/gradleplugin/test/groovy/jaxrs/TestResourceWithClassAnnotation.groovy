@@ -149,7 +149,8 @@ class TestResourceWithClassAnnotation {
     @ApiOperation(value = 'An implicit params operation')
     @ApiImplicitParams([
         @ApiImplicitParam(name = 'body', required = true, dataType = 'com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel', paramType = 'body'),
-        @ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string",  paramType = "header")
+        @ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string", paramType = "header"),
+        @ApiImplicitParam(name = "something", value = "Implicit parameter of an undefined type", dataType = "SomethingElse", paramType = "header")
     ])
     @Path('/implicitparams')
     @POST

@@ -426,7 +426,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
             Class<?> cls = ReflectionUtils.typeFromString(param.dataType());
 
             if (param.dataType()?.trim() && !cls) {
-                throw new ClassNotFoundException(param.dataType());
+                cls = method.getDeclaringClass()
             }
 
             Parameter p = readImplicitParam(param, cls)

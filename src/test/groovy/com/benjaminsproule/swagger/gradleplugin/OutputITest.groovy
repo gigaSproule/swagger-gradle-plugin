@@ -248,7 +248,7 @@ class OutputITest extends AbstractPluginITest {
         assertPaths(paths, format, type, 'withannotation', pathParam)
         assertPaths(paths, format, type, 'withoutannotation', pathParam)
         // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
-        assert paths.size() == 36
+        assert paths.size() == 38
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -257,7 +257,7 @@ class OutputITest extends AbstractPluginITest {
 
         def definitions = producedSwaggerDocument.definitions
         assert definitions
-        assert definitions.size() == 3
+        assert definitions.size() == 7
         assert definitions.RequestModel.type == 'object'
         assert definitions.RequestModel.properties.size() == 2
         assert definitions.RequestModel.properties.name.type == type
@@ -269,6 +269,22 @@ class OutputITest extends AbstractPluginITest {
         assert definitions.SubResponseModel.properties.size() == 2
         assert definitions.SubResponseModel.properties.name.type == type
         assert definitions.SubResponseModel.properties.value.type == type
+        assert definitions.OuterJsonSubType.type == 'object'
+        assert definitions.OuterJsonSubType.discriminator == '__outerType'
+        assert definitions.OuterJsonSubType.properties.size() == 1
+        assert definitions.OuterJsonSubType.properties.innerJsonSubType.'$ref' == '#/definitions/InnerJsonSubType'
+        assert definitions.SubOuterJsonSubType.allOf[0].'$ref' == '#/definitions/OuterJsonSubType'
+        assert definitions.SubOuterJsonSubType.allOf[1].type == 'object'
+        assert definitions.SubOuterJsonSubType.allOf[1].properties.size() == 1
+        assert definitions.SubOuterJsonSubType.allOf[1].properties.subValue.type == type
+        assert definitions.InnerJsonSubType.type == 'object'
+        assert definitions.InnerJsonSubType.discriminator == '__innerType'
+        assert definitions.InnerJsonSubType.properties.size() == 1
+        assert definitions.InnerJsonSubType.properties.value.type == type
+        assert definitions.SubInnerJsonSubType.allOf[0].'$ref' == '#/definitions/InnerJsonSubType'
+        assert definitions.SubInnerJsonSubType.allOf[1].type == 'object'
+        assert definitions.SubInnerJsonSubType.allOf[1].properties.size() == 1
+        assert definitions.SubInnerJsonSubType.allOf[1].properties.subValue.type == type
     }
 
     private static void assertPaths(paths, String format, String type, String path, String pathParam) {
@@ -513,5 +529,15 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/createdrequest".post.responses.get(created).description == 'successful operation'
         assert paths."/root/${path}/createdrequest".post.responses.get(created).schema.type == type
         assert paths."/root/${path}/createdrequest".post.security.basic
+
+        assert paths."/root/${path}/innerjsonsubtype".get.tags == ['Test']
+        assert paths."/root/${path}/innerjsonsubtype".get.summary == 'A inner JSON sub type operation'
+        assert paths."/root/${path}/innerjsonsubtype".get.description == 'Test resource'
+        assert paths."/root/${path}/innerjsonsubtype".get.operationId == 'innerJsonSubType'
+        assert paths."/root/${path}/innerjsonsubtype".get.produces == null
+        assert paths."/root/${path}/innerjsonsubtype".get.consumes == null
+        assert paths."/root/${path}/innerjsonsubtype".get.responses.get(ok).description == 'successful operation'
+        assert paths."/root/${path}/innerjsonsubtype".get.responses.get(ok).schema.'$ref' == '#/definitions/OuterJsonSubType'
+        assert paths."/root/${path}/innerjsonsubtype".get.security.basic
     }
 }

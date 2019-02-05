@@ -1,9 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.test.java.springmvc;
 
-import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel;
-import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel;
-import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel;
-import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel;
+import com.benjaminsproule.swagger.gradleplugin.test.model.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -145,5 +142,11 @@ public class TestResourceWithoutClassAnnotation {
     @RequestMapping(path = "/root/withoutannotation/createdrequest", method = RequestMethod.POST)
     public String createdRequest() {
         return "";
+    }
+
+    @ApiOperation(value = "A inner JSON sub type operation")
+    @RequestMapping(path = "/root/withoutannotation/innerjsonsubtype", method = RequestMethod.GET)
+    public OuterJsonSubType innerJsonSubType() {
+        return new OuterJsonSubType();
     }
 }

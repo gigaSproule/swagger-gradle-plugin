@@ -1,8 +1,8 @@
 package com.benjaminsproule.swagger.gradleplugin.test.scala.springmvc
 
-import com.benjaminsproule.swagger.gradleplugin.test.model.{IgnoredModel, RequestModel, ResponseModel, SubResponseModel}
+import com.benjaminsproule.swagger.gradleplugin.test.model._
 import io.swagger.annotations._
-import javax.ws.rs.{POST, Path}
+import javax.ws.rs.{GET, POST, Path}
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod, RequestParam}
 
@@ -140,5 +140,11 @@ class TestResourceWithClassAnnotation {
     @RequestMapping(path = Array("/createdrequest"), method = Array(RequestMethod.POST))
     def createdRequest(): String = {
         ""
+    }
+
+    @ApiOperation(value = "A inner JSON sub type operation")
+    @RequestMapping(path = Array("/innerjsonsubtype"), method = Array(RequestMethod.GET))
+    def innerJsonSubType(): OuterJsonSubType = {
+        new OuterJsonSubType()
     }
 }

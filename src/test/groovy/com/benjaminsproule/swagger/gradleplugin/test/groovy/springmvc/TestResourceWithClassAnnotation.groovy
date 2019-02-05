@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.test.groovy.springmvc
 
 import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.OuterJsonSubType
 import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel
 import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel
 import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel
@@ -144,5 +145,11 @@ class TestResourceWithClassAnnotation {
     @RequestMapping(path = '/createdrequest', method = RequestMethod.POST)
     String createdRequest() {
         return ''
+    }
+
+    @ApiOperation(value = 'A inner JSON sub type operation')
+    @RequestMapping(path = '/innerjsonsubtype', method = RequestMethod.GET)
+    OuterJsonSubType innerJsonSubType() {
+        return new OuterJsonSubType()
     }
 }

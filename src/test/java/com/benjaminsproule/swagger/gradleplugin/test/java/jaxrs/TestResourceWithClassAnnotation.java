@@ -1,9 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.test.java.jaxrs;
 
-import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel;
-import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel;
-import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel;
-import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel;
+import com.benjaminsproule.swagger.gradleplugin.test.model.*;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -149,7 +146,7 @@ public class TestResourceWithClassAnnotation {
     @ApiOperation(value = "An implicit params operation")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body"),
-        @ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string",  paramType = "header"),
+        @ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string", paramType = "header"),
         @ApiImplicitParam(name = "something", value = "Implicit parameter of an undefined type", dataType = "SomethingElse", paramType = "header")
     })
     @Path("/implicitparams")
@@ -163,5 +160,12 @@ public class TestResourceWithClassAnnotation {
     @POST
     public String createdRequest() {
         return "";
+    }
+
+    @ApiOperation(value = "A inner JSON sub type operation")
+    @Path("/innerjsonsubtype")
+    @GET
+    public OuterJsonSubType innerJsonSubType() {
+        return new OuterJsonSubType();
     }
 }

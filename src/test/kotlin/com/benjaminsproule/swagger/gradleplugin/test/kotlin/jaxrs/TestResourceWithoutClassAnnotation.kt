@@ -1,9 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.test.kotlin.jaxrs
 
-import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel
-import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel
-import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel
-import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.*
 import io.swagger.annotations.*
 import java.util.Collections.singletonList
 import javax.ws.rs.*
@@ -159,5 +156,12 @@ open class TestResourceWithoutClassAnnotation {
     @POST
     fun createdRequest(): String {
         return "";
+    }
+
+    @ApiOperation(value = "A inner JSON sub type operation")
+    @Path("/root/withoutannotation/innerjsonsubtype")
+    @GET
+    fun innerJsonSubType(): OuterJsonSubType {
+        return OuterJsonSubType()
     }
 }

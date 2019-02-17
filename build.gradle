@@ -43,7 +43,6 @@ task createClasspathManifest {
 
     doLast {
         outputDir.mkdirs()
-        println(sourceSets.test.runtimeClasspath.asPath)
         file("${outputDir}/plugin-classpath.txt").text = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).join('\n')
     }
 }

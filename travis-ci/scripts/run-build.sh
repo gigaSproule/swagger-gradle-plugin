@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ev
+set -e
 older_gradle_versions=()
 oracle_prefix="oraclejdk"
 openjdk_prefix="openjdk"

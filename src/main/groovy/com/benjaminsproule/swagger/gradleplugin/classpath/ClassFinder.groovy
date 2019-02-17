@@ -39,7 +39,7 @@ class ClassFinder {
 
     def <T extends Annotation> Set<T> getAnnotations(Class<T> annotation, List<String> packages) {
         if (annotationCache.containsKey(annotation)) {
-            return annotationCache.get(annotation)
+            return annotationCache.get(annotation) as Set<T>
         }
 
         def annotations = []
@@ -53,7 +53,7 @@ class ClassFinder {
             }
         }
 
-        annotationCache.put(annotation, annotations)
+        annotationCache.put(annotation, annotations as Set<? extends Annotation>)
         annotations
     }
 

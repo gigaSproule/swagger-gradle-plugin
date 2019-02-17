@@ -4,7 +4,7 @@ This plugin was based on [kongchen's swagger-maven-plugin](https://github.com/ko
 
 This enables your Swagger-annotated project to generate **Swagger specs** and **customizable, templated static documents** during the gradle build phase. Unlike swagger-core, swagger-gradle-plugin does not actively serve the spec with the rest of the application; it generates the spec as a build artifact to be used in downstream Swagger tooling.
 
-N.B This plugin is tested against the oldest and latest of each major Gradle version from 3.2 onwards. The reason for 3.2 is that it's the first that supports Kotlin therefore keeping tests simpler. This does _not_ mean that this plugin won't work with earlier versions, just your mileage may vary.
+N.B This plugin is tested against the latest of each major Gradle version from 3.x onwards and the earliest of the current major release. The reason for 3.x, is that 3.2 was the first that supported Kotlin, therefore keeping tests simpler. This does _not_ mean that this plugin won't work with earlier versions, just your mileage may vary.
 
 # Features
 

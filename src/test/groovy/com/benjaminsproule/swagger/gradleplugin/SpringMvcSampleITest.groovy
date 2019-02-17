@@ -117,7 +117,7 @@ class SpringMvcSampleITest extends AbstractPluginITest {
     
     def paths = producedSwaggerDocument.get('paths')
     assert paths
-    assert paths.size() == 4
+    assert paths.size() == 5
 
     assert paths."/api/sample".get
     assert paths."/api/sample".get.operationId == "getSample"
@@ -139,11 +139,16 @@ class SpringMvcSampleITest extends AbstractPluginITest {
     assert paths."/api/pets/eagles".get
     assert paths."/api/pets/eagles".get.operationId == "getEagles"
     assert paths."/api/pets/eagles".get.tags == ['eagles']
+
+    assert paths."/api/type-param".post
+    assert paths."/api/type-param".post.operationId == "post"
+    assert paths."/api/type-param".post.tags == ['TypeParamController']
     
     def tags = producedSwaggerDocument.get('tags')
     assert tags
-    assert tags.size() == 4
-    assert tags.sort() == [[name:'eagles'], [name:'OtherController'], [name:'pets'], [name:'SampleController']]
+    assert tags.size() == 5
+    assert tags.sort() == [[name:'eagles'], [name:'OtherController'], [name:'pets'], [name:'SampleController'],
+                           [name:'TypeParamController']]
   }
 
 }

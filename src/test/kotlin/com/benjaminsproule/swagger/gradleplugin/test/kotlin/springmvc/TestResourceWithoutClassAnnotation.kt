@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam
 
 import java.util.Collections.singletonList
 
+@Suppress("UNUSED_PARAMETER")
 @Api(tags = ["Test"], description = "Test resource", authorizations = [Authorization("basic")])
 open class TestResourceWithoutClassAnnotation {
 

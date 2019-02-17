@@ -423,7 +423,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
             return
         }
         for (ApiImplicitParam param : implicitParams.value()) {
-            Class<?> cls = ReflectionUtils.typeFromString(param.dataType());
+            Class<?> cls = ReflectionUtils.typeFromString(param.dataType()) as Class<?>
 
             if (param.dataType()?.trim() && !cls) {
                 cls = method.getDeclaringClass()

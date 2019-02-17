@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin
 
-import static org.gradle.testkit.runner.TaskOutcome.FAILED
+
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class MissingImplicitParamsITest extends AbstractPluginITest {
 
@@ -26,11 +27,11 @@ class MissingImplicitParamsITest extends AbstractPluginITest {
         """
 
         when:
-        def result = runPluginTask(false)
+        def result = runPluginTask()
 
         then:
-        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == FAILED
-        result.output.contains("Caused by: java.lang.ClassNotFoundException: com.benjaminsproule.swagger.gradleplugin.test.model.MissingRequestModel")
+        result.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+        result.output.contains("java.lang.ClassNotFoundException: com.benjaminsproule.swagger.gradleplugin.test.model.MissingRequestModel")
 
         where:
         testSpecificConfig << [

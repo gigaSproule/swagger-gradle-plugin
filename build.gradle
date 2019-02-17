@@ -11,7 +11,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.8.4'
     id 'net.researchgate.release' version '2.7.0'
     id 'com.github.ben-manes.versions' version '0.20.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
     id 'com.dorongold.task-tree' version '1.3.1'
 }
 
@@ -51,7 +51,7 @@ task createClasspathManifest {
 dependencies {
     def jacksonVersion = '2.9.7'
     def springVersion = '5.1.3.RELEASE'
-    def kotlinVersion = '1.3.10'
+    def kotlinVersion = '1.3.21'
 
     compile gradleApi()
     compile localGroovy()

@@ -6,6 +6,7 @@ import java.util.Collections.singletonList
 import javax.ws.rs.*
 import javax.ws.rs.core.Response
 
+@Suppress("UNUSED_PARAMETER")
 @Api(tags = ["Test"], description = "Test resource", authorizations = [Authorization("basic")])
 @Path("/root/withannotation")
 open class TestResourceWithClassAnnotation {

@@ -59,7 +59,7 @@ class ClassFinder {
 
     def <T extends Annotation> Set<Class<T>> getValidClasses(Class<T> clazz, List<String> packages) {
         if (classCache.containsKey(clazz)) {
-            return classCache.get(clazz)
+            return classCache.get(clazz) as Set<Class<T>>
         }
 
         def classes = []
@@ -73,7 +73,7 @@ class ClassFinder {
             classes.addAll(c)
         }
 
-        classCache.put(clazz, classes)
+        classCache.put(clazz, classes as Set<Class<?>>)
         classes
     }
 

@@ -1,10 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin.model
 
 import groovy.transform.ToString
-
-import java.util.List
-import java.util.Map
-
 import org.gradle.api.Project
 
 @ToString(includeNames = true)

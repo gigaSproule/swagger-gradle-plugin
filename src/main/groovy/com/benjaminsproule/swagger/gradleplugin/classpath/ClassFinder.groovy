@@ -65,10 +65,8 @@ class ClassFinder {
         def classes = []
 
         if (packages) {
-            packages.each { location ->
-                Set<Class<?>> c = new Reflections(getClassLoader(), location).getTypesAnnotatedWith(clazz)
-                classes.addAll(c)
-            }
+            Set<Class<?>> c = new Reflections(getClassLoader(), packages).getTypesAnnotatedWith(clazz)
+            classes.addAll(c)
         } else {
             LOG.warn("Scanning the the entire classpath (${clazz}), you should avoid this by specifying package locations")
             Set<Class<?>> c = new Reflections(getClassLoader(), '').getTypesAnnotatedWith(clazz)

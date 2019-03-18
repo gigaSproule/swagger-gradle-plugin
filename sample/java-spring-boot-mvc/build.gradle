@@ -50,6 +50,22 @@ dependencies {
     
     // additional openapi stuff
     compile "org.openapitools:openapi-generator-cli:4.0.0-beta2"
+    
+    // needed as dep for openapi generation for 'java'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'io.gsonfire:gson-fire:1.8.3'
+    compile 'com.squareup.okio:okio:2.2.2'
+    compile 'com.squareup.okhttp3:okhttp:3.14.0'
+    compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'build/openapi/src/main/java'
+        }
+    }
 }
 
 def generateSwagger = swagger {
@@ -86,6 +102,8 @@ def generateSwagger = swagger {
     }
 }
 
+// https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator-gradle-plugin/README.adoc
+// https://github.com/OpenAPITools/openapi-generator
 def generateApi = openApiGenerate {
     generatorName = "java" // kotlin
     // inputSpec = "$rootDir/specs/petstore-v3.0.yaml".toString()

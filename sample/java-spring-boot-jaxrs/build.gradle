@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.5.4.RELEASE'
+        springBootVersion = '2.1.3.RELEASE'
     }
     repositories {
         // mavenLocal()
@@ -28,14 +28,20 @@ group = 'com.benjaminsproule'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-jersey'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'io.swagger:swagger-annotations:1.5.15'
-    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+    compile 'org.springframework.boot:spring-boot-starter-jersey:2.1.3.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.1.3.RELEASE'
+    compile 'io.swagger:swagger-annotations:1.5.22'
+    // compile 'io.swagger.core.v3:swagger-annotations:2.0.7'
+    compile 'javax.ws.rs:javax.ws.rs-api:2.1.1'
 }
 
 swagger {
     apiSource {
+        attachSwaggerArtifact = true
+        locations = ['com.benjaminsproule.public']
+        swaggerDirectory = "${swaggerDirectory}"
+        swaggerFileName = 'publicSwagger'
+
         springmvc = false
         locations = ['com.benjaminsproule.sample']
         schemes = ['http', 'https']

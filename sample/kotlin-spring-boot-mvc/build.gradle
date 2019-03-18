@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        kotlinVersion = '1.3.10'
-        springBootVersion = '1.5.4.RELEASE'
+        kotlinVersion = '1.3.21'
+        springBootVersion = '2.1.3.RELEASE'
     }
     repositories {
         // mavenLocal()
@@ -32,12 +32,18 @@ version = '0.0.1-SNAPSHOT'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'io.swagger:swagger-annotations:1.5.15'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.1.3.RELEASE'
+    compile 'io.swagger:swagger-annotations:1.5.22'
+    // compile 'io.swagger.core.v3:swagger-annotations:2.0.7'
 }
 
 swagger {
     apiSource {
+        attachSwaggerArtifact = true
+        locations = ['com.benjaminsproule.public']
+        swaggerDirectory = "${swaggerDirectory}"
+        swaggerFileName = 'publicSwagger'
+
         springmvc = true
         locations = ['com.benjaminsproule.sample']
         schemes = ['http', 'https']

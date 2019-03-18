@@ -28,7 +28,8 @@ group = 'com.benjaminsproule'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    compile localGroovy()
+    // compile localGroovy()
+    compile "org.codehaus.groovy:groovy-all:2.5.6"
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'io.swagger:swagger-annotations:1.5.15'
 }

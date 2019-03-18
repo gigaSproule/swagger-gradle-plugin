@@ -32,7 +32,7 @@ apply plugin: 'com.benjaminsproule.swagger'
  */
 
 repositories {
-    mavenLocal()
+    // mavenLocal()
     mavenCentral()
     jcenter()
 }

@@ -43,7 +43,7 @@ dependencies {
     compile 'io.swagger:swagger-annotations:1.5.15'
 }
 
-swagger {
+def generateSwagger = swagger {
     apiSource {
         springmvc = true
         locations = ['com.benjaminsproule.sample']
@@ -78,4 +78,4 @@ springBoot {
 }
  */
 
-// build.dependsOn swagger
+build.dependsOn generateSwagger

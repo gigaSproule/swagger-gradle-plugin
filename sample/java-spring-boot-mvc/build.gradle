@@ -50,6 +50,7 @@ dependencies {
     
     // additional openapi stuff
     compile "org.openapitools:openapi-generator-cli:4.0.0-beta2"
+    compile "org.openapitools:jackson-databind-nullable:0.1.0"
     
     // needed as dep for openapi generation for 'java'
     compile 'com.google.code.gson:gson:2.8.5'
@@ -57,6 +58,19 @@ dependencies {
     compile 'com.squareup.okio:okio:2.2.2'
     compile 'com.squareup.okhttp3:okhttp:3.14.0'
     compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2'
+
+    // needed as dep for openapi generation for 'spring'
+    compile 'io.springfox:springfox-spi:2.9.2'
+    compile 'io.springfox:springfox-schema:2.9.2'
+    compile 'io.springfox:springfox-spring-web:2.9.2'
+    // compile 'io.springfox:springfox-spring-webmvc:2.9.2'
+    // compile 'io.springfox:springfox-spring-integration:2.9.2'
+    // https://springfox.github.io/springfox/docs/current/
+    compile "io.springfox:springfox-swagger2:2.9.2"
+    compile "io.springfox:springfox-data-rest:2.9.2"
+    compile "io.springfox:springfox-bean-validators:2.9.2"
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
+    compile 'io.springfox.ui:springfox-swagger-ui-rfc6570:1.0.0'
 }
 
 sourceSets {
@@ -105,7 +119,7 @@ def generateSwagger = swagger {
 // https://github.com/OpenAPITools/openapi-generator/blob/master/modules/openapi-generator-gradle-plugin/README.adoc
 // https://github.com/OpenAPITools/openapi-generator
 def generateApi = openApiGenerate {
-    generatorName = "java" // kotlin
+    generatorName = "spring" // kotlin, java
     // inputSpec = "$rootDir/specs/petstore-v3.0.yaml".toString()
     inputSpec = "$buildDir/swagger-ui/publicSwagger.json".toString()
     outputDir = "$buildDir/openapi".toString()

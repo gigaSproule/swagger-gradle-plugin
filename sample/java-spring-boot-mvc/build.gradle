@@ -10,6 +10,9 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
+
+        // additional openapi stuff
+        classpath "org.openapitools:openapi-generator-gradle-plugin:4.0.0-beta2"
     }
 }
 
@@ -29,6 +32,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.7.RELEASE'
 }
 
+apply plugin: 'org.openapi.generator'
+
 repositories {
     // mavenLocal()
     mavenCentral()
@@ -42,6 +47,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.3.RELEASE'
     compile 'io.swagger:swagger-annotations:1.5.22'
     // compile 'io.swagger.core.v3:swagger-annotations:2.0.7'
+    
+    // additional openapi stuff
+    compile "org.openapitools:openapi-generator-cli:4.0.0-beta2"
 }
 
 def generateSwagger = swagger {
@@ -78,10 +86,39 @@ def generateSwagger = swagger {
     }
 }
 
+def generateApi = openApiGenerate {
+    generatorName = "java" // kotlin
+    // inputSpec = "$rootDir/specs/petstore-v3.0.yaml".toString()
+    inputSpec = "$buildDir/swagger-ui/publicSwagger.json".toString()
+    outputDir = "$buildDir/openapi".toString()
+    apiPackage = "org.openapi.example.api"
+    invokerPackage = "org.openapi.example.invoker"
+    modelPackage = "org.openapi.example.model"
+    skipValidateSpec = false
+    /*
+    modelFilesConstrainedTo = [
+        "Error"
+    ]
+     */
+    configOptions = [
+        dateLibrary: "java8"
+    ]
+}
+
+task initOpenApi() {
+    doFirst {
+        mkdir "build/openapi"
+    }
+}
+
 /*
 springBoot {
     // mainClass = "com.benjaminsproule.sample.springboot.mvc.SampleApplication"
 }
  */
 
+// generateApi.dependsOn initOpenApi
+// build.dependsOn generateApi
 // build.dependsOn generateSwagger
+
+build.dependsOn initOpenApi

@@ -16,7 +16,7 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    // mavenLocal()
     mavenCentral()
     maven {
         url 'https://dl.bintray.com/gigasproule/maven'

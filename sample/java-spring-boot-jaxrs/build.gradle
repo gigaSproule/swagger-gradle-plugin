@@ -3,7 +3,7 @@ buildscript {
         springBootVersion = '1.5.4.RELEASE'
     }
     repositories {
-        mavenLocal()
+        // mavenLocal()
         mavenCentral()
         jcenter()
     }
@@ -19,7 +19,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'com.benjaminsproule.swagger'
 
 repositories {
-    mavenLocal()
+    // mavenLocal()
     mavenCentral()
     jcenter()
 }

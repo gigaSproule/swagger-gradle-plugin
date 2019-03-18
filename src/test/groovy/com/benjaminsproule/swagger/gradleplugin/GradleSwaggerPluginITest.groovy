@@ -493,7 +493,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             }
 
             repositories {
-                mavenLocal()
+                // mavenLocal()
                 mavenCentral()
             }
 

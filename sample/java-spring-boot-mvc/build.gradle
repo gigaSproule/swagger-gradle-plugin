@@ -45,6 +45,11 @@ dependencies {
 
 def generateSwagger = swagger {
     apiSource {
+        attachSwaggerArtifact = true
+        locations = ['com.benjaminsproule.public']
+        swaggerDirectory = "${swaggerDirectory}"
+        swaggerFileName = 'publicSwagger'
+        
         springmvc = true
         locations = ['com.benjaminsproule.sample']
         schemes = ['http', 'https']
@@ -78,4 +83,4 @@ springBoot {
 }
  */
 
-build.dependsOn generateSwagger
+// build.dependsOn generateSwagger

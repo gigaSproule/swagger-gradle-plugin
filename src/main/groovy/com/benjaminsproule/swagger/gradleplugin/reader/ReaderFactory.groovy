@@ -76,7 +76,7 @@ class ReaderFactory {
             Class<?> clazz = customReaderClassFinder.loadClass(customReaderClassName)
             if (AbstractReader.isAssignableFrom(clazz)) {
                 Constructor<?> constructor = clazz.getConstructor(ApiSourceExtension, Set, List, ClassFinder)
-                return (ClassSwaggerReader) constructor.newInstance(apiSourceExtension, loadTypesToSkip(), resolveSwaggerExtensions(), ClassFinder)
+                return (ClassSwaggerReader) constructor.newInstance(apiSourceExtension, loadTypesToSkip(apiSourceExtension), resolveSwaggerExtensions(apiSourceExtension), classFinder)
             } else {
                 return (ClassSwaggerReader) clazz.getConstructor().newInstance()
             }

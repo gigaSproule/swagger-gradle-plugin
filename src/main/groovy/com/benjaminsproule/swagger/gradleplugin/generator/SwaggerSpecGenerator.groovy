@@ -6,6 +6,7 @@ import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
+import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectWriter
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -34,6 +35,8 @@ class SwaggerSpecGenerator implements Generator {
         //Not come across an appropriate solution that is not deprecated yet
         mapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+        mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 
         if (apiSource.jsonExampleValues) {
             mapper.addMixIn(Property, PropertyExampleMixIn)

@@ -2,6 +2,7 @@ package com.benjaminsproule.swagger.gradleplugin
 
 import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import io.swagger.models.*
+import io.swagger.models.parameters.Parameter
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.web.bind.annotation.RequestMapping
 
@@ -79,6 +80,12 @@ class Utils {
             Map<String, Response> responses = op.getResponses()
             TreeMap<String, Response> res = new TreeMap<String, Response>()
             res.putAll(responses)
+            op.getParameters().sort(new Comparator<Parameter>() {
+                @Override
+                int compare(Parameter o1, Parameter o2) {
+                    return o1.getName() <=> o2.getName()
+                }
+            })
             op.setResponses(res)
         } catch (NoSuchMethodException e) {
             throw new GenerateException(e)

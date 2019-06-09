@@ -1,4 +1,4 @@
-package com.benjaminsproule.swagger.gradleplugin.test.springmvc.model
+package com.benjaminsproule.swagger.gradleplugin.test.model
 
 import com.fasterxml.jackson.annotation.JsonView
 

@@ -1,8 +1,8 @@
 package com.benjaminsproule.swagger.gradleplugin.test.springmvc
 
-import com.benjaminsproule.swagger.gradleplugin.test.springmvc.model.TestJsonViewOne
-import com.benjaminsproule.swagger.gradleplugin.test.springmvc.model.TestJsonViewEntity
-import com.benjaminsproule.swagger.gradleplugin.test.springmvc.model.TestJsonViewTwo;
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewOne
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewEntity
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewTwo;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation

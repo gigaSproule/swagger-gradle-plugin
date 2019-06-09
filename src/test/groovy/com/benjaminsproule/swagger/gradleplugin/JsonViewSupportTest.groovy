@@ -1,5 +1,8 @@
 package com.benjaminsproule.swagger.gradleplugin
 
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewEntity
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewOne
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewTwo
 import groovy.json.JsonSlurper
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -60,6 +63,7 @@ class JsonViewSupportTest extends AbstractPluginITest {
         assert withViewTwo.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity_TestJsonViewTwo"
 
         def withoutAny = paths."/api/jsonview/without".post
+        assert withoutAny
         assert withoutAny.operationId == "withoutJsonView"
         assert withoutAny.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity"
 
@@ -68,19 +72,9 @@ class JsonViewSupportTest extends AbstractPluginITest {
         assert definitions
         assert definitions.size() == 3
 
-        def viewOneDef = definitions."TestJsonViewEntity_TestJsonViewOne"
-        assert viewOneDef
-        assert viewOneDef.required == ['requiredValue', 'viewValue']
-
-        def viewTwoDef = definitions."TestJsonViewEntity_TestJsonViewTwo"
-        assert viewTwoDef
-        assert viewTwoDef.required == ['requiredValue']
-
-
-        def regularEntityDef = definitions."TestJsonViewEntity"
-        assert regularEntityDef
-        assert regularEntityDef.required == ['requiredValue', 'viewValue']
-
+        assertDefinition(definitions, TestJsonViewEntity, TestJsonViewOne, ['requiredValue', 'viewValue'])
+        assertDefinition(definitions, TestJsonViewEntity, TestJsonViewTwo, ['requiredValue'])
+        assertDefinition(definitions, TestJsonViewEntity, null, ['requiredValue', 'viewValue'])
 
         where:
         testSpecificConfig << [
@@ -144,6 +138,7 @@ class JsonViewSupportTest extends AbstractPluginITest {
         assert withViewTwo.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity_TestJsonViewTwo"
 
         def withoutAny = paths."/api/jsonview/without".post
+        assert withoutAny
         assert withoutAny.operationId == "withoutJsonView"
         assert withoutAny.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity"
 
@@ -152,19 +147,9 @@ class JsonViewSupportTest extends AbstractPluginITest {
         assert definitions
         assert definitions.size() == 3
 
-        def viewOneDef = definitions."TestJsonViewEntity_TestJsonViewOne"
-        assert viewOneDef
-        assert viewOneDef.required == ['requiredValue', 'viewValue']
-
-        def viewTwoDef = definitions."TestJsonViewEntity_TestJsonViewTwo"
-        assert viewTwoDef
-        assert viewTwoDef.required == ['requiredValue']
-
-
-        def regularEntityDef = definitions."TestJsonViewEntity"
-        assert regularEntityDef
-        assert regularEntityDef.required == ['requiredValue', 'viewValue']
-
+        assertDefinition(definitions, TestJsonViewEntity, TestJsonViewOne, ['requiredValue', 'viewValue'])
+        assertDefinition(definitions, TestJsonViewEntity, TestJsonViewTwo, ['requiredValue'])
+        assertDefinition(definitions, TestJsonViewEntity, null, ['requiredValue', 'viewValue'])
 
         where:
         testSpecificConfig << [
@@ -172,5 +157,15 @@ class JsonViewSupportTest extends AbstractPluginITest {
                 locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.JsonViewController']
             """
         ]
+    }
+
+
+    private static void assertDefinition(def definitions, Class<?> definitionEntity, Class<?> view, Collection<String> expectedFields) {
+        assert definitions
+
+        def defName = definitionEntity.simpleName + view? "_${view.simpleName}" : ""
+        def definition = definitions[defName]
+        assert definition
+        assert definition.required == expectedFields
     }
 }

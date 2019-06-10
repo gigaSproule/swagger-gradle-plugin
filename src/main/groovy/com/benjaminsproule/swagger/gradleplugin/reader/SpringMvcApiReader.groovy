@@ -6,6 +6,7 @@ import com.benjaminsproule.swagger.gradleplugin.exceptions.GenerateException
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.spring.SpringSwaggerExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.model.SpringResource
+import com.fasterxml.jackson.annotation.JsonView
 import com.google.common.collect.Sets
 import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
@@ -260,13 +261,14 @@ class SpringMvcApiReader extends AbstractReader {
         if (responseClassType instanceof Class) {
             hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api) != null
         }
+        JsonView jsonView = AnnotatedElementUtils.findMergedAnnotation(method, JsonView.class)
         if (responseClassType != null
             && responseClassType != Void
             && responseClassType != void
             && responseClassType != ResponseEntity
             && !hasApiAnnotation) {
             if (isPrimitive(responseClassType)) {
-                Property property = ModelConverters.getInstance().readAsProperty(responseClassType)
+                Property property = ModelConverters.getInstance().readAsProperty(responseClassType, jsonView)
                 if (property != null) {
                     Property responseProperty = withResponseContainer(responseContainer, property)
                     operation.response(responseCode, new Response()
@@ -275,9 +277,9 @@ class SpringMvcApiReader extends AbstractReader {
                         .headers(defaultResponseHeaders))
                 }
             } else if (responseClassType != Void && responseClassType != void) {
-                Map<String, Model> models = ModelConverters.getInstance().read(responseClassType)
+                Map<String, Model> models = ModelConverters.getInstance().read(responseClassType, jsonView)
                 if (models.isEmpty()) {
-                    Property pp = ModelConverters.getInstance().readAsProperty(responseClassType)
+                    Property pp = ModelConverters.getInstance().readAsProperty(responseClassType, jsonView)
                     operation.response(responseCode, new Response()
                         .description("successful operation")
                         .schema(pp)
@@ -292,7 +294,7 @@ class SpringMvcApiReader extends AbstractReader {
                     swagger.model(key, models.get(key))
                 }
             }
-            Map<String, Model> models = ModelConverters.getInstance().readAll(responseClassType)
+            Map<String, Model> models = ModelConverters.getInstance().readAll(responseClassType, jsonView)
             for (Map.Entry<String, Model> entry : models.entrySet()) {
                 swagger.model(entry.getKey(), entry.getValue())
             }
@@ -313,7 +315,7 @@ class SpringMvcApiReader extends AbstractReader {
 
         ApiResponses responseAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, ApiResponses)
         if (responseAnnotation != null) {
-            updateApiResponse(operation, responseAnnotation)
+            updateApiResponse(operation, responseAnnotation, jsonView)
         } else {
             ResponseStatus responseStatus = AnnotatedElementUtils.findMergedAnnotation(method, ResponseStatus)
             if (responseStatus != null) {

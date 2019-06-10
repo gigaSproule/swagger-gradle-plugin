@@ -44,8 +44,7 @@ class SpringMvcSampleITest extends AbstractPluginITest {
                 locations = ['com.benjaminsproule.swagger.gradleplugin.test.springmvc.SampleController']
             """
         ]
-    }
-
+   }
     private static void assertSwaggerJson(String swaggerJsonFile) {
         def producedSwaggerDocument = new JsonSlurper().parse(new File(swaggerJsonFile), 'UTF-8')
 
@@ -117,7 +116,7 @@ class SpringMvcSampleITest extends AbstractPluginITest {
     
     def paths = producedSwaggerDocument.get('paths')
     assert paths
-    assert paths.size() == 5
+    assert paths.size() == 8
 
     assert paths."/api/sample".get
     assert paths."/api/sample".get.operationId == "getSample"
@@ -146,9 +145,9 @@ class SpringMvcSampleITest extends AbstractPluginITest {
     
     def tags = producedSwaggerDocument.get('tags')
     assert tags
-    assert tags.size() == 5
+    assert tags.size() == 6
     assert tags.sort() == [[name:'eagles'], [name:'OtherController'], [name:'pets'], [name:'SampleController'],
-                           [name:'TypeParamController']]
+                           [name:'TypeParamController'], [name: 'JsonView']].sort()
   }
 
 }

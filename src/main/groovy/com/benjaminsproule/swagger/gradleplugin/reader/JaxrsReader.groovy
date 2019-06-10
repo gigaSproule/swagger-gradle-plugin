@@ -4,6 +4,7 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.jaxrs.BeanParamInjectionParamExtension
 import com.benjaminsproule.swagger.gradleplugin.reader.extension.jaxrs.JaxrsParameterExtension
+import com.fasterxml.jackson.annotation.JsonView
 import com.google.common.collect.Sets
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -26,6 +27,7 @@ import io.swagger.models.properties.RefProperty
 import io.swagger.util.ReflectionUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.core.annotation.AnnotationUtils
 
 import javax.ws.rs.Consumes
@@ -313,6 +315,7 @@ class JaxrsReader extends AbstractReader {
         if (responseClassType instanceof Class) {
             hasApiAnnotation = AnnotationUtils.findAnnotation((Class) responseClassType, Api) != null
         }
+        def jsonView = AnnotatedElementUtils.findMergedAnnotation(method, JsonView.class)
         if (responseClassType != null
             && responseClassType != Void
             && responseClassType != void
@@ -320,7 +323,7 @@ class JaxrsReader extends AbstractReader {
             && !hasApiAnnotation
             && !isSubResource(httpMethod, method)) {
             if (isPrimitive(responseClassType)) {
-                Property property = ModelConverters.getInstance().readAsProperty(responseClassType)
+                Property property = ModelConverters.getInstance().readAsProperty(responseClassType, jsonView)
                 if (property != null) {
                     Property responseProperty = withResponseContainer(responseContainer, property)
 
@@ -330,9 +333,9 @@ class JaxrsReader extends AbstractReader {
                         .headers(defaultResponseHeaders))
                 }
             } else if (responseClassType != Void && responseClassType != void) {
-                Map<String, Model> models = ModelConverters.getInstance().read(responseClassType)
+                Map<String, Model> models = ModelConverters.getInstance().read(responseClassType, jsonView)
                 if (models.isEmpty()) {
-                    Property p = ModelConverters.getInstance().readAsProperty(responseClassType)
+                    Property p = ModelConverters.getInstance().readAsProperty(responseClassType, jsonView)
                     operation.response(responseCode, new Response()
                         .description("successful operation")
                         .schema(p)
@@ -348,7 +351,7 @@ class JaxrsReader extends AbstractReader {
                     swagger.model(key, models.get(key))
                 }
             }
-            Map<String, Model> models = ModelConverters.getInstance().readAll(responseClassType)
+            Map<String, Model> models = ModelConverters.getInstance().readAll(responseClassType, jsonView)
             for (Map.Entry<String, Model> entry : models.entrySet()) {
                 swagger.model(entry.getKey(), entry.getValue())
             }
@@ -370,7 +373,7 @@ class JaxrsReader extends AbstractReader {
 
         ApiResponses responseAnnotation = AnnotationUtils.findAnnotation(method, ApiResponses)
         if (responseAnnotation) {
-            updateApiResponse(operation, responseAnnotation)
+            updateApiResponse(operation, responseAnnotation, jsonView)
         }
 
         if (AnnotationUtils.findAnnotation(method, Deprecated) != null) {

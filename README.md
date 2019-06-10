@@ -81,7 +81,7 @@ swagger {
 | `outputFormats` | The format types of the generated swagger spec. Valid values are `json`, `yaml` or both (as a list, e.g. `['json']`). The `json` format is default.|
 | `swaggerDirectory` | The directory of generated `swagger.json` file. If null, no `swagger.json` will be generated. |
 | `swaggerFileName` | The filename of generated filename.json file. If null, `swagger.json` will be generated. |
-| `swaggerApiReader` | If not null, the value should be a full name of the class implementing `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader`. More details [below](#swaggerApiReader)|
+| `swaggerApiReader` | If not null, the value should be a full name of the class extending `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader`. More details [below](#swaggerApiReader)|
 | `attachSwaggerArtifact` | If enabled, the generated `swagger.json` file will be attached as a gradle artifact. The `swaggerFileName` will be used as an artifact classifier. Default is `false`. |
 | `modelSubstitute` | The model substitute file's path, see more details [below](#model-substitution)|
 | `typesToSkip` | Nodes of class names to explicitly skip during parameter processing. More details [below](#typesToSkip)|

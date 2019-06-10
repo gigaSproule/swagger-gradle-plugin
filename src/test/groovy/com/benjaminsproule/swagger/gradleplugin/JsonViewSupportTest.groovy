@@ -163,7 +163,7 @@ class JsonViewSupportTest extends AbstractPluginITest {
     private static void assertDefinition(def definitions, Class<?> definitionEntity, Class<?> view, Collection<String> expectedFields) {
         assert definitions
 
-        def defName = definitionEntity.simpleName + view? "_${view.simpleName}" : ""
+        def defName = [definitionEntity.simpleName, view? "_${view.simpleName}" : ""].join()
         def definition = definitions[defName]
         assert definition
         assert definition.required == expectedFields

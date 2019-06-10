@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Test")
+@Api(tags = "JsonView")
 @RestController
 @RequestMapping("/api/jsonview")
 public class JsonViewController {

@@ -18,7 +18,7 @@ Import the plugin in your project by adding following configuration:
 Gradle version >= 2.1
 ```groovy
 plugins {
-    id 'com.benjaminsproule.swagger' version '1.0.0'
+    id 'com.benjaminsproule.swagger' version '1.0.6'
 }
 ```
 Gradle versions < 2.1

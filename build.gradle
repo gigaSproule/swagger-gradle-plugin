@@ -7,12 +7,12 @@ plugins {
     id 'idea'
     id 'jacoco' // Currently this does not exclude methods generated via Annotations (toString in this plugin)
     id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'com.gradle.plugin-publish' version '0.10.1'
     id 'com.jfrog.bintray' version '1.8.4'
-    id 'net.researchgate.release' version '2.7.0'
-    id 'com.github.ben-manes.versions' version '0.20.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
-    id 'com.dorongold.task-tree' version '1.3.1'
+    id 'net.researchgate.release' version '2.8.1'
+    id 'com.github.ben-manes.versions' version '0.25.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+    id 'com.dorongold.task-tree' version '1.4'
 }
 
 repositories {
@@ -48,40 +48,40 @@ task createClasspathManifest {
 }
 
 dependencies {
-    def jacksonVersion = '2.9.7'
-    def springVersion = '5.1.3.RELEASE'
-    def kotlinVersion = '1.3.21'
+    def jacksonVersion = '2.10.0'
+    def springVersion = '5.2.0.RELEASE'
+    def kotlinVersion = '1.3.50'
 
     compile gradleApi()
     compile localGroovy()
 
     compile 'commons-io:commons-io:2.6'
-    compile 'org.apache.commons:commons-lang3:3.8.1'
-    compile 'org.apache.commons:commons-text:1.4'
-    compile 'com.github.jknack:handlebars:4.1.0'
+    compile 'org.apache.commons:commons-lang3:3.9'
+    compile 'org.apache.commons:commons-text:1.8'
+    compile 'com.github.jknack:handlebars:4.1.2'
     compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}"
     compile "com.fasterxml.jackson.module:jackson-module-scala_2.12:${jacksonVersion}"
-    compile 'javax.xml.bind:jaxb-api:2.3.0'
+    compile 'javax.xml.bind:jaxb-api:2.3.1'
 
     //These should be pinned here until ronmamo/reflections#194 has been resolved
-    compile 'io.swagger:swagger-jersey2-jaxrs:1.5.21'
-    compile 'io.swagger:swagger-scala-module_2.12:1.0.4'
+    compile 'io.swagger:swagger-jersey2-jaxrs:1.5.23'
+    compile 'io.swagger:swagger-scala-module_2.12:1.0.5'
 
     compile 'javax.ws.rs:javax.ws.rs-api:2.1.1'
     compile 'com.sun.jersey:jersey-server:1.19.4'
+    compile 'org.glassfish.jersey.core:jersey-server:2.29.1'
     compile "org.springframework:spring-context:${springVersion}"
     compile "org.springframework:spring-web:${springVersion}"
 
     testCompile gradleTestKit()
 
-    testCompile 'org.scala-lang:scala-library:2.12.7'
+    testCompile 'org.scala-lang:scala-library:2.13.1'
     testCompile "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
-    testCompile 'org.scala-lang:scala-library:2.12.7'
-    testCompile 'cglib:cglib-nodep:3.2.8'
-    testCompile 'org.objenesis:objenesis:2.6'
-    testCompile('org.spockframework:spock-core:1.2-groovy-2.4') {
+    testCompile 'cglib:cglib-nodep:3.3.0'
+    testCompile 'org.objenesis:objenesis:3.1'
+    testCompile('org.spockframework:spock-core:1.3-groovy-2.4') {
         //We want to depend on the gradle version of groovy since this is a plugin
         exclude module: 'groovy-all'
     }

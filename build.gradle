@@ -99,6 +99,7 @@ artifacts {
 }
 
 test {
+    inputs.dir "$project.projectDir/externaltestdata"
     testLogging {
         events 'failed'
         exceptionFormat 'full'

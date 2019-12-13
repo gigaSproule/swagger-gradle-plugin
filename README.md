@@ -15,13 +15,21 @@ N.B This plugin is tested against the latest of each major Gradle version from 3
 # Usage
 Import the plugin in your project by adding following configuration: 
 
-Gradle version >= 2.1
+## Gradle version >= 2.1
+### build.gradle (Groovy DSL)
 ```groovy
 plugins {
     id 'com.benjaminsproule.swagger' version '1.0.6'
 }
 ```
-Gradle versions < 2.1
+
+### build.gradle.kts (Kotlin DSL)
+```kotlin
+plugins {
+    id("com.benjaminsproule.swagger") version "1.0.6"
+}
+```
+## Gradle versions < 2.1
 ```groovy
 buildscript {
   repositories {
@@ -398,6 +406,8 @@ swagger {
 
 # Example
 
+## build.gradle (Groovy DSL)
+
 ```groovy
 plugins {
     id "com.benjaminsproule.swagger" version "1.0.0"
@@ -446,5 +456,58 @@ swagger {
         modelConverters = [ 'io.swagger.validator.BeanValidator' ]
         attachSwaggerArtifact = true
     }
+}
+```
+
+## build.gradle.kts (Kotlin DSL)
+
+```kotlin
+plugins {
+    id("com.benjaminsproule.swagger") version "1.0.0"
+}
+
+swagger {
+    apiSource(closureOf<ApiSourceExtension> {
+        springmvc = true
+        locations = listOf("com.wordnik.swagger.sample"]
+        schemes = listOf("http", "https")
+        host = "www.example.com:8080"
+        basePath = "/api"
+        info(closureOf<InfoExtension> {
+            title = "Swagger Gradle Plugin Sample"
+            version = "v1"
+            // use markdown here because I"m using markdown for output,
+            // if you need to use html or other markup language, you need to use your target language
+            description = "This is a sample."
+            termsOfService = "http://www.example.com/termsOfService"
+            contact(closureOf<ContactExtension> {
+                email = "email@email.com"
+                name = "Name"
+                url = "http://www.example.com"
+            })
+            license(closureOf<LicenseExtension> {
+                url = "http://www.apache.org/licenses/LICENSE-2.0.html"
+                name = "Apache 2.0"
+            })
+        })
+        securityDefinition(closureOf<SecurityDefinitionExtension> {
+            name = "basicAuth"
+            type = "basic"
+        })
+        securityDefinition(closureOf<SecurityDefinitionExtension> {
+            json = "securityDefinition.json"
+        }
+        /**
+            Support classpath or file absolute path here.
+            1) classpath e.g: "classpath:/markdown.hbs", "classpath:/templates/hello.html"
+            2) file e.g: "${project.rootDir}/src/main/resources/markdown.hbs", "${project.rootDir}/src/main/resources/template/hello.html"
+        **/
+        templatePath = "${project.rootDir}/src/test/resources/strapdown.html.hbs"
+        outputPath = "${project.rootDir}/generated/document.html"
+        swaggerDirectory = "${project.rootDir}/generated/swagger-ui"
+        swaggerApiReader = "com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader"
+        modelConverters = listOf("io.swagger.validator.BeanValidator")
+        attachSwaggerArtifact = true
+    })
 }
 ```

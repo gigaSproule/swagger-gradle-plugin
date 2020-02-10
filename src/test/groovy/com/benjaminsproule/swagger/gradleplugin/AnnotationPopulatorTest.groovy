@@ -3,7 +3,9 @@ package com.benjaminsproule.swagger.gradleplugin
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.*
 import org.gradle.api.Project
+import org.reflections.Configuration
 import org.reflections.Reflections
+import org.reflections.util.ConfigurationBuilder
 import spock.lang.Specification
 
 import java.lang.annotation.Annotation
@@ -19,9 +21,12 @@ class AnnotationPopulatorTest extends Specification {
         mockClassFinder = Mock(ClassFinder)
         annotationPopulator = new AnnotationPopulator(mockProject, mockClassFinder)
 
-        mockClassFinder.getAnnotations(_, _) >> { args ->
+        mockClassFinder.getAnnotations(_, _, true) >> { args ->
             def annotation = args[0] as Class<? extends Annotation>
-            new Reflections(getClass().getClassLoader(), args[1]).getTypesAnnotatedWith(annotation).collect {
+            def Configuration configuration = ConfigurationBuilder.build(getClass().getClassLoader(), args[1])
+            configuration.setExpandSuperTypes(true)
+
+            new Reflections(configuration).getTypesAnnotatedWith(annotation).collect {
                 it.getAnnotation(annotation)
             }
         }

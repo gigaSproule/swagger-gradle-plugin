@@ -1,10 +1,11 @@
 package com.benjaminsproule.swagger.gradleplugin.classpath
 
 import org.gradle.api.Project
+import org.reflections.Configuration
 import org.reflections.Reflections
+import org.reflections.util.ConfigurationBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import java.lang.annotation.Annotation
 
 class ClassFinder {
@@ -37,14 +38,14 @@ class ClassFinder {
         annotationCache.clear()
     }
 
-    def <T extends Annotation> Set<T> getAnnotations(Class<T> annotation, List<String> packages) {
+    def <T extends Annotation> Set<T> getAnnotations(Class<T> annotation, List<String> packages, boolean expandSuperTypes = true) {
         if (annotationCache.containsKey(annotation)) {
             return annotationCache.get(annotation) as Set<T>
         }
 
         def annotations = []
 
-        Set<Class<?>> classes = getValidClasses(annotation, packages)
+        Set<Class<?>> classes = getValidClasses(annotation, packages, expandSuperTypes)
         classes.each {
             it.annotations.each {
                 if (it.annotationType() == annotation) {
@@ -57,7 +58,7 @@ class ClassFinder {
         annotations
     }
 
-    def <T extends Annotation> Set<Class<T>> getValidClasses(Class<T> clazz, List<String> packages) {
+    def <T extends Annotation> Set<Class<T>> getValidClasses(Class<T> clazz, List<String> packages, boolean expandSuperTypes = true) {
         if (classCache.containsKey(clazz)) {
             return classCache.get(clazz) as Set<Class<T>>
         }
@@ -65,11 +66,17 @@ class ClassFinder {
         def classes = []
 
         if (packages) {
-            Set<Class<?>> c = new Reflections(getClassLoader(), packages).getTypesAnnotatedWith(clazz)
+            LOG.warn("ExpandSuperType (${expandSuperTypes})")
+
+            Configuration configuration = ConfigurationBuilder.build(getClassLoader(), packages)
+            configuration.setExpandSuperTypes(expandSuperTypes)
+
+            Set<Class<?>> c = new Reflections(configuration).getTypesAnnotatedWith(clazz)
             classes.addAll(c)
+
         } else {
             LOG.warn("Scanning the the entire classpath (${clazz}), you should avoid this by specifying package locations")
-            Set<Class<?>> c = new Reflections(getClassLoader(), '').getTypesAnnotatedWith(clazz)
+            Set<Class<?>> c = new Reflections(getClassLoader(), '').getTygetValidClassespesAnnotatedWith(clazz)
             classes.addAll(c)
         }
 
@@ -90,6 +97,7 @@ class ClassFinder {
             classpaths += project.configurations.runtime.resolve()
         }
         classpaths.flatten().each {
+
             urls += it.toURI().toURL()
         }
 
@@ -98,12 +106,18 @@ class ClassFinder {
                 if (it.exists()) {
                     urls += it.toURI().toURL()
                 }
+
             }
         } else {
             urls += project.sourceSets.main.output.classesDir.toURI().toURL()
         }
 
         urls += project.sourceSets.main.output.resourcesDir.toURI().toURL()
+
+        (urls as URL[]).each {
+
+        }
+
 
         return new URLClassLoader(urls as URL[], getClass().getClassLoader())
     }

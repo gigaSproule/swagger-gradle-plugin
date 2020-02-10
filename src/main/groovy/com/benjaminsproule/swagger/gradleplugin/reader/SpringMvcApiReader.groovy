@@ -61,7 +61,7 @@ class SpringMvcApiReader extends AbstractReader {
     }
 
     Set<Class<?>> getValidClasses() {
-        Set<Class<?>> classes = Sets.union(classFinder.getValidClasses(Api, apiSource.locations), classFinder.getValidClasses(RestController, apiSource.locations))
+        Set<Class<?>> classes = Sets.union(classFinder.getValidClasses(Api, apiSource.locations, apiSource.expandSuperTypes), classFinder.getValidClasses(RestController, apiSource.locations, apiSource.expandSuperTypes))
         Set<Class<?>> copied = new HashSet<>(classes)
         for (Class<?> clazz : classes) {
             for (Class<?> aClazz : classes) {

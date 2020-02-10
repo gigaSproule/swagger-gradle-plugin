@@ -26,6 +26,7 @@ class ApiSourceExtension {
     boolean useJAXBAnnotationProcessorAsPrimary = true
     boolean jsonExampleValues = false
     boolean attachSwaggerArtifact
+    boolean expandSuperTypes = true
     String tagStrategy   // null | "class"
     File descriptionFile
     List<String> swaggerExtensions

@@ -109,15 +109,18 @@ test {
     }
 }
 
-compileTestJava.dependsOn compileTestGroovy
-compileTestJava.classpath += files(compileTestGroovy.destinationDir)
+tasks.compileTestGroovy.dependsOn = tasks.compileTestGroovy.taskDependencies.getDependencies(compileTestGroovy) - tasks.compileTestJava
 
-compileTestGroovy.dependsOn = compileTestGroovy.taskDependencies.getDependencies(compileTestGroovy) - compileTestJava
-compileTestKotlin.dependsOn compileTestGroovy
-compileTestKotlin.classpath += files(compileTestGroovy.destinationDir)
-compileTestScala.dependsOn compileTestGroovy
-compileTestScala.classpath += files(compileTestGroovy.destinationDir)
-testClasses.dependsOn tasks.compileTestKotlin
+tasks.compileTestJava.dependsOn tasks.compileTestGroovy
+tasks.compileTestJava.classpath += files(tasks.compileTestGroovy.destinationDir)
+
+tasks.compileTestKotlin.dependsOn tasks.compileTestGroovy
+tasks.compileTestKotlin.classpath += files(tasks.compileTestGroovy.destinationDir)
+
+tasks.compileTestScala.dependsOn tasks.compileTestGroovy
+tasks.compileTestScala.classpath += files(tasks.compileTestGroovy.destinationDir)
+
+tasks.testClasses.dependsOn tasks.compileTestKotlin
 
 if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
     bintray {

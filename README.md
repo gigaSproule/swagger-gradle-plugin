@@ -90,6 +90,7 @@ swagger {
 | `modelConverters` | List of custom implementations of `io.swagger.converter.ModelConverter` that should be used when generating the swagger files. More details [below](#modelConverters)|
 | `excludePattern` | Regex of files that will be excluded from the swagger documentation. The default is `.*\\.pom` so it ignores all pom files. |
 | `tagStrategy` | Default no. `class` use class name if no tags are set to group operations specific to controller. (currently only springmvc)  |
+| `expandSuperTypes` | Default `true`. You can skip the scan of super types (parent class, interfarce)
 
 # <a id="templatefile">Template File</a>
 

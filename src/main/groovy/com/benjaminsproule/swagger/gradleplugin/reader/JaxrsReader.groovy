@@ -75,7 +75,7 @@ class JaxrsReader extends AbstractReader {
     }
 
     private Set<Class<?>> getValidClasses() {
-        Set<Class<?>> classes = Sets.union(classFinder.getValidClasses(Api, apiSource.locations), classFinder.getValidClasses(Path, apiSource.locations))
+        Set<Class<?>> classes = Sets.union(classFinder.getValidClasses(Api, apiSource.locations, apiSource.expandSuperTypes), classFinder.getValidClasses(Path, apiSource.locations, apiSource.expandSuperTypes))
         Set<Class<?>> copied = new HashSet<>(classes)
         for (Class<?> clazz : classes) {
             for (Class<?> aClazz : classes) {
@@ -184,7 +184,7 @@ class JaxrsReader extends AbstractReader {
         def tags = [:]
 
         classFinder
-            .getValidClasses(SwaggerDefinition, apiSource.locations)
+            .getValidClasses(SwaggerDefinition, apiSource.locations, apiSource.expandSuperTypes)
             .each {
             def swaggerDefinition = AnnotationUtils.findAnnotation(it, SwaggerDefinition)
 

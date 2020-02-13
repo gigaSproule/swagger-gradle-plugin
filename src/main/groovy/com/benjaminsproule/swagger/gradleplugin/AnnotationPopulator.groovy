@@ -41,7 +41,7 @@ class AnnotationPopulator {
     }
 
     private String getHostFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations)
+        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations, apiSourceExtension.expandSuperTypes)
         if (swaggerDefinitions && !swaggerDefinitions.isEmpty()) {
             return swaggerDefinitions.first().host()
         }
@@ -50,7 +50,7 @@ class AnnotationPopulator {
     }
 
     private String getBasePathFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations)
+        def swaggerDefinitions = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations, apiSourceExtension.expandSuperTypes)
         if (swaggerDefinitions && !swaggerDefinitions.isEmpty()) {
             return swaggerDefinitions.first().basePath()
         }
@@ -60,7 +60,7 @@ class AnnotationPopulator {
 
     private List<TagExtension> getTagsFromAnnotation(ApiSourceExtension apiSourceExtension) {
         def tags = []
-        classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations).each { swaggerDefinition ->
+        classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations, apiSourceExtension.expandSuperTypes).each { swaggerDefinition ->
             swaggerDefinition.tags().each { tag ->
                 if (!tag.name() && !tag.description()) {
                     return
@@ -87,7 +87,7 @@ class AnnotationPopulator {
     }
 
     private InfoExtension getInfoFromAnnotation(ApiSourceExtension apiSourceExtension) {
-        Info infoAnnotation = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations).findResult {
+        Info infoAnnotation = classFinder.getAnnotations(SwaggerDefinition, apiSourceExtension.locations, apiSourceExtension.expandSuperTypes).findResult {
             it.info()
         }
         InfoExtension infoExtension = new InfoExtension(project)

@@ -12,35 +12,31 @@ import com.fasterxml.jackson.databind.ObjectWriter
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.swagger.models.Swagger
 import io.swagger.models.properties.Property
-import io.swagger.util.Yaml
+import io.swagger.util.ObjectMapperFactory
 import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class SwaggerSpecGenerator implements Generator {
     private static final Logger LOG = LoggerFactory.getLogger(SwaggerSpecGenerator)
+    private static final String KEY_JSON = "json"
+    private static final String KEY_YAML = "yaml"
 
     ApiSourceExtension apiSource
-    ObjectMapper mapper = new ObjectMapper()
+    HashMap<String, ObjectMapper> typeToObjectMapperMap = new HashMap<>();
     boolean isSorted = false
     String encoding
 
     SwaggerSpecGenerator(ApiSourceExtension apiSourceExtension) {
         this.apiSource = apiSourceExtension
         this.encoding = 'UTF-8'
+        this.typeToObjectMapperMap.put(KEY_JSON, ObjectMapperFactory.createJson())
+        this.typeToObjectMapperMap.put(KEY_YAML, ObjectMapperFactory.createYaml())
     }
 
     @Override
     void generate(Swagger source) {
-        //Not come across an appropriate solution that is not deprecated yet
-        mapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-        mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-
-        if (apiSource.jsonExampleValues) {
-            mapper.addMixIn(Property, PropertyExampleMixIn)
-        }
+        typeToObjectMapperMap.each { type, mapper -> configureMapper(mapper) }
 
         if (!apiSource.swaggerDirectory) {
             return
@@ -71,10 +67,10 @@ class SwaggerSpecGenerator implements Generator {
             try {
                 switch (format.trim().toLowerCase()) {
                     case 'json':
-                        writeAsJsonFormat(dir, fileName, source)
+                        writeFormatByObjectMapper(typeToObjectMapperMap.get(KEY_JSON), dir, fileName, ".json", source)
                         break
                     case 'yaml':
-                        FileUtils.write(new File(dir, fileName + ".yaml"), Yaml.pretty().writeValueAsString(source), encoding)
+                        writeFormatByObjectMapper(typeToObjectMapperMap.get(KEY_YAML), dir, fileName, ".yaml", source)
                         break
                 }
             } catch (Exception e) {
@@ -83,8 +79,20 @@ class SwaggerSpecGenerator implements Generator {
         }
     }
 
-    private void writeAsJsonFormat(File dir, String fileName, Swagger source) {
-        ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter())
-        FileUtils.write(new File(dir, fileName + ".json"), jsonWriter.writeValueAsString(source), encoding)
+    private void configureMapper(ObjectMapper objectMapper) {
+        //Not come across an appropriate solution that is not deprecated yet
+        objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+
+        if (apiSource.jsonExampleValues) {
+            objectMapper.addMixIn(Property, PropertyExampleMixIn)
+        }
+    }
+
+    private void writeFormatByObjectMapper(ObjectMapper objectMapper, File dir, String fileName, String suffix, Swagger source) {
+        ObjectWriter writer = objectMapper.writer(new DefaultPrettyPrinter())
+        FileUtils.write(new File(dir, fileName + suffix), writer.writeValueAsString(source), encoding)
     }
 }

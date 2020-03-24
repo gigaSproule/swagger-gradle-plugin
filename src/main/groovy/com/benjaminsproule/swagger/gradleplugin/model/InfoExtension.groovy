@@ -9,6 +9,7 @@ class InfoExtension {
     String version
     ContactExtension contact
     LicenseExtension license
+    Map<String, Object> vendorExtensions;
 
     private Project project
 

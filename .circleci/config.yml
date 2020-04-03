@@ -26,6 +26,8 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run: ./gradlew check
+      - store_test_results:
+          path: plugin/build/tests/test
 
   test_gradle:
     executor: jdk8

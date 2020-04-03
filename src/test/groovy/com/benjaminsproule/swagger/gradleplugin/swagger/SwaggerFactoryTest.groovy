@@ -4,7 +4,6 @@ import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.*
 import io.swagger.models.Scheme
 import io.swagger.models.auth.In
-import javafx.util.Pair
 import org.reflections.Reflections
 import spock.lang.Specification
 
@@ -37,7 +36,7 @@ class SwaggerFactoryTest extends Specification {
         infoExtension.termsOfService = 'terms of service'
         infoExtension.title = 'title'
         infoExtension.version = '1.0'
-        infoExtension.vendorExtensions = Map.of("x-tags","API")
+        infoExtension.vendorExtensions = Map.of("x-tags", "API")
 
         def contactExtension = new ContactExtension()
         contactExtension.name = 'contact name'

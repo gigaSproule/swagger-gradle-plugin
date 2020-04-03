@@ -40,16 +40,17 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: |
-        ./gradlew install
-        ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+      - run:
+        command: |
+          ./gradlew install
+          ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
 
   release:
     executor: jdk

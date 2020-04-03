@@ -1,1 +1,6 @@
 rootProject.name = 'swagger-gradle-plugin'
+include 'test-models'
+include 'java-tests'
+include 'kotlin-tests'
+include 'scala-tests'
+include 'plugin'

@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation project(':test-models')
+    //These should be pinned here until ronmamo/reflections#194 has been resolved
+    implementation "io.swagger:swagger-jersey2-jaxrs:${rootProject.ext.swaggerVersion}"
+    implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"
+    implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
+
+}

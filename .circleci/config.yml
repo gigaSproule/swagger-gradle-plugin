@@ -4,6 +4,9 @@ executors:
   jdk:
     docker:
       - image: circleci/openjdk:11-jdk
+  jdk8:
+    docker:
+      - image: circleci/openjdk:8-jdk
 
 jobs:
   build_test:
@@ -23,6 +26,29 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run: ./gradlew check
+
+  test_gradle:
+    executor: jdk8
+    working_directory: ~/repo
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          command: |
+              older_gradle_versions=(3.5.1 4.10.3)
+              for gradle_version in ${older_gradle_versions[@]} ; do
+                  ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
+              done
 
   test_sample:
     executor: jdk
@@ -75,6 +101,11 @@ workflows:
   build:
     jobs:
       - build_test:
+          filters:
+            branches:
+              ignore:
+                - master
+      - test_gradle:
           filters:
             branches:
               ignore:

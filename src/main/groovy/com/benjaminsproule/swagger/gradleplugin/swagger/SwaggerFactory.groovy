@@ -74,6 +74,10 @@ class SwaggerFactory {
             info.setLicense(generateSwaggerLicence(infoExtension.license))
         }
 
+        infoExtension.vendorExtensions.each{ key, value ->
+            info.setVendorExtension(key, value)
+        }
+
         return info
     }
 
@@ -192,10 +196,10 @@ class SwaggerFactory {
             throw new GenerateException(e)
         }
     }
-    
+
     private List<SecurityRequirement> generateSecurity(List<Map<String, List<String>>> securityList, Set<String> securityDefinitionNames) {
         def requirements = []
-        securityList.each { securityMap -> 
+        securityList.each { securityMap ->
             def sr = new SecurityRequirement()
             securityMap.each { key, value ->
                 // Valdiation is done here and not in the ApiSourceValidator, otherwise
@@ -207,8 +211,8 @@ class SwaggerFactory {
             }
             requirements.add(sr)
         }
-        
+
         return requirements
     }
-    
+
 }

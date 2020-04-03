@@ -55,17 +55,20 @@ class JsonViewSupportTest extends AbstractPluginITest {
         def withViewOne = paths."/api/jsonview/with/1".get
         assert withViewOne
         assert withViewOne.operationId == "withJsonViewOne"
-        assert withViewOne.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity_TestJsonViewOne"
+        assert withViewOne.responses."200".schema.$ref == "#/definitions/TestJsonViewEntity_TestJsonViewOne"
+        assert withViewOne.responses."200".responseSchema == null
 
         def withViewTwo = paths."/api/jsonview/with/2".get
         assert withViewTwo
         assert withViewTwo.operationId == "withJsonViewTwo"
-        assert withViewTwo.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity_TestJsonViewTwo"
+        assert withViewTwo.responses."200".schema.$ref == "#/definitions/TestJsonViewEntity_TestJsonViewTwo"
+        assert withViewTwo.responses."200".responseSchema == null
 
         def withoutAny = paths."/api/jsonview/without".post
         assert withoutAny
         assert withoutAny.operationId == "withoutJsonView"
-        assert withoutAny.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity"
+        assert withoutAny.responses."200".schema.$ref == "#/definitions/TestJsonViewEntity"
+        assert withoutAny.responses."200".responseSchema == null
 
         // assert definitions
         def definitions = producedSwaggerDocument.definitions
@@ -130,17 +133,20 @@ class JsonViewSupportTest extends AbstractPluginITest {
         def withViewOne = paths."/api/jsonview/with/1".get
         assert withViewOne
         assert withViewOne.operationId == "withJsonViewOne"
-        assert withViewOne.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity_TestJsonViewOne"
+        assert withViewOne.responses."200".schema.$ref == "#/definitions/TestJsonViewEntity_TestJsonViewOne"
+        assert withViewOne.responses."200".responseSchema == null
 
         def withViewTwo = paths."/api/jsonview/with/2".get
         assert withViewTwo
         assert withViewTwo.operationId == "withJsonViewTwo"
-        assert withViewTwo.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity_TestJsonViewTwo"
+        assert withViewTwo.responses."200".schema.$ref == "#/definitions/TestJsonViewEntity_TestJsonViewTwo"
+        assert withViewTwo.responses."200".responseSchema == null
 
         def withoutAny = paths."/api/jsonview/without".post
         assert withoutAny
         assert withoutAny.operationId == "withoutJsonView"
-        assert withoutAny.responses."200".responseSchema.originalRef == "#/definitions/TestJsonViewEntity"
+        assert withoutAny.responses."200".schema.$ref == "#/definitions/TestJsonViewEntity"
+        assert withoutAny.responses."200".responseSchema == null
 
         // assert definitions
         def definitions = producedSwaggerDocument.definitions

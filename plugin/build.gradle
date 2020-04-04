@@ -36,6 +36,7 @@ dependencies {
 
     //These should be pinned here until ronmamo/reflections#194 has been resolved
     implementation "io.swagger:swagger-jersey2-jaxrs:${rootProject.ext.swaggerVersion}"
+    implementation "io.swagger:swagger-scala-module_2.13:1.0.6"
 
     implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
     implementation 'com.sun.jersey:jersey-server:1.19.4'

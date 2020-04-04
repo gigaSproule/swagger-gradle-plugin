@@ -16,12 +16,12 @@ class OutputITest extends AbstractPluginITest {
         """
             locations = ['com.benjaminsproule.swagger.gradleplugin.test.java']
         """,
+        """
+            locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
+        """,
 //        """
-//            locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
-//        """,
-        """
-            locations = ['com.benjaminsproule.swagger.gradleplugin.test.scala']
-        """
+//            locations = ['com.benjaminsproule.swagger.gradleplugin.test.scala']
+//        """
     ]
 
     def 'Produces Swagger documentation with JAX-RS'() {

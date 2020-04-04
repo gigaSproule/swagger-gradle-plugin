@@ -166,13 +166,15 @@ class JsonViewSupportTest extends AbstractPluginITest {
         ]
     }
 
-
-    private static void assertDefinition(def definitions, Class<?> definitionEntity, Class<?> view, Collection<String> expectedFields) {
+    private static void assertDefinition(def definitions, Class<?> definitionEntity, Class<?> view, List<String> expectedFields) {
         assert definitions
 
         def defName = [definitionEntity.simpleName, view ? "_${view.simpleName}" : ""].join()
         def definition = definitions[defName]
         assert definition
-        assert definition.required == expectedFields
+        definition.properties.eachWithIndex { Map.Entry<Object, Object> entry, int i ->
+            assert entry.key == expectedFields[i]
+            assert entry.value == ["type": "object"]
+        }
     }
 }

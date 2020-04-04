@@ -2,6 +2,9 @@ plugins {
     id 'scala'
 }
 
+compileScala.targetCompatibility = JavaVersion.VERSION_1_8
+compileScala.sourceCompatibility = JavaVersion.VERSION_1_8
+
 dependencies {
     implementation project(':test-models')
     implementation 'org.scala-lang:scala-library:2.13.1'

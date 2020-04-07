@@ -18,7 +18,7 @@ class ApiSourceExtension {
     String outputPath
     String swaggerDirectory
     String swaggerFileName = "swagger"
-    String modelSubstitute
+    Map<String, String> modelSubstitutions = [:]
     String swaggerInternalFilter
     String swaggerApiReader
     boolean springmvc

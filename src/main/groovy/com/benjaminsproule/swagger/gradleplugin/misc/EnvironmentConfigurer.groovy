@@ -88,14 +88,8 @@ class EnvironmentConfigurer {
             modelModifier.setApiModelPropertyAccessExclusions(apiSourceExtension.apiModelPropertyAccessExclusionsList)
         }
 
-        if (apiSourceExtension.modelSubstitute) {
-            classFinder.getClassLoader().getResourceAsStream(apiSourceExtension.modelSubstitute).eachLine { line ->
-                def classes = line.split(":")
-                if (classes.length != 2) {
-                    throw new GenerateException('Bad format of override model file, it should be ${actualClassName}:${expectClassName}')
-                }
-                modelModifier.addModelSubstitute(classes[0].trim(), classes[1].trim())
-            }
+        apiSourceExtension.modelSubstitutions.each { actual, expect ->
+            modelModifier.addModelSubstitute(actual, expect)
         }
 
         modelModifiers += modelModifier

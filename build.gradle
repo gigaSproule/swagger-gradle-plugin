@@ -65,7 +65,7 @@ dependencies {
     compile 'javax.xml.bind:jaxb-api:2.3.1'
 
     //These should be pinned here until ronmamo/reflections#194 has been resolved
-    compile 'io.swagger:swagger-jersey2-jaxrs:1.5.23'
+    compile 'io.swagger:swagger-jersey2-jaxrs:1.6.1'
     compile 'io.swagger:swagger-scala-module_2.12:1.0.5'
 
     compile 'javax.ws.rs:javax.ws.rs-api:2.1.1'

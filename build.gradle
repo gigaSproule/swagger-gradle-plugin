@@ -66,7 +66,7 @@ dependencies {
 
     //These should be pinned here until ronmamo/reflections#194 has been resolved
     compile 'io.swagger:swagger-jersey2-jaxrs:1.5.23'
-    compile 'io.swagger:swagger-scala-module_2.12:1.0.5'
+    compile 'io.swagger:swagger-scala-module_2.12:1.0.6'
 
     compile 'javax.ws.rs:javax.ws.rs-api:2.1.1'
     compile 'com.sun.jersey:jersey-server:1.19.4'

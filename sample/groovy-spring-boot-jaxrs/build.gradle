@@ -28,11 +28,11 @@ group = 'com.benjaminsproule'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    compile localGroovy()
-    compile 'org.springframework.boot:spring-boot-starter-jersey'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'io.swagger:swagger-annotations:1.5.15'
-    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+    implementation localGroovy()
+    implementation 'org.springframework.boot:spring-boot-starter-jersey'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'io.swagger:swagger-annotations:1.5.15'
+    implementation 'javax.ws.rs:javax.ws.rs-api:2.0.1'
 }
 
 swagger {

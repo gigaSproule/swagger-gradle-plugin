@@ -1,0 +1,13 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+}
+
+dependencies {
+    implementation project(':test-models')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlinVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:${rootProject.ext.kotlinVersion}"
+    //These should be pinned here until ronmamo/reflections#194 has been resolved
+    implementation "io.swagger:swagger-jersey2-jaxrs:${rootProject.ext.swaggerVersion}"
+    implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"
+    implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
+}

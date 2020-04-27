@@ -3,7 +3,10 @@ version: 2.1
 executors:
   jdk:
     docker:
-      -image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11-jdk
+  jdk8:
+    docker:
+      - image: circleci/openjdk:8-jdk
 
 jobs:
   build_test:
@@ -22,7 +25,32 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: ./gradlew check
+      - run: ./gradlew --no-daemon check
+      - store_test_results:
+          path: plugin/build/tests/test
+
+  test_gradle:
+    executor: jdk8
+    working_directory: ~/repo
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          command: |
+              older_gradle_versions=(3.5.1 4.10.3)
+              for gradle_version in ${older_gradle_versions[@]} ; do
+                  ./gradlew --no-daemon clean check -Dtest.gradleVersion=${gradle_version}
+              done
 
   test_sample:
     executor: jdk
@@ -35,21 +63,22 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             - v1-dependencies-
-      - run: ./gradlew dependenices
+      - run: ./gradlew --no-daemon dependenices
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: |
-        ./gradlew install
-        ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-        ./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+      - run:
+        command: |
+          ./gradlew --no-daemon install
+          ./gradlew --no-daemon -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+          ./gradlew --no-daemon -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
 
   release:
     executor: jdk
@@ -67,13 +96,18 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: ./gradlew release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew --no-daemon release -Prelease.useAutomaticVersion=true
 
 workflows:
   version: 2
   build:
     jobs:
       - build_test:
+          filters:
+            branches:
+              ignore:
+                - master
+      - test_gradle:
           filters:
             branches:
               ignore:

@@ -1,0 +1,131 @@
+plugins {
+    id 'maven'
+    id 'maven-publish'
+    id 'groovy'
+    id 'java-gradle-plugin'
+    id 'net.researchgate.release'
+    id 'com.gradle.plugin-publish' version '0.10.1'
+    id 'com.jfrog.bintray' version '1.8.4'
+}
+
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("${outputDir}/plugin-classpath.txt").text = (sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath).join('\n')
+    }
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.apache.commons:commons-text:1.8'
+    implementation 'com.github.jknack:handlebars:4.1.2'
+    implementation "com.fasterxml.jackson.core:jackson-core:${rootProject.ext.jacksonVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${rootProject.ext.jacksonVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-scala_2.12:${rootProject.ext.jacksonVersion}"
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    //These should be pinned here until ronmamo/reflections#194 has been resolved
+    implementation "io.swagger:swagger-jersey2-jaxrs:${rootProject.ext.swaggerVersion}"
+
+    implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
+    implementation 'com.sun.jersey:jersey-server:1.19.4'
+    implementation 'org.glassfish.jersey.core:jersey-server:2.29.1'
+    implementation "org.springframework:spring-context:${rootProject.ext.springVersion}"
+    implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"
+
+    testImplementation gradleTestKit()
+
+    testImplementation project(':test-models')
+    testImplementation project(':java-tests')
+    testImplementation project(':kotlin-tests')
+    testImplementation project(':scala-tests')
+    testImplementation 'cglib:cglib-nodep:3.3.0'
+    testImplementation 'org.objenesis:objenesis:3.1'
+    testImplementation('org.spockframework:spock-core:1.3-groovy-2.4') {
+        //We want to depend on the gradle version of groovy since this is a plugin
+        exclude module: 'groovy-all'
+    }
+
+    testRuntime files(createClasspathManifest)
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+test {
+    inputs.dir "$project.rootDir/externaltestdata"
+    testLogging {
+        events 'failed'
+        exceptionFormat 'full'
+    }
+    options {
+        systemProperties(System.getProperties())
+    }
+}
+
+if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
+    bintray {
+        user = bintray_user
+        key = bintray_apiKey
+
+        configurations = ['archives']
+        pkg {
+            repo = 'maven'
+            name = 'swagger-gradle-plugin'
+            websiteUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+            vcsUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+            githubRepo = 'gigaSproule/swagger-gradle-plugin'
+            githubReleaseNotesFile = 'README.md'
+            licenses = ['Apache-2.0']
+            publish = true
+            version {
+                name = project.version
+                released = new Date()
+            }
+        }
+    }
+
+    afterReleaseBuild.dependsOn bintrayUpload
+}
+
+pluginBundle {
+    website = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+    vcsUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+    description = 'Plugin to create Swagger documentation using Gradle'
+    tags = ['swagger', 'documentation']
+
+    plugins {
+        swagger {
+            id = 'com.benjaminsproule.swagger'
+            displayName = 'Swagger Gradle Plugin'
+        }
+    }
+}
+
+publishing {
+    publications {
+        pluginPublication(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId project.name
+            version "${project.version}-SNAPSHOT"
+        }
+    }
+}
+
+afterReleaseBuild.dependsOn publishPlugins

@@ -26,7 +26,7 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
-          command: ./gradlew --no-daemon check
+          command: ./gradlew --no-daemon --max-workers 2 check
           no_output_timeout: 20m
       - store_test_results:
           path: plugin/build/tests/test
@@ -51,7 +51,7 @@ jobs:
           command: |
             older_gradle_versions=(3.5.1 4.10.3)
             for gradle_version in ${older_gradle_versions[@]} ; do
-                ./gradlew --no-daemon clean check -Dtest.gradleVersion=${gradle_version}
+                ./gradlew --no-daemon --max-workers 2 clean check -Dtest.gradleVersion=${gradle_version}
             done
           no_output_timeout: 20m
 
@@ -73,7 +73,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
         command: |
-          ./gradlew --no-daemon install
+          ./gradlew --no-daemon install -x test
           ./gradlew --no-daemon -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
           ./gradlew --no-daemon -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
           ./gradlew --no-daemon -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
@@ -111,6 +111,15 @@ workflows:
               ignore:
                 - master
       - test_gradle:
+          requires:
+            - build_test
+          filters:
+            branches:
+              ignore:
+                - master
+      - test_sample:
+          requires:
+            - test_gradle
           filters:
             branches:
               ignore:
@@ -120,11 +129,25 @@ workflows:
       - build_test:
           filters:
             branches:
-              only:
+              ignore:
+                - master
+      - test_gradle:
+          requires:
+            - build_test
+          filters:
+            branches:
+              ignore:
+                - master
+      - test_sample:
+          requires:
+            - test_gradle
+          filters:
+            branches:
+              ignore:
                 - master
       - release:
           requires:
-            - build_test
+            - test_sample
           filters:
             branches:
               only:

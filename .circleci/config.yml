@@ -13,7 +13,7 @@ jobs:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx2048m
+      JAVA_TOOL_OPTIONS: -Xmx512m
     steps:
       - checkout
       - restore_cache:
@@ -59,7 +59,7 @@ jobs:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx2048m
+      JAVA_TOOL_OPTIONS: -Xmx512m
     steps:
       - checkout
       - restore_cache:
@@ -87,7 +87,7 @@ jobs:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx2048m
+      JAVA_TOOL_OPTIONS: -Xmx512m
     steps:
       - checkout
       - restore_cache:

@@ -72,16 +72,16 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
-        command: |
-          ./gradlew --no-daemon install -x test
-          ./gradlew --no-daemon -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-          ./gradlew --no-daemon -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+          command: |
+            ./gradlew --no-daemon install -x test
+            ./gradlew --no-daemon -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew --no-daemon -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
 
   release:
     executor: jdk

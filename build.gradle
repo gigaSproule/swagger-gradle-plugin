@@ -35,9 +35,4 @@ allprojects {
         swaggerVersion = '1.5.23'
         javaxVersion = '2.1.1'
     }
-
-    test {
-        maxHeapSize '512m'
-        jvmArgs '-Xmx512m'
-    }
 }

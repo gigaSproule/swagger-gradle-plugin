@@ -68,10 +68,15 @@ artifacts {
 }
 
 test {
-    maxHeapSize = "256m"
+    if (System.properties['test.profile'] == 'integration') {
+        include '**/*ITest*'
+    } else if (System.properties['test.profile'] == 'unit') {
+        exclude '**/*ITest*'
+    }
+
     inputs.dir "$project.rootDir/externaltestdata"
     testLogging {
-        events 'failed'
+        events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
     }
     options {

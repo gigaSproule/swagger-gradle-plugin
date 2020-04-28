@@ -129,21 +129,21 @@ workflows:
       - build_test:
           filters:
             branches:
-              ignore:
+              only:
                 - master
       - test_gradle:
           requires:
             - build_test
           filters:
             branches:
-              ignore:
+              only:
                 - master
       - test_sample:
           requires:
             - test_gradle
           filters:
             branches:
-              ignore:
+              only:
                 - master
       - release:
           requires:

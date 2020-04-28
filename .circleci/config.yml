@@ -26,8 +26,8 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
-        command: ./gradlew --no-daemon check
-        no_output_timeout: 20m
+          command: ./gradlew --no-daemon check
+          no_output_timeout: 20m
       - store_test_results:
           path: plugin/build/tests/test
 

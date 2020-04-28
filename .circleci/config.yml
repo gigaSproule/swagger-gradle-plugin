@@ -25,7 +25,9 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: ./gradlew --no-daemon check
+      - run:
+        command: ./gradlew --no-daemon check
+        no_output_timeout: 20m
       - store_test_results:
           path: plugin/build/tests/test
 
@@ -51,6 +53,7 @@ jobs:
             for gradle_version in ${older_gradle_versions[@]} ; do
                 ./gradlew --no-daemon clean check -Dtest.gradleVersion=${gradle_version}
             done
+          no_output_timeout: 20m
 
   test_sample:
     executor: jdk

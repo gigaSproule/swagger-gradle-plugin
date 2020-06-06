@@ -36,7 +36,11 @@ class SwaggerFactoryTest extends Specification {
         infoExtension.termsOfService = 'terms of service'
         infoExtension.title = 'title'
         infoExtension.version = '1.0'
-        infoExtension.vendorExtensions = Map.of("x-tags", "API")
+        infoExtension.vendorExtensions = new HashMap<String, String>() {
+            {
+                put("x-tags", "API")
+            }
+        }
 
         def contactExtension = new ContactExtension()
         contactExtension.name = 'contact name'

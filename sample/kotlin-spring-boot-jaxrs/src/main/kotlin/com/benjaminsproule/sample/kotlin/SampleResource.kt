@@ -1,4 +1,4 @@
-package com.benjaminsproule.sample.kotlin;
+package com.benjaminsproule.sample.kotlin
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -15,6 +15,6 @@ class SampleResource {
     @GET
     @ApiOperation(value = "Return hello message", response = String::class)
     fun home(): String {
-        return "{\"Hello\": \"World!\"}";
+        return "{\"Hello\": \"World!\"}"
     }
 }

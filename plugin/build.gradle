@@ -1,11 +1,9 @@
 plugins {
-    id 'maven'
     id 'maven-publish'
     id 'groovy'
-    id 'java-gradle-plugin'
     id 'net.researchgate.release'
     id "com.gradle.plugin-publish" version "0.12.0"
-    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.jfrog.bintray' version '1.8.5'
 }
 
 task createClasspathManifest {
@@ -24,9 +22,9 @@ dependencies {
     implementation gradleApi()
     implementation localGroovy()
 
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'org.apache.commons:commons-lang3:3.9'
-    implementation 'org.apache.commons:commons-text:1.8'
+    implementation 'commons-io:commons-io:2.7'
+    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.apache.commons:commons-text:1.9'
     implementation 'com.github.jknack:handlebars:4.1.2'
     implementation "com.fasterxml.jackson.core:jackson-core:${rootProject.ext.jacksonVersion}"
     implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${rootProject.ext.jacksonVersion}"
@@ -38,7 +36,7 @@ dependencies {
 
     implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
     implementation 'com.sun.jersey:jersey-server:1.19.4'
-    implementation 'org.glassfish.jersey.core:jersey-server:2.29.1'
+    implementation 'org.glassfish.jersey.core:jersey-server:2.31'
     implementation "org.springframework:spring-context:${rootProject.ext.springVersion}"
     implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"
 
@@ -68,9 +66,15 @@ artifacts {
 }
 
 test {
+    if (System.properties['test.profile'] == 'integration') {
+        include '**/*ITest*'
+    } else if (System.properties['test.profile'] == 'unit') {
+        exclude '**/*ITest*'
+    }
+
     inputs.dir "$project.rootDir/externaltestdata"
     testLogging {
-        events 'failed'
+        events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
     }
     options {
@@ -82,8 +86,7 @@ if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')
     bintray {
         user = bintray_user
         key = bintray_apiKey
-
-        configurations = ['archives']
+        publications = ['pluginPublication']
         pkg {
             repo = 'maven'
             name = 'swagger-gradle-plugin'
@@ -122,7 +125,7 @@ publishing {
         pluginPublication(MavenPublication) {
             from components.java
             groupId project.group
-            artifactId project.name
+            artifactId 'swagger-gradle-plugin'
             version "${project.version}-SNAPSHOT"
         }
     }

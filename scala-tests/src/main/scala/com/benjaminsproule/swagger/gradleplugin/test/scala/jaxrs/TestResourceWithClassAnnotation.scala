@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.test.scala.jaxrs
 
 import com.benjaminsproule.swagger.gradleplugin.test.model._
+import com.fasterxml.jackson.annotation.JsonView
 import io.swagger.annotations._
 import javax.ws.rs._
 import javax.ws.rs.core.Response
@@ -164,5 +165,28 @@ class TestResourceWithClassAnnotation {
     @GET
     def innerJsonSubType(): OuterJsonSubType = {
         new OuterJsonSubType()
+    }
+
+    @ApiOperation(value = "With JsonViewOne specification")
+    @Path("/withjsonview1")
+    @GET
+    @JsonView(value = Array(classOf[TestJsonViewOne]))
+    def withJsonViewOne(): TestJsonViewEntity = {
+        null
+    }
+
+    @ApiOperation("With JsonViewTwo specification")
+    @Path("/withjsonview2")
+    @GET
+    @JsonView(value = Array(classOf[TestJsonViewTwo]))
+    def withJsonViewTwo(): TestJsonViewEntity = {
+        null
+    }
+
+    @ApiOperation("Entity definition has to contain all possible fields")
+    @Path("/withoutjsonview1")
+    @GET
+    def withoutJsonView(): TestJsonViewEntity = {
+        null
     }
 }

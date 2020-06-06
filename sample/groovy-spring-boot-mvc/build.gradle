@@ -1,31 +1,30 @@
 buildscript {
-    ext {
-        springBootVersion = '1.5.4.RELEASE'
-    }
     repositories {
         mavenLocal()
-        mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
     }
 }
 
-apply plugin: 'maven'
-apply plugin: 'groovy'
-apply plugin: 'org.springframework.boot'
+plugins {
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'groovy'
+}
+
 apply plugin: 'com.benjaminsproule.swagger'
+
+group = 'com.benjaminsproule'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
 
 repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
 }
-
-group = 'com.benjaminsproule'
-version = '0.0.1-SNAPSHOT'
 
 dependencies {
     implementation localGroovy()

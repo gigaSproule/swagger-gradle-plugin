@@ -7,7 +7,7 @@ compileScala.sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
     implementation project(':test-models')
-    implementation 'org.scala-lang:scala-library:2.13.1'
+    implementation 'org.scala-lang:scala-library:2.13.2'
     //These should be pinned here until ronmamo/reflections#194 has been resolved
     implementation "io.swagger:swagger-jersey2-jaxrs:${rootProject.ext.swaggerVersion}"
     implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"

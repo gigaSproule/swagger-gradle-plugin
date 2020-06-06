@@ -13,7 +13,7 @@ jobs:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx3200m
+      JAVA_TOOL_OPTIONS: -Xmx512m -XX:MaxMetaspaceSize=128m -Dorg.gradle.daemon=false
     steps:
       - checkout
       - restore_cache:
@@ -35,7 +35,7 @@ jobs:
     executor: jdk8
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx3200m
+      JAVA_TOOL_OPTIONS: -Xmx512m -XX:MaxMetaspaceSize=128m -Dorg.gradle.daemon=false
     steps:
       - checkout
       - restore_cache:
@@ -59,7 +59,7 @@ jobs:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx3200m
+      JAVA_TOOL_OPTIONS: -Xmx512m -XX:MaxMetaspaceSize=128m -Dorg.gradle.daemon=false
     steps:
       - checkout
       - restore_cache:

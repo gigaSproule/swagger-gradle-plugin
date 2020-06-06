@@ -68,7 +68,7 @@ artifacts {
 }
 
 test {
-    maxHeapSize = "512m"
+    maxHeapSize = "256m"
     inputs.dir "$project.rootDir/externaltestdata"
     testLogging {
         events 'failed'

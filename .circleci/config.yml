@@ -151,14 +151,14 @@ workflows:
               ignore:
                 - master
       - test_gradle:
-          requires:
-            - build_test
           filters:
             branches:
               ignore:
                 - master
       - test_sample:
           requires:
+            - build_test_jdk
+            - build_test_jdk8
             - test_gradle
           filters:
             branches:
@@ -177,14 +177,14 @@ workflows:
               only:
                 - master
       - test_gradle:
-          requires:
-            - build_test
           filters:
             branches:
               only:
                 - master
       - test_sample:
           requires:
+            - build_test_jdk
+            - build_test_jdk8
             - test_gradle
           filters:
             branches:

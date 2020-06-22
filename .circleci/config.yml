@@ -166,7 +166,12 @@ workflows:
                 - master
   build_release:
     jobs:
-      - build_test:
+      - build_test_jdk:
+          filters:
+            branches:
+              only:
+                - master
+      - build_test_jdk8:
           filters:
             branches:
               only:

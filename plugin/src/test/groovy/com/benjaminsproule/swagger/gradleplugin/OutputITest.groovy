@@ -19,6 +19,7 @@ class OutputITest extends AbstractPluginITest {
         """
             locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
         """,
+        // For scala, list definitions are being returned instead of array like all the other languages
 //        """
 //            locations = ['com.benjaminsproule.swagger.gradleplugin.test.scala']
 //        """

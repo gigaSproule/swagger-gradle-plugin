@@ -1,5 +1,4 @@
 plugins {
-    id 'maven'
     id 'maven-publish'
     id 'groovy'
     id 'java-gradle-plugin'

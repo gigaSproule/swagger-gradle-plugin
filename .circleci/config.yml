@@ -107,7 +107,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
           command: |
-            ./gradlew install -x test
+            ./gradlew publishToMavenLocal -x test
             ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
             ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
             ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation

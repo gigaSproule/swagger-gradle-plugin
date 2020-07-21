@@ -3,30 +3,62 @@ version: 2.1
 executors:
   jdk:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:13-jdk-buster
   jdk8:
     docker:
       - image: circleci/openjdk:8-jdk
 
 jobs:
-  build_test:
+  build_test_jdk:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx512m -XX:MaxMetaspaceSize=128m -Dorg.gradle.daemon=false
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             - v1-dependencies-
-      - run: gradle dependencies
+      - run: ./gradlew dependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
-          command: ./gradlew --no-daemon --max-workers 2 :plugin:check
+          name: Run unit tests
+          command: ./gradlew check -Dtest.profile=unit
+      - run:
+          name: Run integration tests
+          command: ./gradlew check -Dtest.profile=integration
+          no_output_timeout: 20m
+      - store_test_results:
+          path: plugin/build/tests/test
+
+  build_test_jdk8:
+    executor: jdk8
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          name: Run unit tests
+          command: ./gradlew check -Dtest.profile=unit
+      - run:
+          name: Run integration tests
+          command: ./gradlew check -Dtest.profile=integration
           no_output_timeout: 20m
       - store_test_results:
           path: plugin/build/tests/test
@@ -35,14 +67,15 @@ jobs:
     executor: jdk8
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx512m -XX:MaxMetaspaceSize=128m -Dorg.gradle.daemon=false
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             - v1-dependencies-
-      - run: gradle dependencies
+      - run: ./gradlew dependencies
       - save_cache:
           paths:
             - ~/.gradle
@@ -51,7 +84,7 @@ jobs:
           command: |
             older_gradle_versions=(3.5.1 4.10.3)
             for gradle_version in ${older_gradle_versions[@]} ; do
-                ./gradlew --no-daemon --max-workers 2 clean :plugin:check -Dtest.gradleVersion=${gradle_version}
+                ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
             done
           no_output_timeout: 20m
 
@@ -59,66 +92,73 @@ jobs:
     executor: jdk
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx512m -XX:MaxMetaspaceSize=128m -Dorg.gradle.daemon=false
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             - v1-dependencies-
-      - run: ./gradlew --no-daemon dependenices
+      - run: ./gradlew dependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
           command: |
-            ./gradlew --no-daemon :plugin:install -x test
-            ./gradlew --no-daemon -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
-            ./gradlew --no-daemon -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew publishToMavenLocal -x test
+            ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+#            ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+#            ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+#            ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+#            ./gradlew -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
 
   release:
-    executor: jdk
+    executor: jdk8
     working_directory: ~/repo
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx512m
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             - v1-dependencies-
-      - run: gradle dependencies
+      - run: ./gradlew dependencies
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: ./gradlew --no-daemon :plugin:release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew release -Prelease.useAutomaticVersion=true
 
 workflows:
   version: 2
   build:
     jobs:
-      - build_test:
+      - build_test_jdk:
+          filters:
+            branches:
+              ignore:
+                - master
+      - build_test_jdk8:
           filters:
             branches:
               ignore:
                 - master
       - test_gradle:
-          requires:
-            - build_test
           filters:
             branches:
               ignore:
                 - master
       - test_sample:
           requires:
+            - build_test_jdk
+            - build_test_jdk8
             - test_gradle
           filters:
             branches:
@@ -126,20 +166,25 @@ workflows:
                 - master
   build_release:
     jobs:
-      - build_test:
+      - build_test_jdk:
+          filters:
+            branches:
+              only:
+                - master
+      - build_test_jdk8:
           filters:
             branches:
               only:
                 - master
       - test_gradle:
-          requires:
-            - build_test
           filters:
             branches:
               only:
                 - master
       - test_sample:
           requires:
+            - build_test_jdk
+            - build_test_jdk8
             - test_gradle
           filters:
             branches:

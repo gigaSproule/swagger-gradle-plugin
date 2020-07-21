@@ -1,12 +1,26 @@
 package com.benjaminsproule.swagger.gradleplugin.test.kotlin.springmvc
 
-import com.benjaminsproule.swagger.gradleplugin.test.model.*
-import io.swagger.annotations.*
+import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.OuterJsonSubType
+import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewEntity
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewOne
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewTwo
+import com.fasterxml.jackson.annotation.JsonView
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiImplicitParam
+import io.swagger.annotations.ApiImplicitParams
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.Authorization
+import io.swagger.annotations.AuthorizationScope
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
-
 import java.util.Collections.singletonList
 
 @Suppress("UNUSED_PARAMETER")
@@ -32,7 +46,12 @@ open class TestResourceWithoutClassAnnotation {
     }
 
     @ApiOperation("Consumes and Produces operation")
-    @RequestMapping(path = ["/root/withoutannotation/datatype"], method = [RequestMethod.POST], consumes = ["application/json"], produces = ["application/json"])
+    @RequestMapping(
+        path = ["/root/withoutannotation/datatype"],
+        method = [RequestMethod.POST],
+        consumes = ["application/json"],
+        produces = ["application/json"]
+    )
     fun dataType(@ApiParam requestModel: RequestModel): ResponseEntity<Any> {
         return ResponseEntity.ok().build()
     }
@@ -62,11 +81,15 @@ open class TestResourceWithoutClassAnnotation {
         return ""
     }
 
-    @ApiOperation("An auth operation", authorizations = [
-        Authorization(value = "oauth2", scopes = [
-            AuthorizationScope(scope = "scope", description = "scope description")
-        ])
-    ])
+    @ApiOperation(
+        "An auth operation", authorizations = [
+            Authorization(
+                value = "oauth2", scopes = [
+                    AuthorizationScope(scope = "scope", description = "scope description")
+                ]
+            )
+        ]
+    )
     @RequestMapping(path = ["/root/withoutannotation/auth"], method = [RequestMethod.GET])
     fun withAuth(): String {
         return ""
@@ -100,7 +123,8 @@ open class TestResourceWithoutClassAnnotation {
     @RequestMapping(path = ["/root/withoutannotation/multipleParameters/{parameter1}"], method = [RequestMethod.GET])
     fun multipleParameters(
         @RequestParam("parameter1") parameterDouble: Double,
-        @RequestParam(name = "parameter2", required = false) parameterBool: Boolean): String {
+        @RequestParam(name = "parameter2", required = false) parameterBool: Boolean
+    ): String {
         return ""
     }
 
@@ -128,8 +152,18 @@ open class TestResourceWithoutClassAnnotation {
 
     @ApiOperation(value = "An implicit params operation")
     @ApiImplicitParams(
-        ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body"),
-        ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string", paramType = "header")
+        ApiImplicitParam(
+            name = "body",
+            required = true,
+            dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel",
+            paramType = "body"
+        ),
+        ApiImplicitParam(
+            name = "id",
+            value = "Implicit parameter of primitive type string",
+            dataType = "string",
+            paramType = "header"
+        )
     )
     @RequestMapping(path = ["/root/withoutannotation/implicitparams"], method = [RequestMethod.POST])
     fun implicitParams(requestModel: String): String {
@@ -146,5 +180,25 @@ open class TestResourceWithoutClassAnnotation {
     @RequestMapping(path = ["/root/withoutannotation/innerjsonsubtype"], method = [RequestMethod.GET])
     fun innerJsonSubType(): OuterJsonSubType {
         return OuterJsonSubType()
+    }
+
+    @ApiOperation("With JsonViewOne specification")
+    @GetMapping("/root/withoutannotation/withjsonview1")
+    @JsonView(TestJsonViewOne::class)
+    fun withJsonViewOne(): TestJsonViewEntity? {
+        return null
+    }
+
+    @ApiOperation("With JsonViewTwo specification")
+    @GetMapping("/root/withoutannotation/withjsonview2")
+    @JsonView(TestJsonViewTwo::class)
+    fun withJsonViewTwo(): TestJsonViewEntity? {
+        return null
+    }
+
+    @ApiOperation("Entity definition has to contain all possible fields")
+    @GetMapping("/root/withoutannotation/withoutjsonview")
+    fun withoutJsonView(): TestJsonViewEntity? {
+        return null
     }
 }

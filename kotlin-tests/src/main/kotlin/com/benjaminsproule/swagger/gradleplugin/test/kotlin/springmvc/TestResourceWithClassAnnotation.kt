@@ -1,8 +1,10 @@
 package com.benjaminsproule.swagger.gradleplugin.test.kotlin.springmvc
 
 import com.benjaminsproule.swagger.gradleplugin.test.model.*
+import com.fasterxml.jackson.annotation.JsonView
 import io.swagger.annotations.*
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -147,5 +149,25 @@ open class TestResourceWithClassAnnotation {
     @RequestMapping(path = ["/innerjsonsubtype"], method = [RequestMethod.GET])
     fun innerJsonSubType(): OuterJsonSubType {
         return OuterJsonSubType()
+    }
+
+    @ApiOperation("With JsonViewOne specification")
+    @GetMapping("/withjsonview1")
+    @JsonView(TestJsonViewOne::class)
+    fun withJsonViewOne(): TestJsonViewEntity? {
+        return null
+    }
+
+    @ApiOperation("With JsonViewTwo specification")
+    @GetMapping("/withjsonview2")
+    @JsonView(TestJsonViewTwo::class)
+    fun withJsonViewTwo(): TestJsonViewEntity? {
+        return null
+    }
+
+    @ApiOperation("Entity definition has to contain all possible fields")
+    @GetMapping("/withoutjsonview")
+    fun withoutJsonView(): TestJsonViewEntity? {
+        return null
     }
 }

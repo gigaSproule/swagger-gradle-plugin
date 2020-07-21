@@ -46,7 +46,7 @@ abstract class AbstractPluginITest extends Specification {
             .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
             .withPluginClasspath(pluginClasspath)
             .withTestKitDir(File.createTempDir())
-            .withGradleVersion(System.getProperty('test.gradleVersion', '4.10.2'))
+            .withGradleVersion(System.getProperty('test.gradleVersion', '6.3'))
             .withDebug(true)
             .forwardOutput()
     }

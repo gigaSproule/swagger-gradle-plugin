@@ -1,7 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.test.groovy.jaxrs
 
-
 import com.benjaminsproule.swagger.gradleplugin.test.model.*
+import com.fasterxml.jackson.annotation.JsonView
 import io.swagger.annotations.*
 
 import javax.ws.rs.*
@@ -10,32 +10,31 @@ import javax.ws.rs.core.Response
 import static java.util.Collections.singletonList
 
 @Api(tags = 'Test', description = 'Test resource', authorizations = @Authorization('basic'))
-@Path('/root/withannotation')
-class TestResourceWithClassAnnotation {
+class TestResourceWithoutClassAnnotation {
 
     @ApiOperation('A basic operation')
-    @Path('/basic')
+    @Path('/root/withoutannotation/basic')
     @GET
     String basic() {
         return ''
     }
 
     @ApiOperation('A default operation')
-    @Path('/default')
+    @Path('/root/withoutannotation/default')
     @GET
     Response defaultResponse() {
         return Response.ok().build()
     }
 
     @ApiOperation('A generics operation')
-    @Path('/generics')
+    @Path('/root/withoutannotation/generics')
     @POST
     List<String> generics(@ApiParam List<RequestModel> body) {
         return singletonList('')
     }
 
     @ApiOperation('Consumes and Produces operation')
-    @Path('/datatype')
+    @Path('/root/withoutannotation/datatype')
     @Consumes('application/json')
     @Produces('application/json')
     @POST
@@ -44,28 +43,28 @@ class TestResourceWithClassAnnotation {
     }
 
     @ApiOperation(value = 'A response operation', response = ResponseModel)
-    @Path('/response')
+    @Path('/root/withoutannotation/response')
     @POST
     ResponseModel response() {
         return new ResponseModel()
     }
 
     @ApiOperation(value = 'A response container operation', response = ResponseModel, responseContainer = 'List')
-    @Path('/responseContainer')
+    @Path('/root/withoutannotation/responseContainer')
     @POST
     List<ResponseModel> responseContainer() {
         return singletonList(new ResponseModel())
     }
 
     @ApiOperation('An extended operation')
-    @Path('/extended')
+    @Path('/root/withoutannotation/extended')
     @GET
     SubResponseModel extended() {
         return new SubResponseModel()
     }
 
     @ApiOperation('A deprecated operation')
-    @Path('/deprecated')
+    @Path('/root/withoutannotation/deprecated')
     @GET
     @Deprecated
     String deprecated() {
@@ -77,45 +76,44 @@ class TestResourceWithClassAnnotation {
             @AuthorizationScope(scope = 'scope', description = 'scope description')
         )
     )
-    @Path('/auth')
+    @Path('/root/withoutannotation/auth')
     @GET
     String withAuth() {
         return ''
     }
 
     @ApiOperation('A model operation')
-    @Path('/model')
+    @Path('/root/withoutannotation/model')
     @GET
     String model() {
         return ''
     }
 
     @ApiOperation('An overriden operation')
-    @Path('/overriden')
+    @Path('/root/withoutannotation/overriden')
     @GET
     String overriden() {
         return ''
     }
 
     @ApiOperation('An overriden operation')
-    @Path('/overridenWithoutDescription')
+    @Path('/root/withoutannotaiton/overridenWithoutDescription')
     @GET
     String overridenWithoutDescription() {
         return ''
     }
 
     @ApiOperation(value = 'A hidden operation', hidden = true)
-    @Path('/hidden')
+    @Path('/root/withoutannotation/hidden')
     @GET
     String hidden() {
         return ''
     }
 
     @ApiOperation('A multiple parameters operation')
-    @Path('/multipleParameters/{parameter1}')
+    @Path('/root/withoutannotation/multipleParameters/{parameter1}')
     @GET
-    String multipleParameters(
-        @PathParam('parameter1') Double parameterDouble, @QueryParam('parameter2') Boolean parameterBool) {
+    String multipleParameters(@PathParam('parameter1') Double parameterDouble, @QueryParam('parameter2') Boolean parameterBool) {
         return ''
     }
 
@@ -124,21 +122,21 @@ class TestResourceWithClassAnnotation {
     }
 
     @ApiOperation('A PATCH operation')
-    @Path('/patch')
+    @Path('/root/withoutannotation/patch')
     @PATCH
     String patch() {
         return ''
     }
 
     @ApiOperation('An OPTIONS operation')
-    @Path('/options')
+    @Path('/root/withoutannotation/options')
     @OPTIONS
     Response options() {
         return Response.ok().build()
     }
 
     @ApiOperation('An HEAD operation')
-    @Path('/head')
+    @Path('/root/withoutannotation/head')
     @HEAD
     String head() {
         return ''
@@ -149,23 +147,46 @@ class TestResourceWithClassAnnotation {
         @ApiImplicitParam(name = 'body', required = true, dataType = 'com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel', paramType = 'body'),
         @ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string", paramType = "header")
     ])
-    @Path('/implicitparams')
+    @Path('/root/withoutannotation/implicitparams')
     @POST
     String implicitParams(String requestModel) {
         return ''
     }
 
     @ApiOperation(value = 'A created request operation', code = 201)
-    @Path('/createdrequest')
+    @Path('/root/withoutannotation/createdrequest')
     @POST
     String createdRequest() {
         return ''
     }
 
     @ApiOperation(value = 'A inner JSON sub type operation')
-    @Path('/innerjsonsubtype')
+    @Path('/root/withoutannotation/innerjsonsubtype')
     @GET
     OuterJsonSubType innerJsonSubType() {
         return new OuterJsonSubType()
+    }
+
+    @ApiOperation("With JsonViewOne specification")
+    @Path("/root/withoutannotation/withjsonview1")
+    @GET
+    @JsonView(TestJsonViewOne)
+    TestJsonViewEntity withJsonViewOne() {
+        return null
+    }
+
+    @ApiOperation("With JsonViewTwo specification")
+    @Path("/root/withoutannotation/withjsonview2")
+    @GET
+    @JsonView(TestJsonViewTwo)
+    TestJsonViewEntity withJsonViewTwo() {
+        return null
+    }
+
+    @ApiOperation("Entity definition has to contain all possible fields")
+    @Path("/root/withoutannotation/withoutjsonview")
+    @GET
+    TestJsonViewEntity withoutJsonView() {
+        return null
     }
 }

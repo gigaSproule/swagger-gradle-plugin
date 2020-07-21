@@ -1,6 +1,7 @@
 package com.benjaminsproule.swagger.gradleplugin.test.scala.springmvc
 
 import com.benjaminsproule.swagger.gradleplugin.test.model._
+import com.fasterxml.jackson.annotation.JsonView
 import io.swagger.annotations._
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod, RequestParam}
@@ -143,5 +144,25 @@ class TestResourceWithoutClassAnnotation {
     @RequestMapping(path = Array("/root/withoutannotation/innerjsonsubtype"), method = Array(RequestMethod.GET))
     def innerJsonSubType(): OuterJsonSubType = {
         new OuterJsonSubType()
+    }
+
+    @ApiOperation(value = "With JsonViewOne specification")
+    @RequestMapping(path = Array("/root/withoutannotation/withjsonview1"), method = Array(RequestMethod.GET))
+    @JsonView(value = Array(classOf[TestJsonViewOne]))
+    def withJsonViewOne(): TestJsonViewEntity = {
+        null
+    }
+
+    @ApiOperation("With JsonViewTwo specification")
+    @RequestMapping(path = Array("/root/withoutannotation/withjsonview2"), method = Array(RequestMethod.GET))
+    @JsonView(value = Array(classOf[TestJsonViewTwo]))
+    def withJsonViewTwo(): TestJsonViewEntity = {
+        null
+    }
+
+    @ApiOperation("Entity definition has to contain all possible fields")
+    @RequestMapping(path = Array("/root/withoutannotation/withoutjsonview1"), method = Array(RequestMethod.GET))
+    def withoutJsonView(): TestJsonViewEntity = {
+        null
     }
 }

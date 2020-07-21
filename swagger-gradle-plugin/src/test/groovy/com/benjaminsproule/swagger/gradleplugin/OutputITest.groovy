@@ -19,6 +19,7 @@ class OutputITest extends AbstractPluginITest {
         """
             locations = ['com.benjaminsproule.swagger.gradleplugin.test.kotlin']
         """,
+        // For scala, list definitions are being returned instead of array like all the other languages
 //        """
 //            locations = ['com.benjaminsproule.swagger.gradleplugin.test.scala']
 //        """
@@ -248,7 +249,7 @@ class OutputITest extends AbstractPluginITest {
         assertPaths(paths, format, type, 'withannotation', pathParam)
         assertPaths(paths, format, type, 'withoutannotation', pathParam)
         // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
-        assert paths.size() == 38
+        assert paths.size() == 44
 
         def securityDefinitions = producedSwaggerDocument.securityDefinitions
         assert securityDefinitions
@@ -257,7 +258,7 @@ class OutputITest extends AbstractPluginITest {
 
         def definitions = producedSwaggerDocument.definitions
         assert definitions
-        assert definitions.size() == 7
+        assert definitions.size() == 10
         assert definitions.RequestModel.type == 'object'
         assert definitions.RequestModel.properties.size() == 2
         assert definitions.RequestModel.properties.name.type == type

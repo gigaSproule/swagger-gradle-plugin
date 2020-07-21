@@ -1,9 +1,32 @@
 package com.benjaminsproule.swagger.gradleplugin.test.kotlin.jaxrs
 
-import com.benjaminsproule.swagger.gradleplugin.test.model.*
-import io.swagger.annotations.*
+import com.benjaminsproule.swagger.gradleplugin.test.model.IgnoredModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.OuterJsonSubType
+import com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.ResponseModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.SubResponseModel
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewEntity
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewOne
+import com.benjaminsproule.swagger.gradleplugin.test.model.TestJsonViewTwo
+import com.fasterxml.jackson.annotation.JsonView
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiImplicitParam
+import io.swagger.annotations.ApiImplicitParams
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.Authorization
+import io.swagger.annotations.AuthorizationScope
 import java.util.Collections.singletonList
-import javax.ws.rs.*
+import javax.ws.rs.Consumes
+import javax.ws.rs.GET
+import javax.ws.rs.HEAD
+import javax.ws.rs.OPTIONS
+import javax.ws.rs.PATCH
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.Response
 
 @Suppress("UNUSED_PARAMETER")
@@ -70,11 +93,15 @@ open class TestResourceWithClassAnnotation {
         return ""
     }
 
-    @ApiOperation("An auth operation", authorizations = [
-        Authorization(value = "oauth2", scopes = [
-            AuthorizationScope(scope = "scope", description = "scope description")
-        ])
-    ])
+    @ApiOperation(
+        "An auth operation", authorizations = [
+            Authorization(
+                value = "oauth2", scopes = [
+                    AuthorizationScope(scope = "scope", description = "scope description")
+                ]
+            )
+        ]
+    )
     @Path("/auth")
     @GET
     fun withAuth(): String {
@@ -112,7 +139,10 @@ open class TestResourceWithClassAnnotation {
     @ApiOperation("A multiple parameters operation")
     @Path("/multipleParameters/{parameter1}")
     @GET
-    fun multipleParameters(@PathParam("parameter1") parameterDouble: Double, @QueryParam("parameter2") parameterBool: Boolean): String {
+    fun multipleParameters(
+        @PathParam("parameter1") parameterDouble: Double,
+        @QueryParam("parameter2") parameterBool: Boolean
+    ): String {
         return ""
     }
 
@@ -143,8 +173,18 @@ open class TestResourceWithClassAnnotation {
 
     @ApiOperation(value = "An implicit params operation")
     @ApiImplicitParams(
-        ApiImplicitParam(name = "body", required = true, dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel", paramType = "body"),
-        ApiImplicitParam(name = "id", value = "Implicit parameter of primitive type string", dataType = "string", paramType = "header")
+        ApiImplicitParam(
+            name = "body",
+            required = true,
+            dataType = "com.benjaminsproule.swagger.gradleplugin.test.model.RequestModel",
+            paramType = "body"
+        ),
+        ApiImplicitParam(
+            name = "id",
+            value = "Implicit parameter of primitive type string",
+            dataType = "string",
+            paramType = "header"
+        )
     )
     @Path("/implicitparams")
     @POST
@@ -164,5 +204,28 @@ open class TestResourceWithClassAnnotation {
     @GET
     fun innerJsonSubType(): OuterJsonSubType {
         return OuterJsonSubType()
+    }
+
+    @ApiOperation("With JsonViewOne specification")
+    @Path("/withjsonview1")
+    @GET
+    @JsonView(TestJsonViewOne::class)
+    fun withJsonViewOne(): TestJsonViewEntity? {
+        return null
+    }
+
+    @ApiOperation("With JsonViewTwo specification")
+    @Path("/withjsonview2")
+    @GET
+    @JsonView(TestJsonViewTwo::class)
+    fun withJsonViewTwo(): TestJsonViewEntity? {
+        return null
+    }
+
+    @ApiOperation("Entity definition has to contain all possible fields")
+    @Path("/withoutjsonview")
+    @GET
+    fun withoutJsonView(): TestJsonViewEntity? {
+        return null
     }
 }

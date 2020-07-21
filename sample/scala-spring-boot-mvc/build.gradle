@@ -1,21 +1,23 @@
 buildscript {
-    ext {
-        springBootVersion = '1.5.4.RELEASE'
-    }
     repositories {
         mavenLocal()
-        mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
         classpath 'com.benjaminsproule:swagger-gradle-plugin:+'
     }
 }
 
-apply plugin: 'scala'
-apply plugin: 'org.springframework.boot'
+plugins {
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'scala'
+}
+
 apply plugin: 'com.benjaminsproule.swagger'
+
+group = 'com.benjaminsproule'
+version = '0.0.1-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -23,11 +25,8 @@ repositories {
     jcenter()
 }
 
-group = 'com.benjaminsproule'
-version = '0.0.1-SNAPSHOT'
-
 dependencies {
-    implementation 'org.scala-lang:scala-library:2.12.7'
+    implementation 'org.scala-lang:scala-library:2.13.3'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'io.swagger:swagger-annotations:1.5.15'
 }

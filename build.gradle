@@ -35,3 +35,7 @@ allprojects {
         javaxVersion = '2.1.1'
     }
 }
+
+release {
+    preCommitText = '[skip ci]'
+}

@@ -134,3 +134,7 @@ publishing {
 }
 
 afterReleaseBuild.dependsOn publishPlugins
+
+release {
+    preCommitText = "[skip ci]"
+}

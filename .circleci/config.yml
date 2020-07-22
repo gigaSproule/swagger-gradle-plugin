@@ -134,6 +134,11 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          name: Set Git globals
+          command: |
+            git config --global user.email "circleci@benjaminsproule.com"
+            git config --global user.name "Circle CI"
       - run: ./gradlew release -Prelease.useAutomaticVersion=true
 
 workflows:

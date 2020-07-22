@@ -127,7 +127,7 @@ publishing {
         pluginPublication(MavenPublication) {
             from components.java
             groupId project.group
-            artifactId project.name
+            artifactId 'swagger-gradle-plugin'
             version "${project.version}-SNAPSHOT"
         }
     }
@@ -136,5 +136,5 @@ publishing {
 afterReleaseBuild.dependsOn publishPlugins
 
 release {
-    preCommitText = "[skip ci]"
+    preCommitText = '[skip ci]'
 }

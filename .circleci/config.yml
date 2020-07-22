@@ -134,6 +134,9 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
+      - add_ssh_keys:
+          fingerprints:
+            - '05:aa:42:b1:4d:4a:9f:bf:71:10:c2:2a:f3:cf:31:9c'
       - run:
           name: Set Git globals
           command: |

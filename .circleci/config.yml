@@ -142,7 +142,7 @@ jobs:
           command: |
             git config --global user.email "circleci@benjaminsproule.com"
             git config --global user.name "Circle CI"
-      - run: ./gradlew release -Prelease.useAutomaticVersion=true
+      - run: ./gradlew :plugin:release -Prelease.useAutomaticVersion=true -Pbintray_apiKey=${BINTRAY_APIKEY} -Pbintray_user=${BINTRAY_USER} -Pgradle.publish.key=${GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${GRADLE_PUBLISH_SECRET}
 
 workflows:
   version: 2

@@ -11,7 +11,7 @@ executors:
 jobs:
   build_test_jdk:
     executor: jdk
-    working_directory: ~/workspace
+    working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -38,7 +38,7 @@ jobs:
 
   build_test_jdk8:
     executor: jdk8
-    working_directory: ~/workspace
+    working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -65,7 +65,7 @@ jobs:
 
   test_gradle:
     executor: jdk8
-    working_directory: ~/workspace
+    working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -90,7 +90,7 @@ jobs:
 
   test_sample:
     executor: jdk
-    working_directory: ~/workspace
+    working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -119,7 +119,7 @@ jobs:
 
   release:
     executor: jdk8
-    working_directory: ~/workspace
+    working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -138,7 +138,7 @@ jobs:
           command: |
             git config --global user.email "circleci@benjaminsproule.com"
             git config --global user.name "Circle CI"
-      - run: ./gradlew release -Prelease.useAutomaticVersion=true -Pgradle.publish.key=${GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${GRADLE_PUBLISH_SECRET} --debug --stacktrace
+      - run: ./gradlew release -Prelease.useAutomaticVersion=true -Pbintray_apiKey=${BINTRAY_APIKEY} -Pbintray_user=${BINTRAY_USER} -Pgradle.publish.key=${GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${GRADLE_PUBLISH_SECRET} --debug --stacktrace
       - save_cache:
           paths:
             - ~/.gradle

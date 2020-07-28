@@ -103,7 +103,7 @@ if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')
         }
     }
 
-    afterReleaseBuild.dependsOn bintrayUpload
+//    afterReleaseBuild.dependsOn bintrayUpload
 }
 
 pluginBundle {
@@ -131,4 +131,4 @@ publishing {
     }
 }
 
-afterReleaseBuild.dependsOn publishPlugins
+//afterReleaseBuild.dependsOn publishPlugins

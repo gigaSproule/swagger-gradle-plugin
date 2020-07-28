@@ -34,8 +34,8 @@ allprojects {
         swaggerVersion = '1.5.23'
         javaxVersion = '2.1.1'
     }
-}
 
-release {
-    preCommitText = '[skip ci]'
+    release {
+        preCommitText = '[skip ci]'
+    }
 }

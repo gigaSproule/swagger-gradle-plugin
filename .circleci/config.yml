@@ -11,7 +11,7 @@ executors:
 jobs:
   build_test_jdk:
     executor: jdk
-    working_directory: ~/repo
+    working_directory: ~/workspace
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -38,7 +38,7 @@ jobs:
 
   build_test_jdk8:
     executor: jdk8
-    working_directory: ~/repo
+    working_directory: ~/workspace
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -65,7 +65,7 @@ jobs:
 
   test_gradle:
     executor: jdk8
-    working_directory: ~/repo
+    working_directory: ~/workspace
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -90,7 +90,7 @@ jobs:
 
   test_sample:
     executor: jdk
-    working_directory: ~/repo
+    working_directory: ~/workspace
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
@@ -119,7 +119,7 @@ jobs:
 
   release:
     executor: jdk8
-    working_directory: ~/repo
+    working_directory: ~/workspace
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process

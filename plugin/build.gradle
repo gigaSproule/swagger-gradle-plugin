@@ -31,7 +31,6 @@ dependencies {
     implementation "com.fasterxml.jackson.module:jackson-module-scala_2.12:${rootProject.ext.jacksonVersion}"
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
-    //These should be pinned here until ronmamo/reflections#194 has been resolved
     implementation "io.swagger:swagger-jersey2-jaxrs:${rootProject.ext.swaggerVersion}"
 
     implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"

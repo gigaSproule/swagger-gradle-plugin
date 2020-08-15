@@ -213,16 +213,16 @@ class OutputITest extends AbstractPluginITest {
     private static void assertSwaggerJson(String swaggerJsonFilePath, String type = 'string', String pathParam = 'path') {
         def swaggerJsonFile = new File(swaggerJsonFilePath)
         assert Files.exists(swaggerJsonFile.toPath())
-        assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), 'json', type, pathParam)
+        assertSwaggerDocument(new JsonSlurper().parse(swaggerJsonFile, 'UTF-8'), type, pathParam)
     }
 
     private static void assertSwaggerYaml(String swaggerYamlFilePath, String type = 'string', String pathParam = 'path') {
         def swaggerYamlFile = new File(swaggerYamlFilePath)
         assert Files.exists(swaggerYamlFile.toPath())
-        assertSwaggerDocument(new Yaml().load(swaggerYamlFile.getText('UTF-8')), 'yaml', type, pathParam)
+        assertSwaggerDocument(new Yaml().load(swaggerYamlFile.getText('UTF-8')), type, pathParam)
     }
 
-    private static void assertSwaggerDocument(def producedSwaggerDocument, String format, String type, String pathParam) {
+    private static void assertSwaggerDocument(def producedSwaggerDocument, String type, String pathParam) {
         assert producedSwaggerDocument.swagger == '2.0'
         assert producedSwaggerDocument.host == 'localhost:8080'
         assert producedSwaggerDocument.basePath == '/'
@@ -246,8 +246,8 @@ class OutputITest extends AbstractPluginITest {
 
         def paths = producedSwaggerDocument.paths
         assert paths
-        assertPaths(paths, format, type, 'withannotation', pathParam)
-        assertPaths(paths, format, type, 'withoutannotation', pathParam)
+        assertPaths(paths, type, 'withannotation', pathParam)
+        assertPaths(paths, type, 'withoutannotation', pathParam)
         // After path assertion for better test output i.e. this won't tell us what is missing, but tells us we are checking everything
         assert paths.size() == 44
 
@@ -288,9 +288,9 @@ class OutputITest extends AbstractPluginITest {
         assert definitions.SubInnerJsonSubType.allOf[1].properties.subValue.type == type
     }
 
-    private static void assertPaths(paths, String format, String type, String path, String pathParam) {
-        def ok = format == 'json' ? '200' : 200
-        def created = format == 'json' ? '201' : 201
+    private static void assertPaths(paths, String type, String path, String pathParam) {
+        def ok = '200'
+        def created = '201'
 
         assert paths."/root/${path}/basic".get.tags == ['Test']
         assert paths."/root/${path}/basic".get.summary == 'A basic operation'

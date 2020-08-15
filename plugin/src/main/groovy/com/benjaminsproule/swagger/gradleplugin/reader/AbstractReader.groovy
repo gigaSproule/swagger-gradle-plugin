@@ -1,9 +1,9 @@
 package com.benjaminsproule.swagger.gradleplugin.reader
 
-import com.fasterxml.jackson.annotation.JsonView
 import com.benjaminsproule.swagger.gradleplugin.classpath.ClassFinder
 import com.benjaminsproule.swagger.gradleplugin.model.ApiSourceExtension
 import com.benjaminsproule.swagger.gradleplugin.swagger.SwaggerFactory
+import com.fasterxml.jackson.annotation.JsonView
 import io.swagger.annotations.*
 import io.swagger.converter.ModelConverters
 import io.swagger.jaxrs.ext.SwaggerExtension
@@ -342,10 +342,6 @@ abstract class AbstractReader implements ClassSwaggerReader {
         return parameters
     }
 
-    protected void updateApiResponse(Operation operation, ApiResponses responses) {
-      updateApiResponse(operation, responses, null)
-    }
-
     protected void updateApiResponse(Operation operation, ApiResponses responseAnnotation, JsonView jsonView) {
         for (ApiResponse apiResponse : responseAnnotation.value()) {
             Map<String, Property> responseHeaders = parseResponseHeaders(apiResponse.responseHeaders())
@@ -377,7 +373,7 @@ abstract class AbstractReader implements ClassSwaggerReader {
                     swagger.model(entry.getKey(), entry.getValue())
                 }
 
-                if (response.getSchema() == null) {
+                if (response.getResponseSchema() == null) {
                     Map<String, Response> responses = operation.getResponses()
                     if (responses != null) {
                         Response apiOperationResponse = responses.get(String.valueOf(apiResponse.code()))

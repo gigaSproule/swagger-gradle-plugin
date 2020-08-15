@@ -14,6 +14,8 @@ import io.swagger.annotations.ApiImplicitParam
 import io.swagger.annotations.ApiImplicitParams
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
 import io.swagger.annotations.Authorization
 import io.swagger.annotations.AuthorizationScope
 import org.springframework.http.ResponseEntity
@@ -173,6 +175,17 @@ open class TestResourceWithoutClassAnnotation {
     @ApiOperation(value = "A created request operation", code = 201)
     @RequestMapping(path = ["/root/withoutannotation/createdrequest"], method = [RequestMethod.POST])
     fun createdRequest(): String {
+        return ""
+    }
+
+    @ApiResponses(
+        value = [
+            ApiResponse(code = 201, message = "Success", response = String::class),
+            ApiResponse(code = 422, message = "Business errors", response = String::class)
+        ]
+    )
+    @RequestMapping(path = ["/root/withoutannotation/apiresponses"], method = [RequestMethod.POST])
+    fun apiResponses(): String {
         return ""
     }
 

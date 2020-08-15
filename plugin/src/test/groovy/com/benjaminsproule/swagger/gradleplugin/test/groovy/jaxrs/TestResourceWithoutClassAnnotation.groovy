@@ -160,6 +160,18 @@ class TestResourceWithoutClassAnnotation {
         return ''
     }
 
+    @ApiResponses(
+        value = [
+            @ApiResponse(code = 201, message = "Success", response = String),
+            @ApiResponse(code = 422, message = "Business errors", response = String)
+        ]
+    )
+    @Path('/root/withoutannotation/apiresponses')
+    @POST
+    String apiResponses() {
+        return ''
+    }
+
     @ApiOperation(value = 'A inner JSON sub type operation')
     @Path('/root/withoutannotation/innerjsonsubtype')
     @GET

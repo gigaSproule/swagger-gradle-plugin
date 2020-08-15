@@ -291,6 +291,7 @@ class OutputITest extends AbstractPluginITest {
     private static void assertPaths(paths, String format, String type, String path, String pathParam) {
         def ok = format == 'json' ? '200' : 200
         def created = format == 'json' ? '201' : 201
+        def unprocessableEntity = format == 'json' ? '422' : 422
 
         assert paths."/root/${path}/basic".get.tags == ['Test']
         assert paths."/root/${path}/basic".get.summary == 'A basic operation'
@@ -526,6 +527,19 @@ class OutputITest extends AbstractPluginITest {
         assert paths."/root/${path}/createdrequest".post.responses.get(created).description == 'successful operation'
         assert paths."/root/${path}/createdrequest".post.responses.get(created).schema.type == type
         assert paths."/root/${path}/createdrequest".post.security.basic
+
+        assert paths."/root/${path}/apiresponses".post.tags == ['Test']
+        assert paths."/root/${path}/apiresponses".post.summary == null
+        assert paths."/root/${path}/apiresponses".post.description == 'Test resource'
+        assert paths."/root/${path}/apiresponses".post.operationId == 'apiResponses'
+        assert paths."/root/${path}/apiresponses".post.produces == null
+        assert paths."/root/${path}/apiresponses".post.consumes == null
+        assert paths."/root/${path}/apiresponses".post.responses.get(ok) == null
+        assert paths."/root/${path}/apiresponses".post.responses.get(created).description == 'Success'
+        assert paths."/root/${path}/apiresponses".post.responses.get(created).schema.type == type
+        assert paths."/root/${path}/apiresponses".post.responses.get(unprocessableEntity).description == 'Business errors'
+        assert paths."/root/${path}/apiresponses".post.responses.get(unprocessableEntity).schema.type == type
+        assert paths."/root/${path}/apiresponses".post.security.basic
 
         assert paths."/root/${path}/innerjsonsubtype".get.tags == ['Test']
         assert paths."/root/${path}/innerjsonsubtype".get.summary == 'A inner JSON sub type operation'

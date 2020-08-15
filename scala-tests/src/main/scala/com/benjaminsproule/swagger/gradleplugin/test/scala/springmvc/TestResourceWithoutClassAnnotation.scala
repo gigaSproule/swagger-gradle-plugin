@@ -140,6 +140,17 @@ class TestResourceWithoutClassAnnotation {
         ""
     }
 
+    @ApiResponses(
+        value = Array(
+            new ApiResponse(code = 201, message = "Success", response = classOf[String]),
+            new ApiResponse(code = 422, message = "Business errors", response = classOf[String])
+        )
+    )
+    @RequestMapping(path = Array("/root/withoutannotation/apiresponses"), method = Array(RequestMethod.POST))
+    def apiResponses(): String = {
+        ""
+    }
+
     @ApiOperation(value = "A inner JSON sub type operation")
     @RequestMapping(path = Array("/root/withoutannotation/innerjsonsubtype"), method = Array(RequestMethod.GET))
     def innerJsonSubType(): OuterJsonSubType = {

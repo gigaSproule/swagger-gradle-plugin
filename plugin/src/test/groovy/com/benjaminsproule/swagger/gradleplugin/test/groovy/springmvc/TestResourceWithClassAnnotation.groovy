@@ -144,6 +144,17 @@ class TestResourceWithClassAnnotation {
         return ''
     }
 
+    @ApiResponses(
+        value = [
+            @ApiResponse(code = 201, message = "Success", response = String),
+            @ApiResponse(code = 422, message = "Business errors", response = String)
+        ]
+    )
+    @RequestMapping(path = '/apiresponses', method = RequestMethod.POST)
+    String apiResponses() {
+        return ''
+    }
+
     @ApiOperation(value = 'A inner JSON sub type operation')
     @RequestMapping(path = '/innerjsonsubtype', method = RequestMethod.GET)
     OuterJsonSubType innerJsonSubType() {

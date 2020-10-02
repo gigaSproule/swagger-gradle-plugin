@@ -22,7 +22,7 @@ dependencies {
     implementation gradleApi()
     implementation localGroovy()
 
-    implementation 'commons-io:commons-io:2.7'
+    implementation 'commons-io:commons-io:2.8.0'
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'org.apache.commons:commons-text:1.9'
     implementation 'com.github.jknack:handlebars:4.1.2'
@@ -35,7 +35,7 @@ dependencies {
 
     implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
     implementation 'com.sun.jersey:jersey-server:1.19.4'
-    implementation 'org.glassfish.jersey.core:jersey-server:2.31'
+    implementation 'org.glassfish.jersey.core:jersey-server:2.32'
     implementation "org.springframework:spring-context:${rootProject.ext.springVersion}"
     implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"
 

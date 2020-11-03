@@ -21,4 +21,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew -Pgradle.publish.key=${{ GRADLE_KEY }} -Pgradle.publish.secret=${{ GRADLE_SECRET }} publishPlugins
+      run: ./gradlew -Pgradle.publish.key=${{ secrets.GRADLE_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_SECRET }} publishPlugins

@@ -19,7 +19,7 @@ allprojects {
     }
 
     group = 'com.github.wakingrufus'
-    version = "1.2"
+    version = "0.0.1-SNAPSHOT"
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 

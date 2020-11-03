@@ -25,7 +25,7 @@ class SecurityITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -83,7 +83,7 @@ class SecurityITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -103,7 +103,7 @@ class SecurityITest extends AbstractPluginITest {
                         type = 'apiKey'
                         keyLocation = 'header'
                         keyName = 'X-API-Key'
-                    } 
+                    }
                     securityDefinition {
                         name = 'MyOAuth2'
                         type = 'oauth2'
@@ -142,21 +142,21 @@ class SecurityITest extends AbstractPluginITest {
     assert info
     assert info.version == '1'
     assert info.title == 'test'
-    
+
     // Validate securityDefinitions
     def securityDefinitions = producedSwaggerDocument.securityDefinitions;
     assert securityDefinitions
     assert securityDefinitions.size() == 3
-    
+
     def basicAuthDef = securityDefinitions['MyBasicAuth']
     assert basicAuthDef
     assert basicAuthDef.type == 'basic'
-    
+
     def apiKeyDef = securityDefinitions['MyApiKey']
     assert apiKeyDef
     assert apiKeyDef.type == 'apiKey'
-    
-    
+
+
     def oauth2Definition = securityDefinitions['MyOAuth2']
     assert oauth2Definition
     assert oauth2Definition.type == 'oauth2'
@@ -164,8 +164,8 @@ class SecurityITest extends AbstractPluginITest {
     assert oauth2Definition.flow == 'implicit'
     assert oauth2Definition.scopes
     assert oauth2Definition.scopes['scope1'] == 'description'
-    
-    
+
+
     // Validate security
     def security = producedSwaggerDocument.security;
     assert security
@@ -173,7 +173,7 @@ class SecurityITest extends AbstractPluginITest {
     assert security[0].containsKey('MyBasicAuth')
     assert security[0].containsKey('MyApiKey')
     assert security[1].containsKey('MyOAuth2')
-    
+
   }
 
 }

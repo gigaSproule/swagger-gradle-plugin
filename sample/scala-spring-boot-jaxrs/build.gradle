@@ -14,7 +14,7 @@ plugins {
     id 'scala'
 }
 
-apply plugin: 'com.benjaminsproule.swagger'
+apply plugin: 'com.github.wakingrufus.swagger'
 
 group = 'com.benjaminsproule'
 version = '0.0.1-SNAPSHOT'

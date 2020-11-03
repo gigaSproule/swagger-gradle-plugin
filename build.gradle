@@ -8,11 +8,7 @@ plugins {
 
 allprojects {
     repositories {
-        mavenLocal()
         mavenCentral()
-        maven {
-            url 'https://dl.bintray.com/gigasproule/maven'
-        }
     }
 
     idea {
@@ -22,8 +18,8 @@ allprojects {
         }
     }
 
-    group = 'com.benjaminsproule'
-
+    group = 'com.github.wakingrufus'
+    version = "1.2"
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 

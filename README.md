@@ -19,14 +19,14 @@ Import the plugin in your project by adding following configuration:
 ### build.gradle (Groovy DSL)
 ```groovy
 plugins {
-    id 'com.benjaminsproule.swagger' version '1.0.8'
+    id 'com.github.wakingrufus.swagger' version '1.0.8'
 }
 ```
 
 ### build.gradle.kts (Kotlin DSL)
 ```kotlin
 plugins {
-    id("com.benjaminsproule.swagger") version "1.0.8"
+    id("com.github.wakingrufus.swagger") version "1.0.8"
 }
 ```
 ## Gradle versions < 2.1
@@ -42,7 +42,7 @@ buildscript {
   }
 }
 
-apply plugin: 'com.benjaminsproule.swagger'
+apply plugin: 'com.github.wakingrufus.swagger'
 
 swagger {
     apiSource {

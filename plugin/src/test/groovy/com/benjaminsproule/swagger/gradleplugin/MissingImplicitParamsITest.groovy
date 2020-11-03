@@ -12,7 +12,7 @@ class MissingImplicitParamsITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {

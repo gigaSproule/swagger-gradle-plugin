@@ -15,7 +15,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -49,7 +49,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -100,7 +100,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                 id 'java'
                 id 'groovy'
                 id 'maven-publish'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             group = 'com.benjaminsproule.swagger'
             version = '0.0.1'
@@ -163,7 +163,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                 id 'java'
                 id 'groovy'
                 id 'maven-publish'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             group = 'com.benjaminsproule.swagger'
             version = '0.0.1'
@@ -230,7 +230,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
                 id 'java'
                 id 'groovy'
                 id 'maven-publish'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             group = 'com.benjaminsproule.swagger'
             version = '0.0.1'
@@ -313,7 +313,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -353,7 +353,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -394,7 +394,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -441,7 +441,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -489,7 +489,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
 
             repositories {

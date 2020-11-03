@@ -15,7 +15,7 @@ class ApiDocsITest extends AbstractPluginITest {
             plugins {
                 id 'java'
                 id 'groovy'
-                id 'com.benjaminsproule.swagger'
+                id 'com.github.wakingrufus.swagger'
             }
             swagger {
                 apiSource {
@@ -40,7 +40,7 @@ class ApiDocsITest extends AbstractPluginITest {
                     securityDefinition {
                         name = 'MyBasicAuth'
                         type = 'basic'
-                    } 
+                    }
                     templatePath = '${templatePathValue}'
                     outputPath = '${expectedSwaggerApiDocsFile}'
                 }

@@ -79,20 +79,6 @@ test {
     }
 }
 
-pluginBundle {
-    website = 'https://github.com/wakingrufus/swagger-gradle-plugin'
-    vcsUrl = 'https://github.com/wakingrufus/swagger-gradle-plugin'
-    description = 'Plugin to create Swagger documentation using Gradle'
-    tags = ['swagger', 'documentation']
-
-    plugins {
-        swagger {
-            id = 'com.github.wakingrufus.swagger'
-            displayName = 'Swagger Gradle Plugin'
-        }
-    }
-}
-
 gradlePlugin {
     plugins {
         swaggerPlugin {
@@ -101,3 +87,19 @@ gradlePlugin {
         }
     }
 }
+
+pluginBundle {
+    website = 'https://github.com/wakingrufus/swagger-gradle-plugin'
+    vcsUrl = 'https://github.com/wakingrufus/swagger-gradle-plugin'
+    description = 'Plugin to create Swagger documentation using Gradle'
+    tags = ['swagger', 'documentation']
+
+    plugins {
+        swaggerPlugin {
+            displayName = 'Swagger Gradle Plugin'
+            tags = ['swagger', 'documentation']
+            version = project.version
+        }
+    }
+}
+

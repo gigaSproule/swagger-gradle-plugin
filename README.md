@@ -1,6 +1,10 @@
-# Swagger Gradle Plugin [![CircleCI](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin.svg?style=svg)](https://circleci.com/gh/gigaSproule/swagger-gradle-plugin)   [![Download](https://api.bintray.com/packages/gigasproule/maven/swagger-gradle-plugin/images/download.svg)](https://bintray.com/gigasproule/maven/swagger-gradle-plugin/_latestVersion)
+# Swagger Gradle Plugin
 
-This plugin was based on [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)
+![](https://github.com/wakingrufus/swagger-gradle-plugin/workflows/Java%20CI%20with%20Gradle/badge.svg)
+[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v?label=Plugin+Portal&metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fcom%2Fgithub%2Fwakingrufus%2Fswagger%2fcom.github.wakingrufus.gradle.plugin%2Fmaven-metadata.xml)](https://plugins.gradle.org/plugin/com.github.wakingrufus.swagger)
+
+This plugin is a fork of [gigaSproule's swagger-gradle-plugin](https://github.com/gigaSproule/swagger-gradle-plugin)
+which is based on [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)
 
 This enables your Swagger-annotated project to generate **Swagger specs** and **customizable, templated static documents** during the gradle build phase. Unlike swagger-core, swagger-gradle-plugin does not actively serve the spec with the rest of the application; it generates the spec as a build artifact to be used in downstream Swagger tooling.
 

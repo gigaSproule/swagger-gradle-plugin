@@ -62,10 +62,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            def classLoader = createdClassFinder.getClassLoader() as URLClassLoader
-            generateSwaggerDocsTask.inputFiles = classLoader.getURLs().collect {
-                new File(it.toURI())
-            }
+            generateSwaggerDocsTask.inputFiles = project.configurations.getByName("runtime").files()
         }
     }
 }

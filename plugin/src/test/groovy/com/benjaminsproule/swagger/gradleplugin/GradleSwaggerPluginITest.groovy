@@ -1,6 +1,8 @@
 package com.benjaminsproule.swagger.gradleplugin
 
 import groovy.json.JsonSlurper
+import org.gradle.testkit.runner.GradleRunner
+import spock.lang.Unroll
 
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -90,6 +92,10 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
         assert tags.get(0).description == 'Test tag description'
     }
 
+    /**
+     * This "happy path" test has been parameterized to test against all known supported versions of gradle.
+     */
+    @Unroll("Generate Swagger artifact when flag is set in gradle #gradleVersion")
     def 'Generate Swagger artifact when flag is set'() {
         given:
         def localRepo = "${testProjectOutputDirAsString}/repo"
@@ -139,7 +145,15 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
         """
 
         when:
-        def runResult = runPluginTask()
+        def runResult = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
+            .withPluginClasspath(pluginClasspath)
+            .withTestKitDir(File.createTempDir())
+            .withGradleVersion(gradleVersion)
+            .withDebug(true)
+            .forwardOutput()
+            .build()
         new File("${localRepo}").mkdirs()
         def publishResult = pluginTaskRunnerBuilder()
             .withArguments('publishMavenPublicationToMavenRepository')
@@ -151,6 +165,9 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
         def swaggerFile = new File("${localRepo}/com/benjaminsproule/swagger/${buildFile.getParentFile().getName()}/0.0.1/${buildFile.getParentFile().getName()}-0.0.1.json")
         assert swaggerFile.exists()
+
+        where:
+        gradleVersion << GradleVersions.SUPPORTED_VERSIONS
     }
 
     def 'Generate Swagger artifact when flag is set for multiple formats'() {
@@ -523,5 +540,51 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
 
         then:
         runResult.task(":${GenerateSwaggerDocsTask.TASK_NAME}").outcome == SUCCESS
+    }
+
+    def 'Does not resolve dependencies too early'() {
+        given:
+        def expectedSwaggerDirectory = "${testProjectOutputDirAsString}/swaggerui"
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'groovy'
+                id 'com.github.wakingrufus.swagger'
+            }
+
+            repositories {
+                mavenLocal()
+                mavenCentral()
+            }
+
+            dependencies {
+                compile 'io.swagger:swagger-jersey2-jaxrs:+'
+            }
+
+            swagger {
+                apiSource {
+                    locations = ['com.benjaminsproule.swagger.gradleplugin.test.groovy']
+                    schemes = ['http']
+                    info {
+                        title = 'test'
+                        version = '1'
+                        license { name = 'Apache 2.0' }
+                        contact { name = 'Joe Blogs' }
+                    }
+                    swaggerDirectory = '${expectedSwaggerDirectory}'
+                    host = 'localhost:8080'
+                    basePath = '/'
+                }
+            }
+            afterEvaluate {
+                dependencies.compileOnly("com.google.code.findbugs:annotations:3.0.1")
+            }
+        """
+
+        when:
+        def runResult = runPluginTask()
+
+        then:
+        !runResult.output.contains("Dependencies were resolved during project configuration")
     }
 }

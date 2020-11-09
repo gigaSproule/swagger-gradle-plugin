@@ -1,7 +1,7 @@
 # Swagger Gradle Plugin
 
-![](https://github.com/wakingrufus/swagger-gradle-plugin/workflows/Java%20CI%20with%20Gradle/badge.svg)
-[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v?label=Plugin+Portal&metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fcom%2Fgithub%2Fwakingrufus%2Fswagger%2fcom.github.wakingrufus.gradle.plugin%2Fmaven-metadata.xml)](https://plugins.gradle.org/plugin/com.github.wakingrufus.swagger)
+![](https://github.com/wakingrufus/swagger-gradle-plugin/workflows/Build/badge.svg)
+[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v?label=Plugin+Portal&metadataUrl=https://plugins.gradle.org/m2/com/github/wakingrufus/swagger/com.github.wakingrufus.swagger.gradle.plugin/maven-metadata.xml)](https://plugins.gradle.org/plugin/com.github.wakingrufus.swagger)
 
 This plugin is a fork of [gigaSproule's swagger-gradle-plugin](https://github.com/gigaSproule/swagger-gradle-plugin)
 which is based on [kongchen's swagger-maven-plugin](https://github.com/kongchen/swagger-maven-plugin)

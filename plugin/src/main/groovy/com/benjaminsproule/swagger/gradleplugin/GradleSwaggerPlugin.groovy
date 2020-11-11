@@ -32,15 +32,6 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             generateSwaggerDocsTask.enabled = false
         }
         project.afterEvaluate {
-            project.configurations {
-                swagger {
-                    extendsFrom(project.configurations.runtime)
-                    canBeResolved = true
-                }
-            }
-            project.dependencies {
-                swagger project.sourceSets.main.output
-            }
             swaggerExtension.apiSourceExtensions.each { apiSourceExtension ->
                 if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory) {
                     apiSourceExtension.outputFormats.each { outputFormat ->
@@ -52,6 +43,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
                         }
                     }
                 }
+                apiSourceExtension.expandSuperTypes = false
             }
 
             generateSwaggerDocsTask.outputDirectories = swaggerExtension.apiSourceExtensions.collect {
@@ -70,20 +62,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            generateSwaggerDocsTask.inputFiles = project.configurations.getByName("swagger").files()
-
-//            // Workaround for an issue in the generateSwaggerDocumentation plugin
-//            // check https://github.com/gigaSproule/swagger-gradle-plugin/issues/158#issuecomment-585823379
-//            def fixSwagger = project.task("fixGenerateSwaggerDocumentation") {
-//                doLast {
-//                    project.configurations.runtimeClasspath.resolve()
-//                        .collect { it.toURI().toURL() }
-//                        .each { project.buildscript.classLoader.addURL it }
-//                }
-//            }
-//            generateSwaggerDocsTask.dependsOn fixSwagger
+            generateSwaggerDocsTask.inputFiles = project.configurations.getByName("runtime").files()
         }
-
-
     }
 }

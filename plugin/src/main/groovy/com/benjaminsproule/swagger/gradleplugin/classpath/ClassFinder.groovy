@@ -88,9 +88,37 @@ class ClassFinder {
         if (classLoader) {
             return classLoader
         }
-        URL[] urls = project.configurations.swagger.files.collect { File file ->
-            file.toURI().toURL()
-        }.toArray(new URL[0])
-        return new URLClassLoader(urls, getClass().getClassLoader())
+
+        def urls = []
+        def classpaths = [project.configurations.compileClasspath.resolve()]
+        if (project.configurations.hasProperty('runtimeClasspath')) {
+            classpaths += project.configurations.runtimeClasspath.resolve()
+        } else {
+            classpaths += project.configurations.runtime.resolve()
+        }
+        classpaths.flatten().each {
+
+            urls += it.toURI().toURL()
+        }
+
+        if (project.sourceSets.main.output.hasProperty('classesDirs')) {
+            project.sourceSets.main.output.classesDirs.each {
+                if (it.exists()) {
+                    urls += it.toURI().toURL()
+                }
+
+            }
+        } else {
+            urls += project.sourceSets.main.output.classesDir.toURI().toURL()
+        }
+
+        urls += project.sourceSets.main.output.resourcesDir.toURI().toURL()
+
+        (urls as URL[]).each {
+
+        }
+
+
+        return new URLClassLoader(urls as URL[], getClass().getClassLoader())
     }
 }

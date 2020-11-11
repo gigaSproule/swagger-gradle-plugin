@@ -31,16 +31,16 @@ class GradleSwaggerPlugin implements Plugin<Project> {
         if (project.hasProperty('swagger.skip')) {
             generateSwaggerDocsTask.enabled = false
         }
-        project.configurations {
-            swagger {
-                extendsFrom(runtime)
-                canBeResolved = true
-            }
-        }
-        project.dependencies {
-            swagger project.sourceSets.main.output
-        }
         project.afterEvaluate {
+            project.configurations {
+                swagger {
+                    extendsFrom(project.configurations.runtime)
+                    canBeResolved = true
+                }
+            }
+            project.dependencies {
+                swagger project.sourceSets.main.output
+            }
             swaggerExtension.apiSourceExtensions.each { apiSourceExtension ->
                 if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory) {
                     apiSourceExtension.outputFormats.each { outputFormat ->

@@ -31,6 +31,15 @@ class GradleSwaggerPlugin implements Plugin<Project> {
         if (project.hasProperty('swagger.skip')) {
             generateSwaggerDocsTask.enabled = false
         }
+        project.configurations {
+            swagger {
+                extendsFrom(runtime)
+                canBeResolved = true
+            }
+        }
+        project.dependencies {
+            swagger project.sourceSets.main.output
+        }
         project.afterEvaluate {
             swaggerExtension.apiSourceExtensions.each { apiSourceExtension ->
                 if (apiSourceExtension.attachSwaggerArtifact && apiSourceExtension.swaggerDirectory) {
@@ -62,10 +71,18 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            generateSwaggerDocsTask.inputFiles = (
-                project.configurations.findByName("runtime") ?:
-                project.configurations.findByName("runtimeClasspath")
-            ).fileCollection()
+            generateSwaggerDocsTask.inputFiles = project.configurations.getByName("swagger").files()
+
+//            // Workaround for an issue in the generateSwaggerDocumentation plugin
+//            // check https://github.com/gigaSproule/swagger-gradle-plugin/issues/158#issuecomment-585823379
+//            def fixSwagger = project.task("fixGenerateSwaggerDocumentation") {
+//                doLast {
+//                    project.configurations.runtimeClasspath.resolve()
+//                        .collect { it.toURI().toURL() }
+//                        .each { project.buildscript.classLoader.addURL it }
+//                }
+//            }
+//            generateSwaggerDocsTask.dependsOn fixSwagger
         }
     }
 }

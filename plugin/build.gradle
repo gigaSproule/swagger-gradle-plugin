@@ -33,7 +33,7 @@ dependencies {
 
     implementation "javax.ws.rs:javax.ws.rs-api:${rootProject.ext.javaxVersion}"
     implementation 'com.sun.jersey:jersey-server:1.19.4'
-    implementation 'org.glassfish.jersey.core:jersey-server:3.0.1'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.0.2'
     implementation "org.springframework:spring-context:${rootProject.ext.springVersion}"
     implementation "org.springframework:spring-web:${rootProject.ext.springVersion}"
 

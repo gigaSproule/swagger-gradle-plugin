@@ -62,7 +62,11 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            generateSwaggerDocsTask.inputFiles = project.configurations.getByName("runtimeClasspath").files()
+            if (project.configurations.hasProperty('runtimeClasspath')) {
+                generateSwaggerDocsTask.inputFiles = project.configurations.runtimeClasspath.resolve()
+            } else {
+                generateSwaggerDocsTask.inputFiles = project.configurations.runtime.resolve()
+            }
         }
     }
 }

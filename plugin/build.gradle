@@ -1,6 +1,7 @@
 plugins {
     id 'maven-publish'
     id 'groovy'
+    id 'java-gradle-plugin'
     id 'net.researchgate.release'
     id "com.gradle.plugin-publish" version "0.15.0"
     id 'com.jfrog.bintray' version '1.8.5'

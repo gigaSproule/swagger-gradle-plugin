@@ -515,7 +515,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             }
 
             dependencies {
-                compile 'io.swagger:swagger-jersey2-jaxrs:+'
+                implementation 'io.swagger:swagger-jersey2-jaxrs:+'
             }
 
             swagger {
@@ -558,7 +558,7 @@ class GradleSwaggerPluginITest extends AbstractPluginITest {
             }
 
             dependencies {
-                compile 'io.swagger:swagger-jersey2-jaxrs:+'
+                implementation 'io.swagger:swagger-jersey2-jaxrs:+'
             }
 
             swagger {

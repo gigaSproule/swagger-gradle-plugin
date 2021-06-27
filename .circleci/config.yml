@@ -3,10 +3,10 @@ version: 2.1
 executors:
   jdk:
     docker:
-      - image: circleci/openjdk:13-jdk-buster
+      - image: cimg/openjdk:16.0
   jdk8:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:8.0
 
 jobs:
   build_test_jdk:

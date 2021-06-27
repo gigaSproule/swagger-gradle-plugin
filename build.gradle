@@ -28,9 +28,9 @@ allprojects {
     targetCompatibility = JavaVersion.VERSION_1_8
 
     ext {
-        jacksonVersion = '2.12.1'
-        springVersion = '5.3.5'
-        kotlinVersion = '1.4.32'
+        jacksonVersion = '2.12.3'
+        springVersion = '5.3.8'
+        kotlinVersion = '1.5.20'
         swaggerVersion = '1.6.2'
         javaxVersion = '2.1.1'
     }

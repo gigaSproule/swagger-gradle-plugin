@@ -7,6 +7,7 @@ import spock.lang.Specification
 
 abstract class AbstractPluginITest extends Specification {
     File testProjectDir
+    File testKitDir
     File buildFile
     File testProjectOutputDir
     List<File> pluginClasspath
@@ -19,7 +20,7 @@ abstract class AbstractPluginITest extends Specification {
 
     def setup() {
         testProjectDir = File.createTempDir()
-        println(testProjectDir)
+        testKitDir = File.createTempDir()
         buildFile = new File(testProjectDir, 'build.gradle')
         buildFile.createNewFile()
         testProjectOutputDir = new File(testProjectDir, 'build/swagger')
@@ -35,6 +36,7 @@ abstract class AbstractPluginITest extends Specification {
 
     def cleanup() {
         FileUtils.deleteDirectory(testProjectDir);
+        FileUtils.deleteDirectory(testKitDir);
     }
 
     BuildResult runPluginTask(boolean shouldSucceed = true) {
@@ -51,7 +53,7 @@ abstract class AbstractPluginITest extends Specification {
             .withProjectDir(testProjectDir)
             .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
             .withPluginClasspath(pluginClasspath)
-            .withTestKitDir(File.createTempDir())
+//            .withTestKitDir(testKitDir)
             .withGradleVersion(System.getProperty('test.gradleVersion', '7.1'))
             .withDebug(true)
             .forwardOutput()

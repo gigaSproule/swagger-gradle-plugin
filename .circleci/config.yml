@@ -82,7 +82,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
           command: |
-            older_gradle_versions=(3.5.1 4.10.3)
+            older_gradle_versions=(5.6.4 6.9)
             for gradle_version in ${older_gradle_versions[@]} ; do
                 ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
             done

@@ -65,6 +65,7 @@ artifacts {
 }
 
 test {
+    useJUnitPlatform()
     if (System.properties['test.profile'] == 'integration') {
         include '**/*ITest*'
     } else if (System.properties['test.profile'] == 'unit') {

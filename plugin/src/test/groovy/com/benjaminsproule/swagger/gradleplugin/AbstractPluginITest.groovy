@@ -1,5 +1,6 @@
 package com.benjaminsproule.swagger.gradleplugin
 
+import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
@@ -18,6 +19,7 @@ abstract class AbstractPluginITest extends Specification {
 
     def setup() {
         testProjectDir = File.createTempDir()
+        println(testProjectDir)
         buildFile = new File(testProjectDir, 'build.gradle')
         buildFile.createNewFile()
         testProjectOutputDir = new File(testProjectDir, 'build/swagger')
@@ -29,6 +31,10 @@ abstract class AbstractPluginITest extends Specification {
         }
 
         pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
+    }
+
+    def cleanup() {
+        FileUtils.deleteDirectory(testProjectDir);
     }
 
     BuildResult runPluginTask(boolean shouldSucceed = true) {
@@ -46,7 +52,7 @@ abstract class AbstractPluginITest extends Specification {
             .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
             .withPluginClasspath(pluginClasspath)
             .withTestKitDir(File.createTempDir())
-            .withGradleVersion(System.getProperty('test.gradleVersion', '6.3'))
+            .withGradleVersion(System.getProperty('test.gradleVersion', '7.1'))
             .withDebug(true)
             .forwardOutput()
     }

@@ -53,7 +53,7 @@ abstract class AbstractPluginITest extends Specification {
             .withProjectDir(testProjectDir)
             .withArguments('clean', GenerateSwaggerDocsTask.TASK_NAME, '--stacktrace')
             .withPluginClasspath(pluginClasspath)
-//            .withTestKitDir(testKitDir)
+            .withTestKitDir(testKitDir)
             .withGradleVersion(System.getProperty('test.gradleVersion', '7.1'))
             .withDebug(true)
             .forwardOutput()

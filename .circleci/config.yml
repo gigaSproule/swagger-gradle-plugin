@@ -63,6 +63,7 @@ jobs:
       - store_test_results:
           path: plugin/build/tests/test
 
+  # Disabled whilst using spock for tests
   test_gradle:
     executor: jdk8
     working_directory: ~/repo
@@ -158,16 +159,16 @@ workflows:
             branches:
               ignore:
                 - master
-      - test_gradle:
-          filters:
-            branches:
-              ignore:
-                - master
+#      - test_gradle:
+#          filters:
+#            branches:
+#              ignore:
+#                - master
       - test_sample:
           requires:
             - build_test_jdk
             - build_test_jdk8
-            - test_gradle
+#            - test_gradle
           filters:
             branches:
               ignore:
@@ -184,16 +185,16 @@ workflows:
             branches:
               only:
                 - master
-      - test_gradle:
-          filters:
-            branches:
-              only:
-                - master
+#      - test_gradle:
+#          filters:
+#            branches:
+#              only:
+#                - master
       - test_sample:
           requires:
             - build_test_jdk
             - build_test_jdk8
-            - test_gradle
+#            - test_gradle
           filters:
             branches:
               only:

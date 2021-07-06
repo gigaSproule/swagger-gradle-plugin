@@ -62,7 +62,7 @@ class GradleSwaggerPlugin implements Plugin<Project> {
             }.findAll {
                 it != null
             }
-            generateSwaggerDocsTask.inputFiles = project.configurations.getByName("runtime").fileCollection()
+            generateSwaggerDocsTask.inputFiles = project.configurations.findByName("runtime")?.fileCollection() ?: []
         }
     }
 }

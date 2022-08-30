@@ -47,7 +47,7 @@ dependencies {
     testImplementation project(':scala-tests')
     testImplementation 'cglib:cglib-nodep:3.3.0'
     testImplementation 'org.objenesis:objenesis:3.3'
-    testImplementation('org.spockframework:spock-core:1.3-groovy-2.4') {
+    testImplementation('org.spockframework:spock-core:2.1-groovy-3.0') {
         //We want to depend on the gradle version of groovy since this is a plugin
         exclude module: 'groovy-all'
     }

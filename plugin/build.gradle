@@ -1,7 +1,9 @@
 plugins {
+    id 'maven-publish'
     id 'groovy'
-    id "com.gradle.plugin-publish" version "1.2.0"
-    id "java-gradle-plugin"
+    id 'net.researchgate.release'
+    id "com.gradle.plugin-publish" version "1.1.0"
+    id 'com.jfrog.bintray' version '1.8.5'
 }
 
 task createClasspathManifest {
@@ -54,7 +56,7 @@ dependencies {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
+    classifier = 'sources'
     from sourceSets.main.allSource
 }
 
@@ -79,27 +81,57 @@ test {
     }
 }
 
-gradlePlugin {
-    plugins {
-        swaggerPlugin {
-            id = "com.github.wakingrufus.swagger"
-            implementationClass = "com.benjaminsproule.swagger.gradleplugin.GradleSwaggerPlugin"
+if (project.hasProperty('bintray_user') && project.hasProperty('bintray_apiKey')) {
+    bintray {
+        user = bintray_user
+        key = bintray_apiKey
+        publications = ['pluginPublication']
+        pkg {
+            repo = 'maven'
+            name = 'swagger-gradle-plugin'
+            websiteUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+            vcsUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+            githubRepo = 'gigaSproule/swagger-gradle-plugin'
+            githubReleaseNotesFile = 'README.md'
+            licenses = ['Apache-2.0']
+            publish = true
+            version {
+                name = project.version
+                released = new Date()
+            }
         }
     }
+
+    afterReleaseBuild.dependsOn bintrayUpload
 }
 
 pluginBundle {
-    website = 'https://github.com/wakingrufus/swagger-gradle-plugin'
-    vcsUrl = 'https://github.com/wakingrufus/swagger-gradle-plugin'
+    website = 'https://github.com/gigaSproule/swagger-gradle-plugin'
+    vcsUrl = 'https://github.com/gigaSproule/swagger-gradle-plugin'
     description = 'Plugin to create Swagger documentation using Gradle'
     tags = ['swagger', 'documentation']
 
     plugins {
-        swaggerPlugin {
+        swagger {
+            id = 'com.benjaminsproule.swagger'
             displayName = 'Swagger Gradle Plugin'
-            tags = ['swagger', 'documentation']
-            version = project.version
         }
     }
 }
 
+publishing {
+    publications {
+        pluginPublication(MavenPublication) {
+            from components.java
+            groupId project.group
+            artifactId 'swagger-gradle-plugin'
+            version "${project.version}"
+        }
+    }
+}
+
+afterReleaseBuild.dependsOn publishPlugins
+
+release {
+    preCommitText = '[skip ci]'
+}

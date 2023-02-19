@@ -5,5 +5,5 @@ package com.benjaminsproule.swagger.gradleplugin
  * Use this array in parameterized tests to verify against all supported versions.
  */
 class GradleVersions {
-    public static final String[] SUPPORTED_VERSIONS = ["3.5.1", "4.10.3", "5.6.4", "6.3", "6.7"]
+    public static final String[] SUPPORTED_VERSIONS = ["5.6.4", "6.9.1", "7.3", "8.0.1"]
 }

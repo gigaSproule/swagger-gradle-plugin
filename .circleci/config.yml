@@ -3,7 +3,10 @@ version: 2.1
 executors:
   jdk:
     docker:
-      - image: cimg/openjdk:19.0.2
+      - image: cimg/openjdk:19.0
+  jdk11:
+    docker:
+      - image: cimg/openjdk:11.0
 
 jobs:
   build_test_jdk:
@@ -34,7 +37,7 @@ jobs:
           path: plugin/build/tests/test
 
   test_gradle:
-    executor: jdk
+    executor: jdk11
     working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
@@ -52,7 +55,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
       - run:
           command: |
-            older_gradle_versions=(3.5.1 4.10.3)
+            older_gradle_versions=(5.0 7.3)
             for gradle_version in ${older_gradle_versions[@]} ; do
                 ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
             done

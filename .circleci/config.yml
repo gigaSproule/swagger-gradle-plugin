@@ -34,7 +34,7 @@ jobs:
           command: ./gradlew check -Dtest.profile=integration
           no_output_timeout: 20m
       - store_test_results:
-          path: plugin/build/tests/test
+          path: plugin/build/test-results
 
   test_gradle:
     executor: jdk11

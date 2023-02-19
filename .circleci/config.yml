@@ -3,10 +3,7 @@ version: 2.1
 executors:
   jdk:
     docker:
-      - image: circleci/openjdk:13-jdk-buster
-  jdk8:
-    docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:19.0.2
 
 jobs:
   build_test_jdk:
@@ -36,35 +33,8 @@ jobs:
       - store_test_results:
           path: plugin/build/tests/test
 
-  build_test_jdk8:
-    executor: jdk8
-    working_directory: ~/repo
-    environment:
-      JAVA_TOOL_OPTIONS: -Xmx3G
-      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            - v1-dependencies-
-      - run: ./gradlew dependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run:
-          name: Run unit tests
-          command: ./gradlew check -Dtest.profile=unit
-      - run:
-          name: Run integration tests
-          command: ./gradlew check -Dtest.profile=integration
-          no_output_timeout: 20m
-      - store_test_results:
-          path: plugin/build/tests/test
-
   test_gradle:
-    executor: jdk8
+    executor: jdk
     working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
@@ -118,7 +88,7 @@ jobs:
             ./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
 
   release:
-    executor: jdk8
+    executor: jdk
     working_directory: ~/repo
     environment:
       JAVA_TOOL_OPTIONS: -Xmx3G
@@ -132,7 +102,7 @@ jobs:
       - run: ./gradlew dependencies
       - add_ssh_keys:
           fingerprints:
-            - '05:aa:42:b1:4d:4a:9f:bf:71:10:c2:2a:f3:cf:31:9c'
+            - "05:aa:42:b1:4d:4a:9f:bf:71:10:c2:2a:f3:cf:31:9c"
       - run:
           name: Set Git globals
           command: |
@@ -153,11 +123,6 @@ workflows:
             branches:
               ignore:
                 - master
-      - build_test_jdk8:
-          filters:
-            branches:
-              ignore:
-                - master
       - test_gradle:
           filters:
             branches:
@@ -166,7 +131,6 @@ workflows:
       - test_sample:
           requires:
             - build_test_jdk
-            - build_test_jdk8
             - test_gradle
           filters:
             branches:
@@ -179,11 +143,6 @@ workflows:
             branches:
               only:
                 - master
-      - build_test_jdk8:
-          filters:
-            branches:
-              only:
-                - master
       - test_gradle:
           filters:
             branches:
@@ -192,7 +151,6 @@ workflows:
       - test_sample:
           requires:
             - build_test_jdk
-            - build_test_jdk8
             - test_gradle
           filters:
             branches:

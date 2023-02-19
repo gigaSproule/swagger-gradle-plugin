@@ -19,6 +19,7 @@ apply plugin: 'com.benjaminsproule.swagger'
 
 group = 'com.benjaminsproule'
 version = '0.0.1-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenLocal()

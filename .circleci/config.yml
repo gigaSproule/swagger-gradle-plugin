@@ -4,9 +4,6 @@ executors:
   jdk:
     docker:
       - image: cimg/openjdk:19.0
-  jdk11:
-    docker:
-      - image: cimg/openjdk:11.0
 
 jobs:
   build_test_jdk:
@@ -35,31 +32,6 @@ jobs:
           no_output_timeout: 20m
       - store_test_results:
           path: plugin/build/test-results
-
-  test_gradle:
-    executor: jdk11
-    working_directory: ~/repo
-    environment:
-      JAVA_TOOL_OPTIONS: -Xmx3G
-      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            - v1-dependencies-
-      - run: ./gradlew dependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run:
-          command: |
-            older_gradle_versions=(5.0 7.3)
-            for gradle_version in ${older_gradle_versions[@]} ; do
-                ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
-            done
-          no_output_timeout: 20m
 
   test_sample:
     executor: jdk

@@ -32,9 +32,9 @@ This plugin uses the [gradle testkit](https://docs.gradle.org/current/userguide/
 N.B. for reliable test runs in an IDE, it's best to include this as a Gradle build step as part of the test run configuration.
 
 ## To run tests against different versions of Gradle
-This plugin will by default run the tests against Gradle 4.7. To change which version it runs tests against, `test.gradleVersion` system property is required.
+This plugin will by default run the tests against the Gradle versions specified on the official site drop down. To change which version it runs tests against, `test.gradleVersion` system property is required.
 ```bash
-./gradlew clean :plugin:test -Dtest.gradleVersion=4.0
+./gradlew clean :plugin:test -Dtest.gradleVersion=8.0.1
 ```
 
 ## To release

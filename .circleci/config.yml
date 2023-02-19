@@ -1,0 +1,165 @@
+version: 2.1
+
+executors:
+  jdk:
+    docker:
+      - image: cimg/openjdk:19.0.2
+
+jobs:
+  build_test_jdk:
+    executor: jdk
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          name: Run unit tests
+          command: ./gradlew check -Dtest.profile=unit
+      - run:
+          name: Run integration tests
+          command: ./gradlew check -Dtest.profile=integration
+          no_output_timeout: 20m
+      - store_test_results:
+          path: plugin/build/tests/test
+
+  test_gradle:
+    executor: jdk
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          command: |
+            older_gradle_versions=(3.5.1 4.10.3)
+            for gradle_version in ${older_gradle_versions[@]} ; do
+                ./gradlew clean check -Dtest.gradleVersion=${gradle_version}
+            done
+          no_output_timeout: 20m
+
+  test_sample:
+    executor: jdk
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: ./gradlew dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run:
+          command: |
+            ./gradlew publishToMavenLocal -x test
+            ./gradlew -b sample/groovy-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/groovy-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/java-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/java-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/kotlin-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/kotlin-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/scala-spring-boot-jaxrs/build.gradle clean generateSwaggerDocumentation
+            ./gradlew -b sample/scala-spring-boot-mvc/build.gradle clean generateSwaggerDocumentation
+
+  release:
+    executor: jdk
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx3G
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.compiler.execution.strategy=in-process
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: ./gradlew dependencies
+      - add_ssh_keys:
+          fingerprints:
+            - "05:aa:42:b1:4d:4a:9f:bf:71:10:c2:2a:f3:cf:31:9c"
+      - run:
+          name: Set Git globals
+          command: |
+            git config --global user.email "circleci@benjaminsproule.com"
+            git config --global user.name "Circle CI"
+      - run: ./gradlew :plugin:release -Prelease.useAutomaticVersion=true -Pbintray_apiKey=${BINTRAY_APIKEY} -Pbintray_user=${BINTRAY_USER} -Pgradle.publish.key=${GRADLE_PUBLISH_KEY} -Pgradle.publish.secret=${GRADLE_PUBLISH_SECRET}
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build_test_jdk:
+          filters:
+            branches:
+              ignore:
+                - master
+      - test_gradle:
+          filters:
+            branches:
+              ignore:
+                - master
+      - test_sample:
+          requires:
+            - build_test_jdk
+            - test_gradle
+          filters:
+            branches:
+              ignore:
+                - master
+  build_release:
+    jobs:
+      - build_test_jdk:
+          filters:
+            branches:
+              only:
+                - master
+      - test_gradle:
+          filters:
+            branches:
+              only:
+                - master
+      - test_sample:
+          requires:
+            - build_test_jdk
+            - test_gradle
+          filters:
+            branches:
+              only:
+                - master
+      - release:
+          requires:
+            - test_sample
+          filters:
+            branches:
+              only:
+                - master

@@ -32,7 +32,7 @@ class ApiDocGenerator implements Generator {
     @Override
     void generate(Swagger source) {
         if (!isSorted) {
-            Utils.sortSwagger(source)
+            Utils.sortSwagger(source, apiSourceExtension.shouldSortArrays)
             isSorted = true
         }
         LOG.info("Writing swagger doc to ${apiSourceExtension.outputPath}")

@@ -43,7 +43,7 @@ class SwaggerSpecGenerator implements Generator {
         }
 
         if (!isSorted) {
-            Utils.sortSwagger(source)
+            Utils.sortSwagger(source, apiSource.shouldSortArrays)
             isSorted = true
         }
         def dir = new File(apiSource.swaggerDirectory)
@@ -83,8 +83,10 @@ class SwaggerSpecGenerator implements Generator {
         //Not come across an appropriate solution that is not deprecated yet
         objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false)
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        if (apiSource.shouldSortArrays) {
+            objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        }
 
         if (apiSource.jsonExampleValues) {
             objectMapper.addMixIn(Property, PropertyExampleMixIn)

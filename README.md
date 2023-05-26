@@ -91,6 +91,7 @@ swagger {
 | `templatePath` | The path of a [handlebars](http://handlebarsjs.com/) template file, see more details [below](#templatefile).|
 | `outputPath` | The path of the generated static document, not existed parent directories will be created. If you don't want to generate a static document, just don't set it. |
 | `outputFormats` | The format types of the generated swagger spec. Valid values are `json`, `yaml` or both (as a list, e.g. `['json']`). The `json` format is default.|
+| `shouldSortArrays` | JSON arrays will be sorted instead of being written in the order of appearance. Default is `false`.|
 | `swaggerDirectory` | The directory of generated `swagger.json` file. If null, no `swagger.json` will be generated. |
 | `swaggerFileName` | The filename of generated filename.json file. If null, `swagger.json` will be generated. |
 | `swaggerApiReader` | If not null, the value should be a full name of the class extending `com.github.kongchen.swagger.docgen.reader.ClassSwaggerReader`. This allows you to flexibly implement/override the reader's implementation. Default is `com.github.kongchen.swagger.docgen.reader.JaxrsReader`. More details [below](#swaggerApiReader)|

@@ -25,6 +25,7 @@ class ApiSourceExtension {
     boolean useJAXBAnnotationProcessor = false
     boolean useJAXBAnnotationProcessorAsPrimary = true
     boolean jsonExampleValues = false
+    boolean shouldSortArrays = false
     boolean attachSwaggerArtifact
     boolean expandSuperTypes = true
     String tagStrategy   // null | "class"

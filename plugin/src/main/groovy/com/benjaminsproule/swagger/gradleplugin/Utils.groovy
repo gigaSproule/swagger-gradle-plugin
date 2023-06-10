@@ -37,7 +37,7 @@ class Utils {
         return controllerRequestMappingValues
     }
 
-    static void sortSwagger(Swagger swagger) throws GenerateException {
+    static void sortSwagger(Swagger swagger, Boolean orderLists) throws GenerateException {
         if (swagger == null || swagger.getPaths() == null) {
             return
         }
@@ -48,7 +48,7 @@ class Utils {
 
         for (Path path : swagger.getPaths().values()) {
             for (String m : HTTP_METHODS) {
-                sortResponses(path, m)
+                sortResponses(path, m, orderLists)
             }
         }
 
@@ -60,7 +60,7 @@ class Utils {
         }
 
         // order the tags
-        if (swagger.getTags() != null) {
+        if (orderLists && swagger.getTags() != null) {
             Collections.sort(swagger.getTags(), new Comparator<Tag>() {
                 int compare(final Tag a, final Tag b) {
                     return a.toString().compareTo(b.toString())
@@ -70,7 +70,7 @@ class Utils {
 
     }
 
-    private static void sortResponses(Path path, String method) throws GenerateException {
+    private static void sortResponses(Path path, String method, Boolean orderLists) throws GenerateException {
         try {
             Method m = Path.getDeclaredMethod("get" + method)
             Operation op = (Operation) m.invoke(path)
@@ -80,12 +80,14 @@ class Utils {
             Map<String, Response> responses = op.getResponses()
             TreeMap<String, Response> res = new TreeMap<String, Response>()
             res.putAll(responses)
-            op.getParameters().sort(new Comparator<Parameter>() {
-                @Override
-                int compare(Parameter o1, Parameter o2) {
-                    return o1.getName() <=> o2.getName()
-                }
-            })
+            if (orderLists) {
+                op.getParameters().sort(new Comparator<Parameter>() {
+                    @Override
+                    int compare(Parameter o1, Parameter o2) {
+                        return o1.getName() <=> o2.getName()
+                    }
+                })
+            }
             op.setResponses(res)
         } catch (NoSuchMethodException e) {
             throw new GenerateException(e)

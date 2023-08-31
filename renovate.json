@@ -17,5 +17,6 @@
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
     }
-  ]
+  ],
+  "reviewersFromCodeOwners": true
 }

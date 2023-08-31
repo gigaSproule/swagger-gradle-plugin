@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.apache.groovy:groovy:4.0.9'
+    implementation 'org.apache.groovy:groovy:4.0.14'
     implementation 'org.springframework.boot:spring-boot-starter-jersey'
     implementation 'io.swagger:swagger-annotations:1.5.15'
     implementation 'javax.ws.rs:javax.ws.rs-api:2.0.1'

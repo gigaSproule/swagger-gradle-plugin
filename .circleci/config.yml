@@ -3,7 +3,7 @@ version: 2.1
 executors:
   jdk:
     docker:
-      - image: cimg/openjdk:19.0
+      - image: cimg/openjdk:20.0
 
 jobs:
   build_test_jdk:

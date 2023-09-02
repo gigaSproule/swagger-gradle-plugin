@@ -29,7 +29,7 @@ allprojects {
 
     ext {
         jacksonVersion = '2.15.2'
-        springVersion = '5.3.29'
+        springVersion = '6.0.11'
         kotlinVersion = '1.9.10'
         swaggerVersion = '1.6.11'
         javaxVersion = '2.1.1'

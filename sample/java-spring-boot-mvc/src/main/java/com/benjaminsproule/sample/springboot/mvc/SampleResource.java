@@ -1,16 +1,21 @@
 package com.benjaminsproule.sample.springboot.mvc;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class SampleResource {
 
-    @RequestMapping(method = RequestMethod.GET, path = "/sample", produces = "application/json")
-    @ApiOperation(value = "Return hello message", response = String.class)
-    public String home() {
-        return "{\"Hello\": \"World!\"}";
+    @GetMapping(path = "/home", produces = "application/json")
+    @ApiOperation(value = "Return hello message")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("{\"Hello\": \"World!\"}");
+    }
+
+    @PostMapping(path = "/transform")
+    @ApiOperation(value = "Transform enum")
+    public ResponseEntity<EnumWrapper<AEnum>> transform(EnumWrapper<DEnum> enumWrapper) {
+        return ResponseEntity.ok(new EnumWrapper<>());
     }
 }
